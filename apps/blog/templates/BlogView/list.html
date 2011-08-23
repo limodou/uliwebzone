@@ -1,0 +1,44 @@
+{{extend "layout.html"}}
+
+{{block menu}}
+{{menu('home')}}
+{{end}}
+
+{{block content}}
+{{link "blog/blog.css"}}
+<div id="content">
+    {{include "inc_message.html"}}
+    {{if not count:}}
+        {{message(_('There are no articles yet.'), 'attention')}}
+    {{pass}}
+    {{if request.user:}}
+        <a href="/blog/add" class="btn btn-green">{{=_('New Article')}}</a>
+    {{pass}}
+    {{for blog in blogs:}}
+        <div class="post">
+            <div class="date ui-corner-all">
+                {{= blog.publish_date.strftime('%b')}}
+                <div class="day">
+                    {{= blog.publish_date.strftime('%d')}}
+                </div>
+            </div>
+            <div class="title">
+            <h1><a href="/blog/view/{{=blog.publish_date.year}}/{{=blog.publish_date.month}}/{{=blog.id}}" rel="bookmark">{{=blog.title}}</a></h1>
+                by {{=blog.author.username}}
+            </div>
+            <div class="clear"></div>
+            <div class="entry">
+                {{<< blog.content}}
+                <div class="postmetadata">
+                    {{=view.get_field_display(blog, 'tags')['label']}}: {{=view.get_field_display(blog, 'tags')['display']}}<br />
+                    {{=view.get_field_display(blog, 'category')['label']}}: {{=view.get_field_display(blog, 'category')['display']}}<br />
+                    {{if request.user and request.user.id == blog._author_:}}
+                        <a href="/blog/edit/{{=blog.id}}">{{=_('Edit')}}</a> | 
+                        <a href="/blog/delete/{{=blog.id}}">{{=_('Delete')}}</a>
+                    {{pass}}
+                </div>
+            </div>
+        </div>
+    {{pass}}
+</div>
+{{end}}

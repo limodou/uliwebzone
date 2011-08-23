@@ -1,0 +1,6 @@
+www:
+   type: python
+data:
+   type: mysql
+mailer:
+   type: smtp

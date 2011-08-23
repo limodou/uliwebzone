@@ -1,0 +1,12 @@
+{{extend "layout.html"}}
+{{block content}}
+    {{use 'jquery', ui=True}}
+    <div id="content">
+        <div class="box col_12 center">
+            <h2>{{=_('New Article')}}</h2>
+            <div class="box-body">
+                {{<< form}}
+            </div>
+        </div>
+    </div>
+{{end}}
