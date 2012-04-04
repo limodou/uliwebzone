@@ -1,0 +1,23 @@
+{{extend "tutorial_layout.html"}}
+
+{{block content_main}}
+{{use "jqrmselect"}}
+    <ul class="breadcrumb">
+      <li>
+        <a href="/tutorial">返回</a> <span class="divider">/</span>
+      </li>
+      <li class="active">
+        编辑教程
+      </li>
+    </ul>
+    
+    <h2 class="section">编辑教程</h2>
+    <div class="span10">
+    {{<< form}}
+    </div>
+    <script>
+        $(function(){
+            $('#field_authors').remote_multiple_select({width:600});
+        });
+    </script>
+{{end}}

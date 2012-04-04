@@ -1,0 +1,35 @@
+{{extend "tutorial_layout.html"}}
+
+{{block content_main}}
+    <ul class="breadcrumb">
+      <li>
+        <a href="/tutorial">返回</a> <span class="divider">/</span>
+      </li>
+      <li>
+        <a href="/tutorial/read/{{=object.id}}">{{=object.title}}</a> <span class="divider">/</span>
+      </li>
+      <li class="active">
+        目录
+      </li>
+    </ul>
+
+    <div>
+        {{if object.authors.has(request.user) or has_role(request.user, 'superuser'):}}
+        <a href="/tutorial/add_chapter/{{=object.id}}" class="btn btn-primary">増加新的章节</a>
+        {{pass}}
+    </div>
+    
+    <ul class="unstyled chapter-list">
+    {{for level, num, row in objects:}}
+        <li class="chapter-item" style="padding-left:{{=40*level}}px">
+            <span class="chapter-num">{{=num}}</span>
+            <a href="/tutorial/view_chapter/{{=row.id}}" class="chapter-title">{{=row.title}}</a>
+            <div class="chapter-buttons">
+                {{if object.authors.has(request.user) or has_role(request.user, 'superuser'):}}
+                <a href="/tutorial/add_chapter/{{=object.id}}?parent={{=row.id}}">増加子章节</a>
+                {{pass}}
+            </div>
+        </li>
+    {{pass}}
+    </ul>
+{{end}}

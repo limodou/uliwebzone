@@ -1,0 +1,11 @@
+textarea {width:98%;}
+.tutorial-list {position:relative;}
+.tutorial-list img.preface {height:128px; width:128px;}
+.tutorial-list li.tutorial-item {padding:8px; margin-top: 18px; margin-bottom: 10px;border-top:1px dotted #ccc;}
+.tutorial-list .tutorial-buttons {margin-top:8px;}
+.gray {color:#999;}
+.chapter-list {margin-top:18px;}
+.chapter-list li{position:relative;}
+.chapter-list .chapter-item{border-bottom:1px dotted #ccc;padding:4px;}
+.chapter-list .chapter-num, .chapter-list .chapter-title{font-weight:bold; font-size:24px;}
+.chapter-item .chapter-buttons {position:absolute; right:2px;bottom:4px;}

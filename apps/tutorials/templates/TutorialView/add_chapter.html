@@ -1,0 +1,20 @@
+{{extend "tutorial_layout.html"}}
+
+{{block content_main}}
+    <ul class="breadcrumb">
+      <li>
+        <a href="/tutorial">返回</a> <span class="divider">/</span>
+      </li>
+      <li>
+        <a href="/tutorial/read/{{=object.id}}">{{=object.title}}</a> <span class="divider">/</span>
+      </li>
+      <li class="active">
+        添加新章节
+      </li>
+    </ul>
+    
+    <h2 class="section">添加新章节</h2>
+    <div class="span10">
+    {{<< form}}
+    </div>
+{{end}}

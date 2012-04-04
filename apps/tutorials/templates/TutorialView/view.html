@@ -1,0 +1,20 @@
+{{extend "tutorial_layout.html"}}
+
+{{block content_main}}
+    <ul class="breadcrumb">
+      <li>
+        <a href="/tutorial">返回</a> <span class="divider">/</span>
+      </li>
+      <li class="active">
+        {{=object.title}}
+      </li>
+    </ul>
+    <h2 class="section">查看教程</h2>
+    {{<< view}}
+    <div>
+        {{if object.authors.has(request.user) or has_role(request.user, 'superuser'):}}
+        <a href="/tutorial/edit/{{=object.id}}" class="btn btn-primary">编辑</a>
+        <a href="/tutorial/delete/{{=object.id}}" class="btn btn-danger">删除</a>
+        {{pass}}
+    </div>
+{{end}}
