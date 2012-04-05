@@ -118,6 +118,7 @@ class TutorialView(object):
             data['tutorial'] = int(t_id)
             order, = self.model_chapters.filter(self.model_chapters.c.tutorial==int(t_id)).values_one(func.max(self.model_chapters.c.order))
             data['order'] = order+1 if order>0 else 1
+            data['content'] = self._prepare_content(content)
             
         template_data = {'object':obj}
         view = AddView(self.model_chapters, ok_url=get_url, pre_save=pre_save,
@@ -129,7 +130,7 @@ class TutorialView(object):
         查看教程
         """
 #        from uliweb.utils.generic import DetailView
-        from par import WikiGrammar, WikiHtmlVisitor
+        from tut_parser import TutGrammar, TutVisitor
         
         obj = self.model_chapters.get_or_notfound(int(id))
         if obj.deleted:
@@ -139,14 +140,27 @@ class TutorialView(object):
 #        view = DetailView(self.model_chapters, obj=obj)
 #        return view.run()
 
-        g = WikiGrammar()
+        g = TutGrammar()
         result, rest = g.parse(obj.content, resultSoFar=[], skipWS=False)
-        tag_class = {
-            'table':'table',
-        }
-        content = WikiHtmlVisitor('', tag_class).visit(result)
+        content = TutVisitor().visit(result)
         return {'object':obj, 'content':content}
     
+    def _prepare_content(self, text):
+        """
+        对文本进行预处理，对每个段落识别[[#]]标记，计算最大值，同时如果不存在，
+        则自动添加[[#]]
+        """
+        from tut_parser import TutGrammar, TutCVisitor, TutTextVisitor
+        
+        g = TutGrammar()
+        result, rest = g.parse(text, resultSoFar=[], skipWS=False)
+        t = TutCVisitor()
+        new_text = t.visit(result)
+        print 'xxxxxxxxxx', new_text
+        result, rest = g.parse(new_text, resultSoFar=[], skipWS=False)
+        result = TutTextVisitor(t.max_id).visit(result)
+        return result
+        
     def edit_chapter(self, id):
         """
         编辑章节
@@ -154,6 +168,12 @@ class TutorialView(object):
         from uliweb.utils.generic import EditView
     
         obj = self.model_chapters.get_or_notfound(int(id))
-        view = EditView(self.model_chapters, ok_url=url_for(TutorialView.view_chapter, id=id), obj=obj)
+        
+        def pre_save(obj, data):
+            data['content'] = self._prepare_content(data['content'])
+        
+        view = EditView(self.model_chapters, 
+            ok_url=url_for(TutorialView.view_chapter, id=id), 
+            obj=obj, pre_save=pre_save)
         return view.run()
     

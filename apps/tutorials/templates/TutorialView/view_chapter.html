@@ -1,6 +1,7 @@
 {{extend "tutorial_layout.html"}}
 
 {{block content_main}}
+{{use "prettify", theme="sons-of-obsidian"}}
     <ul class="breadcrumb">
       <li>
         <a href="/tutorial">返回</a> <span class="divider">/</span>
@@ -12,12 +13,33 @@
         {{=object.title}}
       </li>
     </ul>
-    <div>
+    <div class="content-outer">
+        <div class="content-inner">
         <h2 class="section">{{=object.title}}</h2>
         {{<< content}}
         {{if object.tutorial.authors.has(request.user) or has_role(request.user, 'superuser'):}}
+        <div class="buttons">
         <a href="/tutorial/edit_chapter/{{=object.id}}" class="btn btn-primary">编辑</a>
         <a href="/tutorial/delete_chapter/{{=object.id}}" class="btn btn-danger">删除</a>
+        </div>
         {{pass}}
+        </div>
     </div>
+    <script>
+        $(function(){
+            window.prettyPrint && prettyPrint();
+            
+            //増加气泡评论显示
+            $('a.comment_point').each(function(index, el){
+                var item = $('<span class="label">11</span>')
+                    .css({position:'absolute', left:'-50px', cursor:'pointer'});
+                $(el).closest('p').append(item);
+            });
+            $('p.tutorial_p').hover(function(e){
+                $(this).find('span').addClass('label-success');
+            }, function(e){
+                $(this).find('span').removeClass('label-success');
+            });
+        });
+    </script>
 {{end}}
