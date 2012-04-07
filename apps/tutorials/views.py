@@ -1,5 +1,5 @@
 #coding=utf-8
-from uliweb import expose
+from uliweb import expose, functions
 from uliweb.orm import get_model
 
 @expose('/tutorial')
@@ -142,8 +142,9 @@ class TutorialView(object):
 
         g = TutGrammar()
         result, rest = g.parse(obj.content, resultSoFar=[], skipWS=False)
-        content = TutVisitor().visit(result)
-        return {'object':obj, 'content':content}
+        t = TutVisitor()
+        content = t.visit(result)
+        return {'object':obj, 'content':content, 'titles':t.titles}
     
     def _prepare_content(self, text):
         """
@@ -156,7 +157,6 @@ class TutorialView(object):
         result, rest = g.parse(text, resultSoFar=[], skipWS=False)
         t = TutCVisitor()
         new_text = t.visit(result)
-        print 'xxxxxxxxxx', new_text
         result, rest = g.parse(new_text, resultSoFar=[], skipWS=False)
         result = TutTextVisitor(t.max_id).visit(result)
         return result
@@ -177,3 +177,62 @@ class TutorialView(object):
             obj=obj, pre_save=pre_save)
         return view.run()
     
+    def view_paragraph_comments(self, cid):
+        """
+        view_paragraph_comments/<cid>?para=pid
+        显示某个段落的评论
+        """
+        
+        _id = int(cid)
+        pid = int(request.GET.get('para', 0))
+        objects = self.model_comments.filter(
+            (self.model_comments.c.chapter==_id) & 
+            (self.model_comments.c.anchor==pid) &
+            (self.model_comments.c.deleted==False)
+        )
+        
+        def get_objects(objects):
+            for row in objects:
+                yield self._get_comment_data(row)
+                
+        return {'objects':get_objects(objects), 'object_id':_id, 'pid':pid}
+    
+    def _get_comment_data(self, obj, data=None):
+        from uliweb.utils.timesince import timesince
+        from uliweb.utils.textconvert import text2html
+
+        d = {}
+        d['username'] = unicode(obj.modified_user)
+        d['image_url'] = functions.get_user_image(obj.modified_user, size=20)
+        d['date'] = timesince(obj.modified_date)
+        d['content'] = text2html(obj.content)
+        return d
+        
+    def add_paragraph_comment(self, cid):
+        """
+        添加某个段落的评论
+        """
+        from uliweb.utils.generic import AddView
+        
+        default_data = {'chapter':int(cid), 'anchor':int(request.GET.get('para'))}
+        view = AddView(self.model_comments, success_data=self._get_comment_data, 
+            default_data=default_data)
+        return view.run(json_result=True)
+    
+    def get_paragraph_comments_count(self, cid):
+        """
+        获得某个章节每个paragraph评论的数目
+        返回结果为：
+        
+        {id1:count1, id2:count2,...}
+        """
+        from uliweb.orm import do_
+        from sqlalchemy.sql import select, func, and_
+        
+        query = select([func.count(1), self.model_comments.c.anchor], 
+            and_(self.model_comments.c.chapter==int(cid),
+                self.model_comments.c.deleted==False)).group_by(self.model_comments.c.anchor)
+        d = {}
+        for row in do_(query):
+            d[row[1]] = row[0]
+        return json(d)

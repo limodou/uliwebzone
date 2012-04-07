@@ -75,12 +75,15 @@ class Tutorials_Chapters_Comments(Model):
     
     chapter = Reference('tutorials_chapters', verbose_name='所属章节')
     parent = SelfReference(verbose_name='上级', collection_name='children_comments')
-    anchor = Field(str, max_length=40, verbose_name='定位点')
-    content = Field(TEXT, verbose_name='内容')
+    anchor = Field(int, verbose_name='定位点', default=0)
+    content = Field(TEXT, verbose_name='内容', required=True)
     vote = Field(int, verbose_name='投票')
     modified_user = Reference('user', verbose_name='留言人', default=get_modified_user, auto=True, auto_add=True)
     modified_date = Field(datetime, verbose_name='留言时间', auto_now=True, auto_now_add=True)
     deleted = Field(bool, verbose_name='删除标志')
+    
+    class AddForm:
+        fields = ['content']
     
     @classmethod
     def OnInit(cls):

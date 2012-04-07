@@ -1,45 +1,166 @@
 {{extend "tutorial_layout.html"}}
 
-{{block content_main}}
+{{block content}}
+
+{{use "jquery", ui=True}}
 {{use "prettify", theme="sons-of-obsidian"}}
-    <ul class="breadcrumb">
-      <li>
-        <a href="/tutorial">返回</a> <span class="divider">/</span>
-      </li>
-      <li>
-        <a href="/tutorial/read/{{=object.tutorial.id}}">{{=object.tutorial.title}}</a> <span class="divider">/</span>
-      </li>
-      <li class="active">
-        {{=object.title}}
-      </li>
-    </ul>
-    <div class="content-outer">
-        <div class="content-inner">
-        <h2 class="section">{{=object.title}}</h2>
-        {{<< content}}
-        {{if object.tutorial.authors.has(request.user) or has_role(request.user, 'superuser'):}}
-        <div class="buttons">
-        <a href="/tutorial/edit_chapter/{{=object.id}}" class="btn btn-primary">编辑</a>
-        <a href="/tutorial/delete_chapter/{{=object.id}}" class="btn btn-danger">删除</a>
-        </div>
-        {{pass}}
+{{use "pageslide"}}
+{{use "jqutils",ajaxForm=True}}
+{{use "poshytip"}}
+
+<style>
+#pageslide {
+width:320px;
+}
+</style>
+<div class="container-fluid">
+    <div class="row-fluid">
+        <div class="span12">
+            <ul class="breadcrumb">
+              <li>
+                <a href="/tutorial">返回</a> <span class="divider">/</span>
+              </li>
+              <li>
+                <a href="/tutorial/read/{{=object.tutorial.id}}">{{=object.tutorial.title}}</a> <span class="divider">/</span>
+              </li>
+              <li class="active">
+                {{=object.title}}
+              </li>
+            </ul>
         </div>
     </div>
-    <script>
-        $(function(){
-            window.prettyPrint && prettyPrint();
-            
-            //増加气泡评论显示
-            $('a.comment_point').each(function(index, el){
-                var item = $('<span class="label">11</span>')
-                    .css({position:'absolute', left:'-50px', cursor:'pointer'});
-                $(el).closest('p').append(item);
-            });
-            $('p.tutorial_p').hover(function(e){
-                $(this).find('span').addClass('label-success');
-            }, function(e){
-                $(this).find('span').removeClass('label-success');
-            });
+    <div class="row-fluid">
+        <div class="span8">
+            <div class="content-outer">
+                <div class="content-inner rounded_bottom">
+                <h2 class="section">{{=object.title}}</h2>
+                {{<< content}}
+                <div class="tutorial-footer">
+                    <p>评论 <a id="global-comment-count" href="/tutorial/view_paragraph_comments/{{=object.id}}?para=0" class="para-comments-count right animated">0</a>
+                        <span class="gray">{{=unicode(object.modified_user)}} 于 {{=object.modified_date}} 更新</span>
+                    </p>
+                    {{if object.tutorial.authors.has(request.user) or has_role(request.user, 'superuser'):}}
+                    <div class="buttons">
+                    <a href="/tutorial/edit_chapter/{{=object.id}}" class="btn btn-primary">编辑</a>
+                    <a href="/tutorial/delete_chapter/{{=object.id}}" class="btn btn-danger">删除</a>
+                    </div>
+                    {{pass}}
+                </div>
+                </div>
+            </div>
+        </div>
+        <div class="span4">
+            <div id="div_titles">
+                <h3 class="section">目录</h3>
+                <ul class="nav unstyled" id="titles">
+                    {{for level, _id, title in titles:}}
+                        <li style="padding-left:{{=(level-2)*20}}px"><a href="#{{=_id}}">{{=title}}</a></li>
+                    {{pass}}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="para-comments" style="display:none;">
+</div>
+<script>
+    function viewport()
+    {
+        var e = window, a = 'inner';
+        if ( !( 'innerWidth' in window ) )
+        {
+            a = 'client';
+            e = document.documentElement || document.body;
+        }
+        return { width : e[ a+'Width' ] , height : e[ a+'Height' ] }
+    }
+    
+    //滚动插件
+    (function () {
+      $.fn.anchorScroll = function (options) {
+        var defaults = {
+          speed: 1100,
+          fx: "jswing",
+          offset: 0
+        };
+        //var version =  "1.0";
+        var options = $.extend(defaults, options);
+        return $(this).each(function () {
+          var element = this;
+          $(element).click(function (event) {
+            var elementClick = $(element).attr("href");
+            var destination = $(elementClick).offset().top - options.offset;
+            $("html,body").animate({
+              scrollTop: destination
+            }, options.speed, options.fx);
+            //Stop links default events
+            event.preventDefault();
+            return false;
+          })
+        })
+      }
+    })(jQuery);
+    
+
+    $(function(){
+        //实现代码高亮
+        window.prettyPrint && prettyPrint();
+        
+        //増加标题探测
+        $('body').scrollspy({target:'#div_titles', offset:50});
+        
+        $.ajax({
+            type:'GET',
+            dateType:'json',
+            url:'/tutorial/get_paragraph_comments_count/{{=object.id}}',
+            success:function(data){
+                //増加气泡评论显示
+                $('a.comment_point').each(function(index, el){
+                    var id = $(el).attr('rel');
+                    var count = id in data?data[id]:0;
+                    var item = $('<a href="/tutorial/view_paragraph_comments/{{=object.id}}?para=' + id + '" class="para-comments-count animated">'+count+'</a>')
+                        .css({position:'absolute', left:'-50px'});
+                    $(el).closest('p').prepend(item);
+                });
+                
+                if (data['0']){
+                    $('#global-comment-count').text(data['0']);
+                }
+                //处理pageslide
+                $('a.para-comments-count').pageslide({
+                    //'href':'#para-comments',
+                    iframe:false,
+                    direction:'right',
+                    width: '400px',
+                    onClick: function(e){
+                        $('a.para-comments-count').removeClass('active');
+                        $(this).addClass('active');
+                    },
+                    onClose: function(){
+                        $('a.para-comments-count').removeClass('active');
+                    }
+                });
+                
+            }
         });
-    </script>
+        $('p.tutorial_p').hover(function(e){
+            $(this).find('a.para-comments-count').addClass('swing');
+        }, function(e){
+            $(this).find('a.para-comments-count').removeClass('swing');
+        });
+        
+        //増加限制目录区高度的处理
+        $('#titles').height(viewport().height - 160);
+        
+        //限定pageslide的高度
+        //$('#pageslide').height(viewport().height - 160);
+        //实现平滑滚动
+        $('#titles a').anchorScroll({offset:50});
+        
+    });
+</script>
+{{end}}
+
+{{block after_footer}}
+<!-- bottomlinks -->
 {{end}}

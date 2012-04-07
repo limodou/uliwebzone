@@ -1,12 +1,13 @@
 from par.pyPEG import *
 import re
 import types
-from par import WikiHtmlVisitor, SimpleVisitor
+from par import WikiGrammar, WikiHtmlVisitor, SimpleVisitor
 
 _ = re.compile
 
-class TutGrammar(dict):
+class TutGrammar(WikiGrammar):
     def __init__(self):
+        super(TutGrammar, self).__init__()
         peg, self.root = self._get_rules()
         self.update(peg)
         
@@ -29,8 +30,8 @@ class TutGrammar(dict):
         def op_string(): return _(r'\*|_|~~|\^|,,')
         def op(): return [(-1, seperator, op_string), (op_string, -1, seperator)]
         def string(): return _(r'[^\\\*_\^~ \t\r\n`,]+', re.U)
-        def code_string_short(): return '`', _(r'[^`]*'), '`'
-        def code_string(): return '{{{', _(r'[^\}\r\n$]*'), '}}}'
+        def code_string_short(): return _(r'`'), _(r'[^`]*'), _(r'`')
+        def code_string(): return _(r'\{\{\{'), _(r'[^\}\r\n$]*'), _(r'\}\}\}')
         def default_string(): return _(r'\S+', re.U)
         def anchor(): return _(r'\[\['), 0, space, _(r'#'), _(r'\d*'), 0, space, _(r'\]\]')
         def word(): return [anchor, literal, literal1, escape_string, code_string, code_string_short, op, link, string, default_string]
