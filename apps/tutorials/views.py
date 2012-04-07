@@ -34,8 +34,13 @@ class TutorialView(object):
             data['creator'] = request.user.id
             if request.user.id not in data['authors']:
                 data['authors'].append(request.user.id)
-            
-        view = AddView(self.model, ok_url=get_url, pre_save=pre_save)
+        
+        def post_created_form(fcls, model, obj):
+            fcls.authors.html_attrs['url'] = '/users/search'
+            fcls.authors.choices = [('', '')]
+        
+        view = AddView(self.model, ok_url=get_url, pre_save=pre_save, 
+            post_created_form=post_created_form)
         return view.run()
     
     def view(self, id):
@@ -62,8 +67,13 @@ class TutorialView(object):
             if request.user.id not in data['authors']:
                 data['authors'].append(request.user.id)
 
+        def post_created_form(fcls, model, obj):
+            fcls.authors.html_attrs['url'] = '/users/search'
+            fcls.authors.query = obj.authors.all()
+        
         obj = self.model.get_or_notfound(int(id))
-        view = EditView(self.model, ok_url=url_for(TutorialView.view, id=id), obj=obj, pre_save=pre_save)
+        view = EditView(self.model, ok_url=url_for(TutorialView.view, id=id), 
+            obj=obj, pre_save=pre_save, post_created_form=post_created_form)
         return view.run()
         
     def delete(self, id):
@@ -118,7 +128,7 @@ class TutorialView(object):
             data['tutorial'] = int(t_id)
             order, = self.model_chapters.filter(self.model_chapters.c.tutorial==int(t_id)).values_one(func.max(self.model_chapters.c.order))
             data['order'] = order+1 if order>0 else 1
-            data['content'] = self._prepare_content(content)
+            data['content'] = self._prepare_content(data['content'])
             
         template_data = {'object':obj}
         view = AddView(self.model_chapters, ok_url=get_url, pre_save=pre_save,

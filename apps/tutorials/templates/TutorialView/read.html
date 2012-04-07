@@ -16,6 +16,7 @@
     <div>
         {{if object.authors.has(request.user) or has_role(request.user, 'superuser'):}}
         <a href="/tutorial/add_chapter/{{=object.id}}" class="btn btn-primary">増加新的章节</a>
+        <a href="/tutorial/edit/{{=object.id}}" class="btn btn-success">修改教程信息</a>
         {{pass}}
     </div>
     
