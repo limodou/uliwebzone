@@ -1,0 +1,55 @@
+<script type="text/html" id="commentTemplate">
+    <li>
+        <img src="${image_url}" align="top"/>
+        <div class="triangle-right left">
+        <p>${content}</p>
+        <span class="gray">${username} 发表于：${date}</span>
+        </div>
+    </li>
+</script>
+<div id="paragraph-comments">
+    <h2 class="section">评论</h2>
+    <ul class="unstyled comment-lists">
+        {{for row in objects:}}
+            <li>
+            <img src="{{=row['image_url']}}" align="top"/>
+            <div class="triangle-right left">
+            <p>{{<<row['content']}}</p>
+            <span class="gray">{{=row['username']}} 发表于：{{=row['date']}}</span>
+            </div>
+            </li>
+        {{pass}}
+    </ul>
+    {{if request.user:}}
+        <form id="add_para_comment_form" action="/tutorial/add_paragraph_comment/{{=object_id}}?para={{=pid}}" method="POST">
+            <textarea name="content" rows="6" placeholder="请输入评论"></textarea>
+            <button type="submit" class="btn btn-primary">添加评论</button>
+        </form>
+    {{else:}}
+        <div class="alert alert-error">
+          你还没有登录，无法发表评论！
+        </div>
+    {{pass}}
+</div>
+<script>
+    $(function(){
+        function success (data){
+            var c = template($('#commentTemplate').html(), data);
+            $('#paragraph-comments').find('ul.comment-lists').append(c);
+            var el = $('a.para-comments-count.active');
+            el.text(parseInt(el.text())+1);
+        }
+        
+        var form = $('#add_para_comment_form');
+        var result_process = create_result_process(form, 
+            {success:success});
+
+        var options = { 
+            success: result_process,  // post-submit callback 
+            dataType: 'json',
+            resetForm: true
+        }; 
+
+        form.ajaxForm(options);
+    });
+</script>
