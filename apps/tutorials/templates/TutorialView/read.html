@@ -1,6 +1,38 @@
 {{extend "tutorial_layout.html"}}
 
 {{block content_main}}
+{{use "jquery",ui=True}}
+{{link "tutorials/jquery.liveflex.Tree.js"}}
+{{use "jqjson"}}
+
+<style type="text/css">
+
+	.over{outline:solid 1px #afa}
+	.on{border:solid 1px green;}
+	.below{border-bottom:solid 2px #f00;}
+	.below span{}
+	.above{border-top:solid 2px #f00;}
+	.tree_hover{background:#fafaff}
+    .ui-droppable {cursor:move;}
+	ul.tree, ul.tree ul{list-style-type:none;padding:0;}
+	ul.tree li, ul.tree li ul li{
+		line-height:1.7em;cursor:default;
+		background:url(icons/line.png) no-repeat;;
+		padding-left:16px;
+	}
+	ul.tree li a.caption{
+		background:url(icons/page.png) no-repeat left center;
+		padding-left:20px;
+		min-width:200px;
+	}
+	
+	span.callback{
+		color:#aaa;
+		font-size:.8em;
+		margin-right:5px;
+	}
+</style>
+
     <ul class="breadcrumb">
       <li>
         <a href="/tutorial">返回</a> <span class="divider">/</span>
@@ -17,20 +49,71 @@
         {{if object.authors.has(request.user) or has_role(request.user, 'superuser'):}}
         <a href="/tutorial/add_chapter/{{=object.id}}" class="btn btn-primary">増加新的章节</a>
         <a href="/tutorial/edit/{{=object.id}}" class="btn btn-success">修改教程信息</a>
+        <script>
+            $(function(){
+                //处理标题排序
+                var tree = $('#titles-list').liveflex_treeview({
+                    handle:'span.chapter-num',
+                    dirSelector:'li.parent',
+                    itemMoved: function(csv){
+                        $.ajax({
+                            type:'POST',
+                            dateType:'json',
+                            url: '/tutorial/change_titles_order/{{=object.id}}',
+                            data:{data:$.toJSON(tree.data("liveflex.treeview").parseTree())},
+                            traditional:true,
+                            success:function(data){
+                                window.location.reload();
+                            }
+                    	});
+                    }
+                });
+                //$('.chapter-list').disableSelection();
+                //处理标题处理按钮
+                $('.chapter-item').hover(
+                    function(){
+                        $(this).find('div.chapter-buttons').slideDown();
+                    },
+                    function(){
+                        $(this).find('div.chapter-buttons').slideUp();
+                    }
+                );
+                
+            });
+        </script>
         {{pass}}
     </div>
     
-    <ul class="unstyled chapter-list">
-    {{for level, num, row in objects:}}
-        <li class="chapter-item" style="padding-left:{{=40*level}}px">
-            <span class="chapter-num">{{=num}}</span>
-            <a href="/tutorial/view_chapter/{{=row.id}}" class="chapter-title">{{=row.title}}</a>
-            <div class="chapter-buttons">
-                {{if object.authors.has(request.user) or has_role(request.user, 'superuser'):}}
-                <a href="/tutorial/add_chapter/{{=object.id}}?parent={{=row.id}}">増加子章节</a>
-                {{pass}}
-            </div>
-        </li>
+    {{def disp(parent, num, ul=False):}}
+        {{flag = False}}
+        {{for num, row in objects(parent, num):}}
+            {{if ul and not flag:}}
+                <ul class="unstyled">
+                {{flag=True}}
+            {{pass}}
+            <li data-id="{{=row.id}}" data-order="{{=row.order}}">
+                <div class="chapter-item">
+                    <span class="chapter-num ui-droppable">{{=num}}</span>&nbsp;&nbsp;
+                    {{if 'debug' in request.GET:}}
+                    <span>[id={{=row.id}}, order={{=row.order}}]</span>
+                    {{pass}}
+                    <a href="/tutorial/view_chapter/{{=row.id}}" class="chapter-title">{{=row.title}}</a>
+                    <span class="small gray chapter-info" style="display:none;">由 {{=unicode(row.modified_user)}} 更新于 {{=row.modified_date}}</span>
+                    {{if object.authors.has(request.user) or has_role(request.user, 'superuser'):}}
+                    <div class="chapter-buttons" style="display:none;">
+                        <a href="/tutorial/add_chapter/{{=object.id}}?parent={{=row.id}}"><i class="icon icon-plus"></i>増加子章节</a>
+                        <a href="/tutorial/delete_chapter/{{=row.id}}"><i class="icon icon-remove"></i>删除</a>
+                    </div>
+                    {{pass}}
+                </div>
+                {{disp(row.id, num+'.', True)}}
+            </li>
+        {{pass}}
+        {{if ul and flag:}}
+            </ul>
+        {{pass}}
     {{pass}}
+    <ul class="unstyled chapter-list" style="margin-top:18px;" id="titles-list">
+    {{disp(None, '')}}
     </ul>
 {{end}}

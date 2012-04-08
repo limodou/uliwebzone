@@ -14,15 +14,19 @@ class Tutorials(Model):
     __verbose_name__ = '教程'
     
     title = Field(str, max_length=255, verbose_name='标题', nullable=False, required=True)
-    creator = Reference('user', verbose_name='创建者', collection_name='user_tutorials')
+    creator = Reference('user', verbose_name='创建者', collection_name='creator_tutorials')
     authors = ManyToMany('user', verbose_name='共同作者', nullable=False, collection_name='authors_tutorials')
     create_date = Field(datetime, verbose_name='创建时间', nullable=False, auto_now_add=True)
+    modified_user = Reference('user', verbose_name='修改人', default=get_modified_user, auto=True, auto_add=True, collection_name="user_tutorials")
     modified_date = Field(datetime, verbose_name='修改时间', auto_now=True, auto_now_add=True)
     hits = Field(int, verbose_name='点击次数')
     votes = Field(int, verbose_name='支持票数')
     image = Field(FILE, max_length=255, verbose_name='封面图片')
     summary = Field(TEXT, verbose_name='介绍', default='', nullable=False)
     deleted = Field(bool, verbose_name='删除标志')
+    last_comment_user = Reference('user', verbose_name='最后评论人')
+    last_comment_date = Field(datetime, verbose_name='最后评论时间')
+    comments_count = Field(int, verbose_name='评论条数', default=0, server_default='0')
     
     def __unicode__(self):
         return self.title
@@ -56,6 +60,7 @@ class Tutorials_Chapters(Model):
     hits = Field(int, verbose_name='点击次数')
     votes = Field(int, verbose_name='支持票数')
     deleted = Field(bool, verbose_name='删除标志')
+    comments_count = Field(int, verbose_name='评论条数', default=0, server_default='0')
     
     def __unicode__(self):
         return self.title

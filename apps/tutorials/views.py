@@ -99,16 +99,14 @@ class TutorialView(object):
         obj = self.model.get_or_notfound(int(id))
         objects = list(self.model_chapters.filter(self.model_chapters.c.tutorial == obj.id).order_by(self.model_chapters.c.parent, self.model_chapters.c.order))
         
-        def get_chapters(objects, parent=None, level=0, parent_num=''):
+        def get_chapters(parent=None, parent_num='', objects=objects):
             index = 1
             for row in objects:
                 if row._parent_ == parent:
                     cur_num = parent_num + str(index)
-                    yield level, cur_num, row
-                    for x in get_chapters(objects, row.id, level+1, cur_num+'.'):
-                        yield x
+                    yield cur_num, row
                     index += 1
-        return {'object':obj, 'objects':get_chapters(objects)}
+        return {'object':obj, 'objects':get_chapters}
     
     def add_chapter(self, t_id):
         """
@@ -187,6 +185,29 @@ class TutorialView(object):
             obj=obj, pre_save=pre_save)
         return view.run()
     
+    def delete_chapter(self, id):
+        """
+        删除章节
+        删除时，如果有子结点，则子结点的父结点应变成当前结点的父结点
+        """
+        obj = self.model_chapters.get_or_notfound(int(id))
+        tutorial = obj.tutorial
+        count = obj.comments_count
+        parent = obj._parent_
+        
+        #修改所有子结点的父结点
+        obj.children_chapters.update(parent=parent)
+        
+        #删除当前章节
+        obj.delete()
+        
+        #删除所属教程的评论数目
+        tutorial.comments_count = max(0, tutorial.comments_count-count)
+        tutorial.save()
+        
+        #跳转回教程展示页面
+        return redirect(url_for(TutorialView.read, id=tutorial.id))
+    
     def view_paragraph_comments(self, cid):
         """
         view_paragraph_comments/<cid>?para=pid
@@ -246,3 +267,20 @@ class TutorialView(object):
         for row in do_(query):
             d[row[1]] = row[0]
         return json(d)
+    
+    def change_titles_order(self, id):
+        """
+        修改教程的顺序
+        id为教程id
+        """
+        from json import loads
+        
+        d = {}
+        for x in loads(request.POST['data']):
+            d[int(x['id'])] = {'parent':x['parent'] or None, 'order':x['order']}
+        for row in self.model_chapters.filter(self.model_chapters.c.tutorial==int(id)):
+            if row.id in d:
+                row.parent = d[row.id]['parent']
+                row.order = d[row.id]['order']
+                row.save()
+        return json({'success':True})

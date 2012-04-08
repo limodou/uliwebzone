@@ -15,7 +15,7 @@
     <li class="tutorial-item clearfix">
         <img src="{{=row._obj_.get_image()}}" class="preface pull-left" title="{{=row.title}}"/>
         <h2>{{=row.title}}</h2>
-        <span class="gray">由 {{=row.creator}} 创建，最后更新时间 {{=row.modified_date}}</span>
+        <span class="gray">由 {{=unicode(row.modified_user)}} 更新，最后更新时间 {{=row.modified_date}}</span>
         <p>
             {{=row.summary}}
         </p>
