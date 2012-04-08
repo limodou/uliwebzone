@@ -239,7 +239,6 @@ class TutorialView(object):
             obj.modified_user = None
             obj.save()
             
-        print 'xxxxxxxxxxxxxxxxxxxxxx', obj.id, obj.modified_user
         d['username'] = unicode(obj.modified_user)
         d['image_url'] = functions.get_user_image(obj.modified_user, size=20)
         d['date'] = timesince(obj.modified_date)
