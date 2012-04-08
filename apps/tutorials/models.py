@@ -69,7 +69,7 @@ class Tutorials_Chapters(Model):
         fields = ['title', 'content']
     
     class EditForm:
-        fields = ['title', 'content']
+        fields = ['title', 'content', 'format', 'hits', 'votes', 'comments_count']
 
     @classmethod
     def OnInit(cls):

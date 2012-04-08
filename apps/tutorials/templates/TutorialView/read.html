@@ -98,10 +98,12 @@
                     <span>[id={{=row.id}}, order={{=row.order}}]</span>
                     {{pass}}
                     <a href="/tutorial/view_chapter/{{=row.id}}" class="chapter-title">{{=row.title}}</a>
+                    <span class="small gray">(评论数:{{=row.comments_count}})</span>
                     <span class="small gray chapter-info" style="display:none;">由 {{=unicode(row.modified_user)}} 更新于 {{=row.modified_date}}</span>
                     {{if object.authors.has(request.user) or has_role(request.user, 'superuser'):}}
                     <div class="chapter-buttons" style="display:none;">
                         <a href="/tutorial/add_chapter/{{=object.id}}?parent={{=row.id}}"><i class="icon icon-plus"></i>増加子章节</a>
+                        <a href="/tutorial/edit_chapter/{{=row.id}}"><i class="icon icon-edit"></i>编辑</a>
                         <a href="/tutorial/delete_chapter/{{=row.id}}"><i class="icon icon-remove"></i>删除</a>
                     </div>
                     {{pass}}
@@ -116,4 +118,16 @@
     <ul class="unstyled chapter-list" style="margin-top:18px;" id="titles-list">
     {{disp(None, '')}}
     </ul>
+    <script>
+        $(function(){
+            $('.chapter-item').hover(
+                function(){
+                    $(this).find('.chapter-info').slideDown();
+                },
+                function(){
+                    $(this).find('.chapter-info').slideUp();
+                }
+            );
+        });
+    </script>
 {{end}}

@@ -231,8 +231,15 @@ class TutorialView(object):
     def _get_comment_data(self, obj, data=None):
         from uliweb.utils.timesince import timesince
         from uliweb.utils.textconvert import text2html
-
+        from uliweb.orm import NotFound
         d = {}
+        try:
+            obj.modified_user
+        except NotFound:
+            obj.modified_user = None
+            obj.save()
+            
+        print 'xxxxxxxxxxxxxxxxxxxxxx', obj.id, obj.modified_user
         d['username'] = unicode(obj.modified_user)
         d['image_url'] = functions.get_user_image(obj.modified_user, size=20)
         d['date'] = timesince(obj.modified_date)
