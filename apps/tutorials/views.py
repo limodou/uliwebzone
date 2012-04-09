@@ -41,7 +41,7 @@ class TutorialView(object):
         from uliweb.utils.generic import AddView
         
         def get_url(**kwargs):
-            return url_for(TutorialView.view, **kwargs)
+            return url_for(TutorialView.read, **kwargs)
         
         def pre_save(data):
             data['creator'] = request.user.id
