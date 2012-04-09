@@ -29,8 +29,9 @@
 
     <div>
         {{if object.authors.has(request.user) or has_role(request.user, 'superuser'):}}
-        <a href="/tutorial/add_chapter/{{=object.id}}" class="btn btn-primary">増加新的章节</a>
-        <a href="/tutorial/edit/{{=object.id}}" class="btn btn-success">修改教程信息</a>
+        <a href="/tutorial/add_chapter/{{=object.id}}" class="btn btn-primary"><i class="icon icon-plus icon-white"></i>増加新的章节</a>
+        <a href="/tutorial/edit/{{=object.id}}" class="btn btn-success"><i class="icon icon-edit icon-white"></i>修改教程信息</a>
+        <a href="/tutorial/delete/{{=object.id}}" class="btn btn-danger" onclick="return confirm('{{=_("您确定要删除此教程吗?")}}');"><i class="icon icon-remove icon-white"></i>删除教程</a>
         <script>
             function process_titles(objs, parent, num){
                 var i=1;
@@ -97,9 +98,26 @@
                     {{if 'debug' in request.GET:}}
                     <span>[id={{=row.id}}, order={{=row.order}}]</span>
                     {{pass}}
-                    <a href="/tutorial/view_chapter/{{=row.id}}" class="chapter-title">{{=row.title}}</a>
-                    <span class="gray">(评论数:{{=row.comments_count}})</span>
-                    <span class="gray chapter-info" style="display:none;">由 {{=unicode(row.modified_user)}} 更新于 {{=row.modified_date}}</span>
+                    <a href="/tutorial/view_chapter/{{=row.id}}" class="chapter-title" id="info-{{=row.id}}">{{=row.title}}</a>
+                    <script>
+                        $(function(){
+                            var txt = (
+                            '<div class="chapter_tip">'
+                            + '<img src="{{=functions.get_user_image(row.modified_user, size=50)}}" align="top"/>'
+                            + '<ul class="unstyled">'
+                            +   '<li><span class="tip-label">更新人</span>:{{=unicode(row.modified_user)}}</li>'
+                            +   '<li><span class="tip-label">更新于</span>:{{=get_date(row.modified_date)}}</li>'
+                            +   '<li><span class="tip-label">字数</span>:{{=row.chars_count}}</li>'
+                            +   '<li><span class="tip-label">评论数</span>:{{=row.comments_count}}</li>'
+                            + '</ul>'
+                            + '</div>');
+                            $('#info-{{=row.id}}').popover({
+                                placement:'right',
+                                title:'章节信息',
+                                content:txt
+                            });
+                        });
+                    </script>
                     {{if object.authors.has(request.user) or has_role(request.user, 'superuser'):}}
                     <div class="chapter-buttons" style="display:none;">
                         <a href="/tutorial/add_chapter/{{=object.id}}?parent={{=row.id}}"><i class="icon icon-plus"></i>増加子章节</a>

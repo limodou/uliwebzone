@@ -1,6 +1,7 @@
 #coding=utf-8
 from uliweb import expose, functions
 from uliweb.orm import get_model
+from uliweb.utils import date
 
 @expose('/tutorial')
 class TutorialView(object):
@@ -8,7 +9,16 @@ class TutorialView(object):
         self.model = get_model('tutorials')
         self.model_chapters = get_model('tutorials_chapters')
         self.model_comments = get_model('tutorials_chapters_comments')
-        
+    
+    def _get_date(self, value, obj=None):
+        """
+        获得本地时间，加obj可以直接用到convert函数当中
+        """
+        from uliweb.utils.timesince import timesince
+
+        #return date.to_local(value).strftime('%Y-%m-%d %H:%M:%S %Z')
+        return timesince(value)
+    
     @expose('')
     def index(self):
         """
@@ -18,7 +28,10 @@ class TutorialView(object):
 
         condition = (self.model.c.deleted==False)
         
-        view = ListView(self.model, condition=condition, order_by=self.model.c.modified_date.desc())
+        fields_convert_map = {'modified_date':self._get_date}
+        view = ListView(self.model, condition=condition, 
+            order_by=self.model.c.modified_date.desc(),
+            fields_convert_map=fields_convert_map)
         return {'objects':view.objects()}
 
     def add(self):
@@ -34,7 +47,9 @@ class TutorialView(object):
             data['creator'] = request.user.id
             if request.user.id not in data['authors']:
                 data['authors'].append(request.user.id)
-        
+            data['modified_date'] = date.now()
+            data['modified_user'] = request.user.id
+            
         def post_created_form(fcls, model):
             fcls.authors.html_attrs['url'] = '/users/search'
             fcls.authors.choices = [('', '')]
@@ -66,13 +81,15 @@ class TutorialView(object):
         def pre_save(obj, data):
             if request.user.id not in data['authors']:
                 data['authors'].append(request.user.id)
+            data['modified_date'] = date.now()
+            data['modified_user'] = request.user.id
 
         def post_created_form(fcls, model, obj):
             fcls.authors.html_attrs['url'] = '/users/search'
             fcls.authors.query = obj.authors.all()
         
         obj = self.model.get_or_notfound(int(id))
-        view = EditView(self.model, ok_url=url_for(TutorialView.view, id=id), 
+        view = EditView(self.model, ok_url=url_for(TutorialView.read, id=id), 
             obj=obj, pre_save=pre_save, post_created_form=post_created_form)
         return view.run()
         
@@ -85,6 +102,8 @@ class TutorialView(object):
         class MyDelete(DeleteView):
             def delete(self, obj):
                 obj.deleted = True
+                obj.modified_user = request.user.id
+                obj.modified_date = date.now()
                 obj.save()
                 
         obj = self.model.get_or_notfound(int(id))
@@ -97,7 +116,7 @@ class TutorialView(object):
         阅读教程
         """
         obj = self.model.get_or_notfound(int(id))
-        objects = list(self.model_chapters.filter(self.model_chapters.c.tutorial == obj.id).order_by(self.model_chapters.c.parent, self.model_chapters.c.order))
+        objects = list(self.model_chapters.filter((self.model_chapters.c.tutorial == obj.id) & (self.model_chapters.c.deleted==False)).order_by(self.model_chapters.c.parent, self.model_chapters.c.order))
         
         def get_chapters(parent=None, parent_num='', objects=objects):
             index = 1
@@ -106,7 +125,7 @@ class TutorialView(object):
                     cur_num = parent_num + str(index)
                     yield cur_num, row
                     index += 1
-        return {'object':obj, 'objects':get_chapters}
+        return {'object':obj, 'objects':get_chapters, 'get_date':self._get_date}
     
     def add_chapter(self, t_id):
         """
@@ -127,10 +146,18 @@ class TutorialView(object):
             order, = self.model_chapters.filter(self.model_chapters.c.tutorial==int(t_id)).values_one(func.max(self.model_chapters.c.order))
             data['order'] = order+1 if order>0 else 1
             data['content'] = self._prepare_content(data['content'])
+            data['chars_count'] = len(data['content'])
+            data['modified_date'] = date.now()
+            data['modified_user'] = request.user.id
+            
+        def post_save(obj, data):
+            obj.tutorial.modified_date = date.now()
+            obj.tutorial.modified_user = request.user.id
+            obj.tutorial.save();
             
         template_data = {'object':obj}
         view = AddView(self.model_chapters, ok_url=get_url, pre_save=pre_save,
-            template_data=template_data)
+            template_data=template_data, post_save=post_save)
         return view.run()
         
     def view_chapter(self, id):
@@ -179,10 +206,18 @@ class TutorialView(object):
         
         def pre_save(obj, data):
             data['content'] = self._prepare_content(data['content'])
+            data['chars_count'] = len(data['content'])
+            data['modified_date'] = date.now()
+            data['modified_user'] = request.user.id
+            
+        def post_save(obj, data):
+            obj.tutorial.modified_date = date.now()
+            obj.tutorial.modified_user = request.user.id
+            obj.tutorial.save();
         
         view = EditView(self.model_chapters, 
             ok_url=url_for(TutorialView.view_chapter, id=id), 
-            obj=obj, pre_save=pre_save)
+            obj=obj, pre_save=pre_save, post_save=post_save)
         return view.run()
     
     def delete_chapter(self, id):
@@ -199,7 +234,10 @@ class TutorialView(object):
         obj.children_chapters.update(parent=parent)
         
         #删除当前章节
-        obj.delete()
+        obj.deleted = True
+        obj.modified_user = request.user.id
+        obj.modified_date = date.now()
+        obj.save()
         
         #删除所属教程的评论数目
         tutorial.comments_count = max(0, tutorial.comments_count-count)
@@ -229,7 +267,6 @@ class TutorialView(object):
         return {'objects':get_objects(objects), 'object_id':_id, 'pid':pid}
     
     def _get_comment_data(self, obj, data=None):
-        from uliweb.utils.timesince import timesince
         from uliweb.utils.textconvert import text2html
         from uliweb.orm import NotFound
         d = {}
@@ -241,7 +278,7 @@ class TutorialView(object):
             
         d['username'] = unicode(obj.modified_user)
         d['image_url'] = functions.get_user_image(obj.modified_user, size=20)
-        d['date'] = timesince(obj.modified_date)
+        d['date'] = self._get_date(obj.modified_date)
         d['content'] = text2html(obj.content)
         return d
         
@@ -251,9 +288,19 @@ class TutorialView(object):
         """
         from uliweb.utils.generic import AddView
         
+        def post_save(obj, data):
+            t = obj.chapter.tutorial
+            t.last_comment_user = request.user.id
+            t.last_comment_date = date.now()
+            t.comments_count += 1
+            t.save()
+            
+            obj.chapter.comments_count += 1
+            obj.chapter.save()
+            
         default_data = {'chapter':int(cid), 'anchor':int(request.GET.get('para'))}
         view = AddView(self.model_comments, success_data=self._get_comment_data, 
-            default_data=default_data)
+            default_data=default_data, post_save=post_save)
         return view.run(json_result=True)
     
     def get_paragraph_comments_count(self, cid):

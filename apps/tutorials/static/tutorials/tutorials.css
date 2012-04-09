@@ -2,8 +2,10 @@ body {font-family:Georgia;}
 textarea {width:98%;}
 .tutorial-list {position:relative;}
 .tutorial-list img.preface {height:128px; width:128px;}
-.tutorial-list li.tutorial-item {padding:8px; margin-top: 18px; margin-bottom: 10px;border-top:1px dotted #ccc;}
+.tutorial-list li.tutorial-item {position:relative;padding:8px; margin-top: 18px; margin-bottom: 10px;border-top:1px dotted #ccc;}
 .tutorial-list .tutorial-buttons {margin-top:8px;}
+.tutorial-info {position:absolute;right:20px;bottom:2px;}
+
 .gray {color:#999;}
 .chapter-list ul{padding-left:40px;margin-left:0;list-style: none;}
 .chapter-list ul li{*list-style: none;}
@@ -30,6 +32,10 @@ box-shadow:1px 1px 3px #292929;
 #titles li:hover a{color:white;background-color:RoyalBlue;}
 #titles li.active{background-color:LightBlue;}
 #titles li.active a{color:white;}
+
+/*章节tip*/
+.chapter_tip img{float:left;margin-right:4px;padding-bottom:18px;}
+.chapter_tip span.tip-label{width:60px;display:block-inline;}
 
 /*侧边评论样式*/
 #paragraph-comments img{float:left;}

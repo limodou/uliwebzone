@@ -22,7 +22,17 @@
         <div class="turorial-buttons">
             <a href="/tutorial/read/{{=row._obj_.id}}" class="btn btn-primary">点击阅读 &raquo;</a>
         </div>
+        <div class="tutorial-info">
+            <span>评论：<a href="#" class="para-comments-count right">{{=row.comments_count}}</a></span>
+        </div>
     </li>
 {{pass}}
 </ul>
+<script>
+    $(function(){
+        $('a.para-comments-count').click(function(e){
+            e.preventDefault();
+        });
+    });
+</script>
 {{end}}
