@@ -60,7 +60,7 @@ $('#MoveResults').val(data);
 						ui.draggable.addClass('moved');
 
 						var subbranch = me.children("ul");
-
+						
 						switch (base.pos.target()) {
 							case 'on':
 								//add as a child
@@ -68,7 +68,8 @@ $('#MoveResults').val(data);
 									//add new ul
 									var newb = $('<ul></ul>');
 									newb.append(dropped);
-									me.append(newb);
+									//using parent node
+									me.parent('li').append(newb);
 								} else {
 									subbranch.eq(0).append(dropped);
 								}
@@ -76,11 +77,11 @@ $('#MoveResults').val(data);
 								break;
 							case 'above':
 								//add before
-								dropped.insertBefore(me);
+								dropped.insertBefore(me.parent('li'));
 								break;
 							case 'below':
 								//add after
-								dropped.insertAfter(me);
+								dropped.insertAfter(me.parent('li'));
 								break;
 						}
 						me.removeClass('on above below');
@@ -227,9 +228,9 @@ $('#MoveResults').val(data);
 		base.parseTree = function(ul) {
 			if (ul == undefined) ul = base.$el;
 			var tags = [];
-			ul.find("li").each(function() {
+			ul.find("li").each(function(index) {
 				var parent = $(this).parent('ul').closest('li');
-				tags.push({id:$(this).data("id"), order:$(this).data("order"), parent:parent.data("id")||0});
+				tags.push({id:$(this).data("id"), order:index+1, parent:parent.data("id")||0});
 			});
 			return tags;
 		};

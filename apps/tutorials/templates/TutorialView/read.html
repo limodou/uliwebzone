@@ -6,31 +6,13 @@
 {{use "jqjson"}}
 
 <style type="text/css">
-
-	.over{outline:solid 1px #afa}
-	.on{border:solid 1px green;}
-	.below{border-bottom:solid 2px #f00;}
-	.below span{}
-	.above{border-top:solid 2px #f00;}
-	.tree_hover{background:#fafaff}
-    .ui-droppable {cursor:move;}
-	ul.tree, ul.tree ul{list-style-type:none;padding:0;}
-	ul.tree li, ul.tree li ul li{
-		line-height:1.7em;cursor:default;
-		background:url(icons/line.png) no-repeat;;
-		padding-left:16px;
-	}
-	ul.tree li a.caption{
-		background:url(icons/page.png) no-repeat left center;
-		padding-left:20px;
-		min-width:200px;
-	}
-	
-	span.callback{
-		color:#aaa;
-		font-size:.8em;
-		margin-right:5px;
-	}
+.over{outline:solid 1px #afa}
+.on{border:solid 1px green;}
+.below{border-bottom:solid 2px #f00;}
+.below span{}
+.above{border-top:solid 2px #f00;}
+.tree_hover{background:#ccc}
+.ui-droppable {cursor:move;}
 </style>
 
     <ul class="breadcrumb">
@@ -50,20 +32,38 @@
         <a href="/tutorial/add_chapter/{{=object.id}}" class="btn btn-primary">増加新的章节</a>
         <a href="/tutorial/edit/{{=object.id}}" class="btn btn-success">修改教程信息</a>
         <script>
+            function process_titles(objs, parent, num){
+                var i=1;
+                var c;
+                for(var j=0; j<objs.length; j++){
+                    if (objs[j].parent == parent){
+                        c = '' + num + i;
+                        $('li[data-id='+objs[j].id+']').find('span.chapter-num').text(c);
+                        process_titles(objs, objs[j].id, c+'.');
+                        i++;
+                    }
+                }
+            }
             $(function(){
                 //处理标题排序
                 var tree = $('#titles-list').liveflex_treeview({
                     handle:'span.chapter-num',
                     dirSelector:'li.parent',
                     itemMoved: function(csv){
+                        //处理标题的序号
+                        var data = tree.data("liveflex.treeview").parseTree();
+                        process_titles(data, 0, '');
                         $.ajax({
                             type:'POST',
                             dateType:'json',
                             url: '/tutorial/change_titles_order/{{=object.id}}',
-                            data:{data:$.toJSON(tree.data("liveflex.treeview").parseTree())},
+                            data:{data:$.toJSON(data)},
                             traditional:true,
                             success:function(data){
-                                window.location.reload();
+                                if(data.success){
+                                    show_message('保存成功');
+                                }else
+                                    window.location.reload();
                             }
                     	});
                     }
@@ -98,8 +98,8 @@
                     <span>[id={{=row.id}}, order={{=row.order}}]</span>
                     {{pass}}
                     <a href="/tutorial/view_chapter/{{=row.id}}" class="chapter-title">{{=row.title}}</a>
-                    <span class="small gray">(评论数:{{=row.comments_count}})</span>
-                    <span class="small gray chapter-info" style="display:none;">由 {{=unicode(row.modified_user)}} 更新于 {{=row.modified_date}}</span>
+                    <span class="gray">(评论数:{{=row.comments_count}})</span>
+                    <span class="gray chapter-info" style="display:none;">由 {{=unicode(row.modified_user)}} 更新于 {{=row.modified_date}}</span>
                     {{if object.authors.has(request.user) or has_role(request.user, 'superuser'):}}
                     <div class="chapter-buttons" style="display:none;">
                         <a href="/tutorial/add_chapter/{{=object.id}}?parent={{=row.id}}"><i class="icon icon-plus"></i>増加子章节</a>
@@ -118,16 +118,4 @@
     <ul class="unstyled chapter-list" style="margin-top:18px;" id="titles-list">
     {{disp(None, '')}}
     </ul>
-    <script>
-        $(function(){
-            $('.chapter-item').hover(
-                function(){
-                    $(this).find('.chapter-info').slideDown();
-                },
-                function(){
-                    $(this).find('.chapter-info').slideUp();
-                }
-            );
-        });
-    </script>
 {{end}}
