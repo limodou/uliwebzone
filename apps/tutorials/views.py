@@ -35,7 +35,7 @@ class TutorialView(object):
             if request.user.id not in data['authors']:
                 data['authors'].append(request.user.id)
         
-        def post_created_form(fcls, model, obj):
+        def post_created_form(fcls, model):
             fcls.authors.html_attrs['url'] = '/users/search'
             fcls.authors.choices = [('', '')]
         
