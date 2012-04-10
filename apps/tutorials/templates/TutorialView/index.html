@@ -1,6 +1,8 @@
 {{extend "tutorial_layout.html"}}
 
 {{block content_main}}
+{{use "jqscrollpagination"}}
+
 <div class="row">
     <div class="pull-right">
         {{if request.user:}}
@@ -10,28 +12,53 @@
         {{pass}}
     </div>
 </div>
-<ul class="unstyled tutorial-list">
-{{for row in objects:}}
+<script type="text/html" id="tutorialTemplate">
     <li class="tutorial-item clearfix">
-        <img src="{{=row._obj_.get_image()}}" class="preface pull-left" title="{{=row.title}}"/>
-        <h2>{{=row.title}}</h2>
-        <span class="gray">由 {{=unicode(row.modified_user)}} 更新，最后更新时间 {{=row.modified_date}}</span>
+        <img src="${image}" class="preface pull-left" title="${title}"/>
+        <h2><a href="/tutorial/read/${id}">《${title}》</a></h2>
+        <span class="gray">由 ${author} 更新，最后更新时间 ${modified_date}</span>
         <p>
-            {{=row.summary}}
+            ${summary}
         </p>
         <div class="turorial-buttons">
-            <a href="/tutorial/read/{{=row._obj_.id}}" class="btn btn-primary">点击阅读 &raquo;</a>
+            <a href="/tutorial/read/${id}" class="btn btn-primary">点击阅读 &raquo;</a>
         </div>
         <div class="tutorial-info">
-            <span>评论：<a href="#" class="para-comments-count right">{{=row.comments_count}}</a></span>
+            <span>评论：<a href="#" class="para-comments-count right">${comments_count}</a></span>
         </div>
     </li>
-{{pass}}
+</script>
+
+<ul class="unstyled tutorial-list" id="tutorials">
 </ul>
+
 <script>
     $(function(){
         $('a.para-comments-count').click(function(e){
             e.preventDefault();
+        });
+        $('#tutorials').scrollpagination({
+            total: {{=total}},
+            pageRows : 4,
+            initLoad : true,
+            onChange: function(page){
+                var that = this;
+                $('#tutorials .loading').remove();
+                $('#tutorials').append('<p style="text-align:center" class="loading"><img src="/static/jqutils/loading.gif"/></p>').fadeIn();
+                $.ajax({
+                    type:'GET',
+                    dataType:'json',
+                    url:'/tutorial?page='+page+'&rows='+that.options.pageRows+'&data=',
+                    success:function(data){
+                        $('#tutorials .loading').fadeOut().remove();
+                        $.each(data.rows, function(index, v){
+                            var t = template($('#tutorialTemplate').html(), v);
+                            $('#tutorials').append(t);
+                        });
+                    }
+                });
+            }
+            
         });
     });
 </script>

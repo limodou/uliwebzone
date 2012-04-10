@@ -25,14 +25,28 @@ class TutorialView(object):
         教程显示首页
         """
         from uliweb.utils.generic import ListView
+        import math
 
         condition = (self.model.c.deleted==False)
-        
-        fields_convert_map = {'modified_date':self._get_date}
-        view = ListView(self.model, condition=condition, 
-            order_by=self.model.c.modified_date.desc(),
-            fields_convert_map=fields_convert_map)
-        return {'objects':view.objects()}
+
+        pageno = int(request.GET.get('page', 1)) - 1
+        rows_per_page = int(request.GET.get('rows', 10))
+
+        if 'data' in request.GET:
+            def render(r, obj):
+                data = dict(r)
+                data['image'] = obj.get_image()
+                data['author'] = unicode(obj.modified_user)
+                data['modified_date'] = self._get_date(obj.modified_date)
+                return data
+            
+            view = ListView(self.model, condition=condition, 
+                order_by=self.model.c.modified_date.desc(), pageno=pageno,
+                rows_per_page=rows_per_page, render=render)
+            return json(view.json())
+        else:
+            total = self.model.filter(condition).count()
+            return {'total':total}
 
     def add(self):
         """
