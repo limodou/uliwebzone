@@ -6,4 +6,11 @@
 
 {{block content}}
 {{<< content}}
+{{end}}
+
+{{block return}}
+<style>
+div.return {position:fix;left:5px;top:5px;}
+</style>
+<div class="return"><a href="/tutorial/read/{{=object._tutorial_}}"><img src="/static/tutorials/return.png"/></a></div>
 {{end}} 

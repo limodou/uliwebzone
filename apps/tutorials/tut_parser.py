@@ -26,7 +26,7 @@ class TutGrammar(WikiGrammar):
         def identifer(): return _(r'[a-zA-Z_][a-zA-Z_0-9]*', re.U)
         def literal(): return _(r'u?r?"[^"\\]*(?:\\.[^"\\]*)*"', re.I|re.DOTALL)
         def literal1(): return _(r"u?r?'[^'\\]*(?:\\.[^'\\]*)*'", re.I|re.DOTALL)
-        def escape_string(): return '\\', _(r'.')
+        def escape_string(): return _(r'\\'), _(r'.')
         def op_string(): return _(r'\*|_|~~|\^|,,')
         def op(): return [(-1, seperator, op_string), (op_string, -1, seperator)]
         def string(): return _(r'[^\\\*_\^~ \t\r\n`,]+', re.U)
@@ -40,8 +40,10 @@ class TutGrammar(WikiGrammar):
         def paragraph(): return -2, line, -1, blankline
     
         #pre
+        def pre_b(): return _(r'\{\{\{')
+        def pre_e(): return _(r'\}\}\}')
         def pre_alt(): return _(r'<code>'), _(r'.+?(?=</code>)', re.M|re.DOTALL), _(r'</code>'), -2, blankline
-        def pre_normal(): return _(r'\{\{\{'), 0, space, eol, _(r'.+?(?=\}\}\})', re.M|re.DOTALL), _(r'\}\}\}'), -2, blankline
+        def pre_normal(): return pre_b, 0, space, eol, _(r'.+?(?=\}\}\})', re.M|re.DOTALL), pre_e, -2, blankline
         def pre(): return [pre_alt, pre_normal]
     
         
@@ -115,6 +117,49 @@ class TutVisitor(WikiHtmlVisitor):
             self.max_id += 1
         return '<a href="#" rel="%d" class="comment_point"></a>' % _id
 
+class RevealVisitor(WikiHtmlVisitor):
+    def __init__(self, template=None, tag_class=None):
+        super(RevealVisitor, self).__init__(template, tag_class)
+        self.section2 = False
+        self.section3 = False
+        
+    def visit_pre_alt(self, node):
+        return self.tag('pre', '<code>' + self.to_html(node[1].strip()) + '</code>')
+    
+    def visit_pre_normal(self, node):
+        return self.tag('pre', '<code>' + self.to_html(self.visit(node).strip()) + '</code>')
+    
+    def visit_title2(self, node):
+        b = ''
+        if self.section3:
+            b = '</section>\n'
+        if self.section2:
+            b = b + '</section>\n<section>\n'
+        else:
+            b = b + '<section>\n'
+        self.section2 = True
+        self.section3 = False
+        return b + self.tag('h2', node[1].text)
+    
+    def visit_title3(self, node):
+        b = ''
+#        if self.section2:
+#            b = '</section>\n'
+        if self.section3:
+            b = b + '</section>\n<section>\n'
+        else:
+            b = b + '<section>\n'
+        self.section3 = True
+        return b + self.tag('h3', node[1].text)
+
+    def __end__(self):
+        if self.section3:
+            b = '</section>\n'
+        if self.section2:
+            return '</section>\n'
+        else:
+            return ''
+        
 r = re.compile(r'\[\[\s*#(\d*)\s*\]\]')
 class TutCVisitor(SimpleVisitor):
     def __init__(self):

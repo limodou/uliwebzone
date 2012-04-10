@@ -145,7 +145,7 @@ class TutorialView(object):
             data['tutorial'] = int(t_id)
             order, = self.model_chapters.filter(self.model_chapters.c.tutorial==int(t_id)).values_one(func.max(self.model_chapters.c.order))
             data['order'] = order+1 if order>0 else 1
-            data['content'] = self._prepare_content(data['content'])
+            data['content'] = self._prepare_content(data['content'], data['render'])
             data['chars_count'] = len(data['content'])
             data['modified_date'] = date.now()
             data['modified_user'] = request.user.id
@@ -165,7 +165,7 @@ class TutorialView(object):
         查看教程
         """
 #        from uliweb.utils.generic import DetailView
-        from tut_parser import TutGrammar, TutVisitor
+        from tut_parser import TutGrammar, TutVisitor, RevealVisitor
         
         obj = self.model_chapters.get_or_notfound(int(id))
         if obj.deleted:
@@ -177,23 +177,33 @@ class TutorialView(object):
 
         g = TutGrammar()
         result, rest = g.parse(obj.content, resultSoFar=[], skipWS=False)
-        t = TutVisitor()
-        content = t.visit(result)
+        
+        if not obj.render or obj.render == '1': #html
+            t = TutVisitor()
+            
+        elif obj.render == '2': #reveal
+            t = RevealVisitor()
+            response.template = 'TutorialView/render_reveal.html'
+        
+        content = t.visit(result, root=True)
         return {'object':obj, 'content':content, 'titles':t.titles}
     
-    def _prepare_content(self, text):
+    def _prepare_content(self, text, render='html'):
         """
         对文本进行预处理，对每个段落识别[[#]]标记，计算最大值，同时如果不存在，
         则自动添加[[#]]
         """
         from tut_parser import TutGrammar, TutCVisitor, TutTextVisitor
         
-        g = TutGrammar()
-        result, rest = g.parse(text, resultSoFar=[], skipWS=False)
-        t = TutCVisitor()
-        new_text = t.visit(result)
-        result, rest = g.parse(new_text, resultSoFar=[], skipWS=False)
-        result = TutTextVisitor(t.max_id).visit(result)
+        if render == 'html':
+            g = TutGrammar()
+            result, rest = g.parse(text, resultSoFar=[], skipWS=False)
+            t = TutCVisitor()
+            new_text = t.visit(result)
+            result, rest = g.parse(new_text, resultSoFar=[], skipWS=False)
+            result = TutTextVisitor(t.max_id).visit(result)
+        else:
+            result = text
         return result
         
     def edit_chapter(self, id):
@@ -205,7 +215,7 @@ class TutorialView(object):
         obj = self.model_chapters.get_or_notfound(int(id))
         
         def pre_save(obj, data):
-            data['content'] = self._prepare_content(data['content'])
+            data['content'] = self._prepare_content(data['content'], data['render'])
             data['chars_count'] = len(data['content'])
             data['modified_date'] = date.now()
             data['modified_user'] = request.user.id

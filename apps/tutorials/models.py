@@ -54,6 +54,7 @@ class Tutorials_Chapters(Model):
     order = Field(int, verbose_name='顺序号')
     content = Field(TEXT, verbose_name='内容', default='', nullable=False)
     format = Field(CHAR, max_length=1, verbose_name='格式', choices=get_var('TUTORIALS/format'), default='1')
+    render = Field(CHAR, max_length=1, verbose_name='渲染器', choices=get_var('TUTORIALS/render'), default='1')
     html = Field(TEXT, verbose_name='显示内容', default='', nullable=False)
     modified_user = Reference('user', verbose_name='修改人')
     modified_date = Field(datetime, verbose_name='修改时间')
@@ -67,10 +68,10 @@ class Tutorials_Chapters(Model):
         return self.title
     
     class AddForm:
-        fields = ['title', 'content']
+        fields = ['title', 'content', 'render']
     
     class EditForm:
-        fields = ['title', 'content', 'format', 'hits', 'votes', 'comments_count']
+        fields = ['title', 'content', 'format', 'render', 'hits', 'votes', 'comments_count']
 
     @classmethod
     def OnInit(cls):
