@@ -99,6 +99,7 @@
                     <span>[id={{=row.id}}, order={{=row.order}}]</span>
                     {{pass}}
                     <a href="/tutorial/view_chapter/{{=row.id}}" class="chapter-title" id="info-{{=row.id}}">{{=row.title}}</a>
+                    <span class="small gray">字数: {{=row.chars_count}}</span>
                     <script>
                         $(function(){
                             var txt = (
@@ -107,7 +108,7 @@
                             + '<ul class="unstyled">'
                             +   '<li><span class="tip-label">更新人</span>:{{=unicode(row.modified_user)}}</li>'
                             +   '<li><span class="tip-label">更新于</span>:{{=get_date(row.modified_date)}}</li>'
-                            +   '<li><span class="tip-label">字数</span>:{{=row.chars_count}}</li>'
+//                            +   '<li><span class="tip-label">字数</span>:{{=row.chars_count}}</li>'
                             +   '<li><span class="tip-label">评论数</span>:{{=row.comments_count}}</li>'
                             + '</ul>'
                             + '</div>');

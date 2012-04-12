@@ -209,7 +209,7 @@ class TutorialView(object):
         """
         from tut_parser import TutGrammar, TutCVisitor, TutTextVisitor
         
-        if render == 'html':
+        if render == '1':   #html
             g = TutGrammar()
             result, rest = g.parse(text, resultSoFar=[], skipWS=False)
             t = TutCVisitor()
