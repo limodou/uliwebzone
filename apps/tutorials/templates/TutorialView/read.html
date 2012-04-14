@@ -3,7 +3,7 @@
 {{block content_main}}
 {{use "jquery",ui=True}}
 {{link "tutorials/jquery.liveflex.Tree.js"}}
-{{use "jqjson"}}
+{{use "json2"}}
 
 <style type="text/css">
 .over{outline:solid 1px #afa}
@@ -58,7 +58,7 @@
                             type:'POST',
                             dateType:'json',
                             url: '/tutorial/change_titles_order/{{=object.id}}',
-                            data:{data:$.toJSON(data)},
+                            data:{data:JSON.stringify(data)},
                             traditional:true,
                             success:function(data){
                                 if(data.success){
