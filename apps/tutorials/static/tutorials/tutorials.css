@@ -37,6 +37,9 @@ box-shadow:1px 1px 3px #292929;
 .chapter_tip img{float:left;margin-right:4px;padding-bottom:18px;}
 .chapter_tip span.tip-label{width:60px;display:block-inline;}
 
+/*文章显示*/
+#article img {max-width:100%;}
+
 /*侧边评论样式*/
 #paragraph-comments img{float:left;}
 

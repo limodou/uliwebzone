@@ -1,0 +1,99 @@
+{{use "jquery", ui=True}}
+{{use "jqupload"}}
+{{use "jqutils"}}
+{{use "jqimgzoom"}}
+
+<style>
+.thumbnails > li {min-height:80px;height:80px;}
+.thumbnails li {position:relative;}
+.thumbnails li a.remove{position:absolute; right:2px; bottom:2px;}
+</style>
+<div class="outter">
+    <div class="control-group">
+      <label class="control-label" for="field_filename">图片上传</label>
+      <div class="controls">
+        <input type="file" id="field_filename" name="filename">
+      </div>
+    </div>
+    <div class="alert alert-success">
+        <a class="close" data-dismiss="alert" href="#">&times;</a>
+        <p>向编辑窗口插入图片只要拖动要插入的图片到编辑窗口中即可。</p>
+    </div>
+    <ul id="album_iamges" class="thumbnails">
+    </ul>
+</div>
+<script type="text/html" id="imageTemplate">
+    <li>
+        <a href="${url}" class="thumbnail insert_image">
+            <img src="${thumbnail_url}"/>
+        </a>
+        <a href="#" class="remove" style="display:none" data-id="${id}"><i class="icon icon-remove"></i></a>
+    </li>
+</script>
+<script>
+    function load_images(el){
+      var that = $(el);
+      $.ajax({
+          url: '/tutorial/getimages/{{=tutorial_id}}',
+          dateType: 'json',
+          success: function(data){
+              $.each(data.data, function(index, value){
+                  var topic = template($('#imageTemplate').html(), value).appendTo(that);
+                    topic.find('img').imgZoom({loadingImg:"{{=url_for_static('jqimgzoom/css/imgzoom-loading.gif')}}"});
+              });
+          }
+      });
+    }
+    
+    $(function () {
+        
+        //处理上传
+        $('#field_filename').fileupload({
+            dataType: 'json',
+            url: '/tutorial/uploadimage/{{=tutorial_id}}',
+            done: function (e, data) {
+                if(data.result.success){
+                    $('#album_iamges').append(template($('#imageTemplate').html(), data.result));
+                }
+            }
+        });
+        
+        //处理双击，则自动插入链接到编辑器中
+        $('body').on('dbclick', 'a.thumbnail', function(e){
+            console.log($(this).data('id'));
+        });
+        
+        //处理删除按钮的显示
+        $('body').on('hover', '.thumbnails > li', 
+            function(e){
+                if(e.type == 'mouseenter'){
+                    $(this).find('a.remove').slideDown();
+                }else{
+                    $(this).find('a.remove').slideUp();
+                }
+            }
+        );
+        
+        //处理图片删除
+        $('body').on('click', 'a.remove', function(e){
+            var that = $(this);
+            e.preventDefault();
+            if(confirm('你确定要删除当前图片吗？')){
+                $.ajax({
+                    type:'POST',
+                    url:'/tutorial/deleteimage/'+that.data('id'),
+                    success:function(data){
+                        if (data.success){
+                            that.parent().remove();
+                        }
+                        show_message(data.message);
+                    }
+                });
+            }
+        })
+        
+        //装入图片
+        load_images('#album_iamges');
+        
+    });
+</script>

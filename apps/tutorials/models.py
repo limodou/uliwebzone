@@ -96,3 +96,10 @@ class Tutorials_Chapters_Comments(Model):
     def OnInit(cls):
         Index('tutchpcmt_indx', cls.c.chapter, cls.c.parent, cls.c.anchor)
     
+class Tutorials_Albums(Model):
+    __verbose_name__ = '像册'
+    
+    tutorial = Reference('tutorials', verbose_name='所属教程', collection_name='turotial_images')
+    filename = Field(FILE, verbose_name='图片')
+    created_on = Field(datetime, verbose_name='创建时间', auto_now_add=True)
+    

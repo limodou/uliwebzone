@@ -1,26 +1,22 @@
-{{extend "tutorial_layout.html"}}
+{{extend "TutorialView/add_chapter.html"}}
 
-{{block content_main}}
+{{block page-nav}}编辑章节{{end}}
+{{block page-title}}编辑章节{{end}}
+{{block before_album}}{{tutorial_id = object._tutorial_}}{{end}}
 
-{{use "codemirror"}}
-
-    <ul class="breadcrumb">
-      <li>
-        <a href="/tutorial">返回</a> <span class="divider">/</span>
-      </li>
-      <li>
-        <a href="/tutorial/read/{{=object._tutorial_}}">{{=object.tutorial.title}}</a> <span class="divider">/</span>
-      </li>
-      <li class="active">
-        编辑章节
-      </li>
-    </ul>
-    
-    <h2 class="section">编辑章节</h2>
-    <div class="span10">
-    {{<< form}}
-    </div>
-    <script>
-        var myCodeMirror = CodeMirror.fromTextArea($('#field_content').get(0));
-    </script>
+{{block link-nav}}
+<ul class="breadcrumb">
+  <li>
+    <a href="/tutorial">返回</a> <span class="divider">/</span>
+  </li>
+  <li>
+    <a href="/tutorial/read/{{=object._tutorial_}}">{{=object.tutorial.title}}</a> <span class="divider">/</span>
+  </li>
+  <li>
+    <a href="/tutorial/view_chapter/{{=object.id}}">{{=object.title}}</a> <span class="divider">/</span>
+  </li>
+  <li class="active">
+    {{block page-nav}}编辑章节{{end}}
+  </li>
+</ul>
 {{end}}

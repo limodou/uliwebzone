@@ -1,8 +1,10 @@
 {{extend "tutorial_layout.html"}}
 
-{{block content_main}}
+{{block content}}
 {{use "codemirror"}}
 
+<div class="container-fluid">
+    {{block link-nav}}
     <ul class="breadcrumb">
       <li>
         <a href="/tutorial">返回</a> <span class="divider">/</span>
@@ -11,15 +13,28 @@
         <a href="/tutorial/read/{{=object.id}}">{{=object.title}}</a> <span class="divider">/</span>
       </li>
       <li class="active">
-        添加新章节
+        {{block page-nav}}添加新章节{{end}}
       </li>
     </ul>
-    
-    <h2 class="section">添加新章节</h2>
-    <div class="span10">
-    {{<< form}}
+    {{end}}
+
+    <div class="row-fluid">
+        <div class="span8">
+            <div class="outter">
+                <h2 class="section">{{block page-title}}添加新章节{{end}}</h2>
+                <div>
+                {{<< form}}
+                </div>
+            </div>
+        </div>
+        <div class="span4">
+            {{block before_album}}{{tutorial_id = object.id}}{{end}}
+            {{include "TutorialView/inc_album.html"}}
+        </div>
     </div>
-    <script>
-        var myCodeMirror = CodeMirror.fromTextArea($('#field_content').get(0));
-    </script>
+</div>
+    
+<script>
+    var myCodeMirror = CodeMirror.fromTextArea($('#field_content').get(0));
+</script>
 {{end}}

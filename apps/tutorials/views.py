@@ -361,3 +361,72 @@ class TutorialView(object):
                 row.order = d[row.id]['order']
                 row.save()
         return json({'success':True})
+    
+    def uploadimage(self, tid):
+        """
+        上传图片
+        :param tid: 论坛id
+        """
+        import os
+        import Image
+        from uliweb.utils.image import thumbnail_image, fix_filename
+        from uliweb import json_dumps
+        from uliweb.form import Form, ImageField
+        
+        File = get_model('tutorials_albums')
+        obj = self.model.get_or_notfound(int(tid))
+        
+        class UploadForm(Form):
+            filename = ImageField()
+        
+        form = UploadForm()
+        flag = form.validate(request.values, request.files)
+        if flag:
+            filename = functions.save_file(os.path.join('toturials', str(obj.id), form.filename.data.filename), form.filename.data.file)
+            #process thumbnail
+            rfilename, thumbnail = thumbnail_image(functions.get_filename(filename, filesystem=True), filename, settings.get_var('TUTORIALS/IMAGE_THUMBNAIL_SIZE'))
+            thumbnail_url = functions.get_href(thumbnail)
+            url = functions.get_href(filename)
+            f = File(filename=filename, tutorial=int(tid))
+            f.save()
+            return json({'success':True, 'filename':form.filename.data.filename, 'url':url, 'thumbnail_url':thumbnail_url, 'id':f.id}, content_type="text/html;charset=utf-8")
+        else:
+            #如果校验失败，则再次返回Form，将带有错误信息
+            return json({'success':False}, content_type="text/html;charset=utf-8")
+
+    def getimages(self, tid):
+        """
+        返回图片
+        :param tid: tutorial id
+        """
+        from uliweb.utils.image import thumbnail_image, fix_filename
+        
+        File = get_model('tutorials_albums')
+
+        data = {'data':[], 'success':True}
+        for row in File.filter(File.c.tutorial==int(tid)):
+            d = {}
+            thumbnail_filename = fix_filename(row.filename, '.thumbnail')
+            d['thumbnail_url'] = functions.get_href(thumbnail_filename)
+            d['url'] = functions.get_href(row.filename)
+            d['id'] = row.id
+            data['data'].append(d)
+        return json(data)
+    
+    def deleteimage(self, id):
+        """
+        删除图片
+        :param id:图片id
+        """
+        from uliweb.utils.image import fix_filename
+
+        File = get_model('tutorials_albums')
+        obj = File.get(int(id))
+        if obj:
+            thumbnail_filename = fix_filename(obj.filename, '.thumbnail')
+            functions.delete_filename(thumbnail_filename)
+            functions.delete_filename(obj.filename)
+            obj.delete()
+            return json({'success':True, 'message':'删除成功'})
+        else:
+            return json({'success':False, 'message':'图片没找到'})

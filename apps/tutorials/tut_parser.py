@@ -78,7 +78,7 @@ class TutGrammar(WikiGrammar):
         #links
         def protocal(): return [_(r'http://'), _(r'https://'), _(r'ftp://')]
         def direct_link(): return protocal, _(r'[\w\d\-\.,@\?\^=%&:/~+#]+')
-        def image_link(): return protocal, _(r'.*?(?:\.png|\.jpg|\.gif|\.jpeg)')
+        def image_link(): return protocal, _(r'.*?(?:\.png|\.jpg|\.gif|\.jpeg)', re.I)
         def alt_direct_link(): return _(r'\['), 0, space, direct_link, space, _(r'[^\]]+'), 0, space, _(r'\]')
         def alt_image_link(): return _(r'\['), 0, space, direct_link, space, image_link, 0, space, _(r'\]')
         def mailto(): return 'mailto:', _(r'[a-zA-Z_0-9-@/\.]+')
