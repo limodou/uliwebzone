@@ -2,6 +2,7 @@
 {{use "jqupload"}}
 {{use "jqutils"}}
 {{use "jqimgzoom"}}
+{{use "jsreader"}}
 
 <style>
 .thumbnails > li {min-height:80px;height:80px;}
@@ -17,9 +18,9 @@
     </div>
     <div class="alert alert-success">
         <a class="close" data-dismiss="alert" href="#">&times;</a>
-        <p>向编辑窗口插入图片只要拖动要插入的图片到编辑窗口中即可。</p>
+        <p>向编辑窗口插入图片只要拖动要插入的图片到编辑窗口中即可。在支持HTML5文件拖拽的浏览器上可以拷贝或拖拽文件到当前页面，图片会自动上传。</p>
     </div>
-    <ul id="album_iamges" class="thumbnails">
+    <ul id="album_images" class="thumbnails">
     </ul>
 </div>
 <script type="text/html" id="imageTemplate">
@@ -53,7 +54,7 @@
             url: '/tutorial/uploadimage/{{=tutorial_id}}',
             done: function (e, data) {
                 if(data.result.success){
-                    $('#album_iamges').append(template($('#imageTemplate').html(), data.result));
+                    $('#album_images').append(template($('#imageTemplate').html(), data.result));
                 }
             }
         });
@@ -93,7 +94,33 @@
         })
         
         //装入图片
-        load_images('#album_iamges');
+        load_images('#album_images');
         
+        //处理图片拷贝
+        if(window.FileReader){
+            $('#copy_image').show();
+            var opts = {
+                readAsMap:{'image/*': 'DataURL'},
+                dragClass:'dragging',
+                on:{
+                    loadend:function(e, file){
+                        console.log('aaaaa', e, file);
+                        var arr = e.target.result.split(",");
+                        var data = {'data':arr[1], 'filename':file.name}; // raw base64
+                        $.post('/tutorial/postimage/{{=tutorial_id}}',
+                            data,
+                            function(data){
+                                if(data.success){
+                                    $('#album_images').append(template($('#imageTemplate').html(), data.data));
+                                    $('#album_images li:last').effect('highlight', 5000);
+                                }
+                            }
+                        );
+                    }
+                }
+            }
+            $("body").fileReaderJS(opts);
+            $("body").fileClipboard(opts);
+        }
     });
 </script>

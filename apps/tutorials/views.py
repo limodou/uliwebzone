@@ -1,4 +1,5 @@
 #coding=utf-8
+import os
 from uliweb import expose, functions
 from uliweb.orm import get_model
 from uliweb.utils import date
@@ -367,7 +368,6 @@ class TutorialView(object):
         上传图片
         :param tid: 论坛id
         """
-        import os
         import Image
         from uliweb.utils.image import thumbnail_image, fix_filename
         from uliweb import json_dumps
@@ -430,3 +430,27 @@ class TutorialView(object):
             return json({'success':True, 'message':'删除成功'})
         else:
             return json({'success':False, 'message':'图片没找到'})
+        
+    def postimage(self, tid):
+        """
+        处理HTML5文件上传
+        :param tid:教程id
+        """
+        import base64
+        from StringIO import StringIO
+        from uliweb.utils.image import thumbnail_image, fix_filename
+    
+        File = get_model('tutorials_albums')
+        
+        if request.method == 'POST':
+            _filename = os.path.join('tutorial/%s' % tid, request.values.get('filename'))
+            fobj = StringIO(base64.b64decode(request.params.get('data')))
+            filename = functions.save_file(_filename, fobj)
+            #process thumbnail
+            rfilename, thumbnail = thumbnail_image(functions.get_filename(filename, filesystem=True), filename, settings.get_var('TUTORIALS/IMAGE_THUMBNAIL_SIZE'))
+            thumbnail_url = functions.get_href(thumbnail)
+            url = functions.get_href(filename)
+            f = File(filename=filename, tutorial=int(tid))
+            f.save()
+            return json({'success':True, 'data':{'filename':request.values.get('filename'), 'url':url, 'thumbnail_url':thumbnail_url, 'id':f.id}})
+    
