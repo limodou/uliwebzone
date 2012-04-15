@@ -228,3 +228,5 @@ float:none;
 	-o-animation-name: swing;
 	animation-name: swing;
 }
+
+.CodeMirror {border: 1px solid #ccc;}
