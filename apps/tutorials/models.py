@@ -52,7 +52,7 @@ class Tutorials_Chapters(Model):
     parent = SelfReference(verbose_name='上级章节', collection_name='children_chapters')
     title = Field(str, max_length=255, verbose_name='标题', required=True)
     order = Field(int, verbose_name='顺序号')
-    content = Field(TEXT, verbose_name='内容', default='', nullable=False)
+    content = Field(TEXT, verbose_name='内容', default='', nullable=False, required=True)
     format = Field(CHAR, max_length=1, verbose_name='格式', choices=get_var('TUTORIALS/format'), default='1')
     render = Field(CHAR, max_length=1, verbose_name='渲染器', choices=get_var('TUTORIALS/render'), default='1')
     html = Field(TEXT, verbose_name='显示内容', default='', nullable=False)

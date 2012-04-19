@@ -94,7 +94,7 @@ class TutGrammar(WikiGrammar):
     
     def parse(self, text, root=None, skipWS=False, **kwargs):
         if not text:
-            return ''
+            return '\n'
         if text[-1] not in ('\r', '\n'):
             text = text + '\n'
         return parseLine(text, root or self.root, skipWS=skipWS, **kwargs)
