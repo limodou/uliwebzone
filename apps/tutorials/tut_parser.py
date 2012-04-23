@@ -1,7 +1,8 @@
 from par.pyPEG import *
 import re
 import types
-from par import WikiGrammar, WikiHtmlVisitor, SimpleVisitor
+from par import SimpleVisitor
+from par.gwiki import WikiGrammar, WikiHtmlVisitor
 
 _ = re.compile
 
