@@ -34,7 +34,8 @@ width:320px;
             <div class="outter">
                 <div class="content-inner rounded_bottom" id="article">
                 <h2 class="section">{{=object.title}}</h2>
-                {{<< content}}
+                {{se = html.index('====><====')}}
+                {{<< html[:se]}}
                 <div class="tutorial-footer">
                     <p>评论 <a id="global-comment-count" href="/tutorial/view_paragraph_comments/{{=object.id}}?para=0" class="para-comments-count right animated">0</a>
                         <span class="gray">{{=unicode(object.modified_user)}} 于 {{=object.modified_date}} 更新</span>
@@ -53,9 +54,7 @@ width:320px;
             <div id="div_titles">
                 <h3 class="section">目录</h3>
                 <ul class="nav unstyled" id="titles">
-                    {{for level, _id, title in titles:}}
-                        <li style="padding-left:{{=(level-2)*20}}px"><a href="#{{=_id}}">{{=title}}</a></li>
-                    {{pass}}
+                    {{<< html[se+10:]}}
                 </ul>
             </div>
         </div>
@@ -88,7 +87,7 @@ width:320px;
         return $(this).each(function () {
           var element = this;
           $(element).click(function (event) {
-            var elementClick = $(element).attr("href");
+            var elementClick = $(element).attr("href").replace(/\./g, '\\.');
             var destination = $(elementClick).offset().top - options.offset;
             $("html,body").animate({
               scrollTop: destination
@@ -107,7 +106,7 @@ width:320px;
         window.prettyPrint && prettyPrint();
         
         //増加标题探测
-        $('body').scrollspy({target:'#div_titles', offset:50});
+        $('body').scrollspy({target:'#titles', offset:50});
         
         $.ajax({
             type:'GET',

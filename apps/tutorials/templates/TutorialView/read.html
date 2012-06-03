@@ -100,6 +100,13 @@
                     {{pass}}
                     <a href="/tutorial/view_chapter/{{=row.id}}" class="chapter-title" id="info-{{=row.id}}">{{=row.title}}</a>
                     <span class="small gray">字数: {{=row.chars_count}}</span>
+                    <span class="badge badge-info" title="评论数">{{=row.comments_count}}</span>
+                    {{from datetime import timedelta
+                    from uliweb.utils import date
+                    }}
+                    {{if (row.modified_date+timedelta(settings.get_var('TUTORIALS/new_diff_days')))>=date.now():}}
+                        <img src="/static/tutorials/new.png"/>
+                    {{pass}}
                     <script>
                         $(function(){
                             var txt = (

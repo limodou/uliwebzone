@@ -161,9 +161,11 @@ class TutorialView(object):
             order, = self.model_chapters.filter(self.model_chapters.c.tutorial==int(t_id)).values_one(func.max(self.model_chapters.c.order))
             data['order'] = order+1 if order>0 else 1
             data['content'] = self._prepare_content(data['content'], data['render'])
+            data['html'] = self._get_chapter_html(data['content'], data['render'])
             data['chars_count'] = len(data['content'])
             data['modified_date'] = date.now()
             data['modified_user'] = request.user.id
+            data['format'] = '2'
             
         def post_save(obj, data):
             obj.tutorial.modified_date = date.now()
@@ -174,49 +176,60 @@ class TutorialView(object):
         view = AddView(self.model_chapters, ok_url=get_url, pre_save=pre_save,
             template_data=template_data, post_save=post_save)
         return view.run()
+    
+    def _get_chapter_html(self, text, render):
+        from tut_parser import TutVisitor, RevealVisitor
+        from par.md import MarkdownGrammar
+        from uliweb import application
+        
+        g = MarkdownGrammar()
+        result, rest = g.parse(text, resultSoFar=[], skipWS=False)
+        
+        if not render or render == '1': #html
+            t = TutVisitor(grammar=g)
+            
+        elif render == '2': #reveal
+            t = RevealVisitor(grammar=g)
+        
+        content = t.visit(result, root=True)
+        txt = application.template('TutorialView/chapter_html.html', 
+            {'content':content, 'titles':t.titles})
+        return txt
         
     def view_chapter(self, id):
         """
         查看教程
         """
-#        from uliweb.utils.generic import DetailView
-        from tut_parser import TutGrammar, TutVisitor, RevealVisitor
         
         obj = self.model_chapters.get_or_notfound(int(id))
         if obj.deleted:
             flash('此章节已经被删除！')
             return redirect(url_for(TutorialView.read, id=obj._tutorial_))
         
-#        view = DetailView(self.model_chapters, obj=obj)
-#        return view.run()
-
-        g = TutGrammar()
-        result, rest = g.parse(obj.content, resultSoFar=[], skipWS=False)
+        if not obj.html:
+            obj.html = self._get_chapter_html(obj.content, obj.render)
+            obj.save()
         
-        if not obj.render or obj.render == '1': #html
-            t = TutVisitor()
-            
-        elif obj.render == '2': #reveal
-            t = RevealVisitor()
+        if obj.render == '2': #reveal
             response.template = 'TutorialView/render_reveal.html'
-        
-        content = t.visit(result, root=True)
-        return {'object':obj, 'content':content, 'titles':t.titles}
+            
+        return {'object':obj, 'html':obj.html}
     
     def _prepare_content(self, text, render='html'):
         """
         对文本进行预处理，对每个段落识别[[#]]标记，计算最大值，同时如果不存在，
         则自动添加[[#]]
         """
-        from tut_parser import TutGrammar, TutCVisitor, TutTextVisitor
+        from tut_parser import TutCVisitor, TutTextVisitor
+        from par.md import MarkdownGrammar
         
         if render == '1':   #html
-            g = TutGrammar()
+            g = MarkdownGrammar()
             result, rest = g.parse(text, resultSoFar=[], skipWS=False)
-            t = TutCVisitor()
-            new_text = t.visit(result)
+            t = TutCVisitor(g)
+            new_text = t.visit(result, True)
             result, rest = g.parse(new_text, resultSoFar=[], skipWS=False)
-            result = TutTextVisitor(t.max_id).visit(result)
+            result = TutTextVisitor(t.max_id, g).visit(result, True)
         else:
             result = text
         return result
@@ -231,6 +244,7 @@ class TutorialView(object):
         
         def pre_save(obj, data):
             data['content'] = self._prepare_content(data['content'], data['render'])
+            data['html'] = self._get_chapter_html(data['content'], data['render'])
             data['chars_count'] = len(data['content'])
             data['modified_date'] = date.now()
             data['modified_user'] = request.user.id

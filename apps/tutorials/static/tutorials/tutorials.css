@@ -22,7 +22,7 @@ background-color: #eee;padding:8px;border-top:2px solid #717171;}
 .buttons {margin-top:10px;}
 #div_titles{position:fixed;width:30%;}
 #titles{overflow-y:auto;}
-#titles li{font-size:16px;line-height: 20px;padding-left:4px;}
+#titles li{font-size:16px;line-height: 20px;}
 #titles li a{padding:4px;}
 #titles li:hover{background-color:RoyalBlue;color:white;
 -webkit-box-shadow:1px 1px 3px #292929;
