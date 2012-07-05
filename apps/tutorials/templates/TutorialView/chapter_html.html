@@ -1,0 +1,5 @@
+{{<< content}}
+====><====
+{{for level, _id, title in titles:}}
+    <li style="padding-left:{{=(level-2)*20}}px"><a href="#{{=_id}}">{{=title}}</a></li>
+{{pass}}
