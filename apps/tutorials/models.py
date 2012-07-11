@@ -63,16 +63,16 @@ class Tutorials_Chapters(Model):
     deleted = Field(bool, verbose_name='删除标志')
     chars_count = Field(int, verbose_name='字节数', default=0, server_default='0')
     comments_count = Field(int, verbose_name='评论条数', default=0, server_default='0')
-    enable_para_comment = Field(bool, verbose_name='是否打开段落评论', default=True)
+    #enable_para_comment = Field(bool, verbose_name='是否打开段落评论', default=True)
     
     def __unicode__(self):
         return self.title
     
     class AddForm:
-        fields = ['title', 'content', 'render', 'enable_para_comment']
+        fields = ['title', 'content', 'format', 'render']
     
     class EditForm:
-        fields = ['title', 'content', 'render', 'hits', 'votes', 'comments_count', 'enable_para_comment']
+        fields = ['title', 'content', 'format', 'render']
 
     @classmethod
     def OnInit(cls):

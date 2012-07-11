@@ -26,7 +26,6 @@ class TutorialView(object):
         教程显示首页
         """
         from uliweb.utils.generic import ListView
-        import math
 
         condition = (self.model.c.deleted==False)
 
@@ -104,6 +103,11 @@ class TutorialView(object):
             fcls.authors.query = obj.authors.all()
         
         obj = self.model.get_or_notfound(int(id))
+        
+        if not self._can_edit_tutorial(obj):
+            flash("你无权修改教程", 'error')
+            return redirect(url_for(TutorialView.read, id=id))
+        
         view = EditView(self.model, ok_url=url_for(TutorialView.read, id=id), 
             obj=obj, pre_save=pre_save, post_created_form=post_created_form)
         return view.run()
@@ -122,6 +126,11 @@ class TutorialView(object):
                 obj.save()
                 
         obj = self.model.get_or_notfound(int(id))
+        
+        if not self._can_edit_tutorial(obj):
+            flash("你无权删除教程", 'error')
+            return redirect(url_for(TutorialView.read, id=id))
+        
         view = MyDelete(self.model, ok_url=url_for(TutorialView.index), 
             obj=obj)
         return view.run()
@@ -151,6 +160,10 @@ class TutorialView(object):
         
         obj = self.model.get_or_notfound(int(t_id))
 
+        if not self._can_edit_tutorial(obj):
+            flash("你无权添加新章节", 'error')
+            return redirect(url_for(TutorialView.read, id=t_id))
+        
         def get_url(**kwargs):
             return url_for(TutorialView.view_chapter, **kwargs)
         
@@ -160,8 +173,8 @@ class TutorialView(object):
             data['tutorial'] = int(t_id)
             order, = self.model_chapters.filter(self.model_chapters.c.tutorial==int(t_id)).values_one(func.max(self.model_chapters.c.order))
             data['order'] = order+1 if order>0 else 1
-            data['content'] = self._prepare_content(data['content'], data['render'])
-            data['html'] = self._get_chapter_html(data['content'], data['render'])
+#            data['content'] = self._prepare_content(data['content'], data['render'])
+            data['html'] = self._get_chapter_html(data['content'], data['format'], data['render'])
             data['chars_count'] = len(data['content'])
             data['modified_date'] = date.now()
             data['modified_user'] = request.user.id
@@ -177,24 +190,31 @@ class TutorialView(object):
             template_data=template_data, post_save=post_save)
         return view.run()
     
-    def _get_chapter_html(self, text, render):
-        from tut_parser import TutVisitor, RevealVisitor
-        from par.md import MarkdownGrammar
-        from uliweb import application
+    def _can_edit_tutorial(self, obj):
+        from uliweb import request
         
-        g = MarkdownGrammar()
+        return (obj.authors.has(request.user) or 
+            functions.has_role(request.user, 'superuser'))
+        
+    def _get_chapter_html(self, text, format, render):
+        if format == '1':
+            from par.gwiki import WikiGrammar as grammar
+            from par.gwiki import WikiHtmlVisitor as parser
+            from tut_parser import WikiRevealVisitor as reveal
+        elif format == '2':
+            from par.md import MarkdownGrammar as grammar
+            from par.md import MarkdownHtmlVisitor as parser
+            from tut_parser import MDRevealVisitor as reveal
+        if render == '2':
+            parser = reveal
+        
+        g = grammar()
         result, rest = g.parse(text, resultSoFar=[], skipWS=False)
         
-        if not render or render == '1': #html
-            t = TutVisitor(grammar=g)
+        t = parser(grammar=g, tag_class={'table':'table'})
             
-        elif render == '2': #reveal
-            t = RevealVisitor(grammar=g)
-        
         content = t.visit(result, root=True)
-        txt = application.template('TutorialView/chapter_html.html', 
-            {'content':content, 'titles':t.titles})
-        return txt
+        return content
         
     def view_chapter(self, id):
         """
@@ -207,7 +227,7 @@ class TutorialView(object):
             return redirect(url_for(TutorialView.read, id=obj._tutorial_))
         
         if not obj.html:
-            obj.html = self._get_chapter_html(obj.content, obj.render)
+            obj.html = self._get_chapter_html(obj.content, obj.format, obj.render)
             obj.save()
         
         if obj.render == '2': #reveal
@@ -215,24 +235,24 @@ class TutorialView(object):
             
         return {'object':obj, 'html':obj.html}
     
-    def _prepare_content(self, text, render='html'):
-        """
-        对文本进行预处理，对每个段落识别[[#]]标记，计算最大值，同时如果不存在，
-        则自动添加[[#]]
-        """
-        from tut_parser import TutCVisitor, TutTextVisitor
-        from par.md import MarkdownGrammar
-        
-        if render == '1':   #html
-            g = MarkdownGrammar()
-            result, rest = g.parse(text, resultSoFar=[], skipWS=False)
-            t = TutCVisitor(g)
-            new_text = t.visit(result, True)
-            result, rest = g.parse(new_text, resultSoFar=[], skipWS=False)
-            result = TutTextVisitor(t.max_id, g).visit(result, True)
-        else:
-            result = text
-        return result
+#    def _prepare_content(self, text, render='html'):
+#        """
+#        对文本进行预处理，对每个段落识别[[#]]标记，计算最大值，同时如果不存在，
+#        则自动添加[[#]]
+#        """
+#        from tut_parser import TutCVisitor, TutTextVisitor
+#        from par.md import MarkdownGrammar
+#        
+#        if render == '1':   #html
+#            g = MarkdownGrammar()
+#            result, rest = g.parse(text, resultSoFar=[], skipWS=False)
+#            t = TutCVisitor(g)
+#            new_text = t.visit(result, True)
+#            result, rest = g.parse(new_text, resultSoFar=[], skipWS=False)
+#            result = TutTextVisitor(t.max_id, g).visit(result, True)
+#        else:
+#            result = text
+#        return result
         
     def edit_chapter(self, id):
         """
@@ -242,9 +262,13 @@ class TutorialView(object):
     
         obj = self.model_chapters.get_or_notfound(int(id))
         
+        if not self._can_edit_tutorial(obj.tutorial):
+            flash("你无权添加新章节", 'error')
+            return redirect(url_for(TutorialView.view_chapter, id=id))
+        
         def pre_save(obj, data):
-            data['content'] = self._prepare_content(data['content'], data['render'])
-            data['html'] = self._get_chapter_html(data['content'], data['render'])
+#            data['content'] = self._prepare_content(data['content'], data['render'])
+            data['html'] = self._get_chapter_html(data['content'], data['format'], data['render'])
             data['chars_count'] = len(data['content'])
             data['modified_date'] = date.now()
             data['modified_user'] = request.user.id

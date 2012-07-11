@@ -7,6 +7,8 @@
 {{use "pageslide"}}
 {{use "jqutils",ajaxForm=True}}
 {{use "poshytip"}}
+{{use "toc"}}
+{{use "fontawesome"}}
 
 <style>
 #pageslide {
@@ -33,30 +35,48 @@ width:320px;
         <div class="span8">
             <div class="outter">
                 <div class="content-inner rounded_bottom" id="article">
-                <h2 class="section">{{=object.title}}</h2>
-                {{se = html.index('====><====')}}
-                {{<< html[:se]}}
-                <div class="tutorial-footer">
-                    <p>评论 <a id="global-comment-count" href="/tutorial/view_paragraph_comments/{{=object.id}}?para=0" class="para-comments-count right animated">0</a>
-                        <span class="gray">{{=unicode(object.modified_user)}} 于 {{=object.modified_date}} 更新</span>
-                    </p>
                     {{if object.tutorial.authors.has(request.user) or has_role(request.user, 'superuser'):}}
-                    <div class="buttons">
-                    <a href="/tutorial/edit_chapter/{{=object.id}}" class="btn btn-primary">编辑</a>
-                    <a href="/tutorial/delete_chapter/{{=object.id}}" class="btn btn-danger">删除</a>
+                    <div class="buttons" align="right">
+                    <a href="/tutorial/edit_chapter/{{=object.id}}" class="btn btn-primary"><i class="icon-edit"></i>编辑</a>
+                    <a href="/tutorial/delete_chapter/{{=object.id}}" class="btn btn-danger"><i class="icon-trash"></i>删除</a>
                     </div>
                     {{pass}}
+                    <h1 class="section">{{=object.title}}</h1>
+                    <div style="margin-top:-10px;margin-bottom:20px;">
+                        <!-- 评论 <a id="global-comment-count" href="/tutorial/view_paragraph_comments/{{=object.id}}?para=0" class="para-comments-count right animated">0</a> -->
+                            <span class="gray">{{=unicode(object.modified_user)}} 于 {{=object.modified_date}} 更新</span>
+                        
+                    </div>
+                
+                    {{<<object.html}}
+                <!-- <hr/>
+                    <div id="disqus_thread"></div>
+                    <script type="text/javascript">
+                       /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+                       var disqus_shortname = 'uliwebzone'; // required: replace example with your forum shortname
+            
+                       /* * * DON'T EDIT BELOW THIS LINE * * */
+                       (function() {
+                           var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                           dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+                           (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                       })();
+                   </script>
+                   <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+                   <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+                -->
+                    <div class="tutorial-footer">
+                        <p>评论 <a id="global-comment-count" href="/tutorial/view_paragraph_comments/{{=object.id}}?para=0" class="para-comments-count right animated">0</a>
+                            <span class="gray">{{=unicode(object.modified_user)}} 于 {{=object.modified_date}} 更新</span>
+                        </p>
+                    </div>
+                
                 </div>
-                </div>
+                
             </div>
         </div>
         <div class="span4">
-            <div id="div_titles">
-                <h3 class="section">目录</h3>
-                <ul class="nav unstyled" id="titles">
-                    {{<< html[se+10:]}}
-                </ul>
-            </div>
+            <div id="toc"></div>
         </div>
     </div>
 </div>
@@ -75,7 +95,7 @@ width:320px;
     }
     
     //滚动插件
-    (function () {
+    /*(function () {
       $.fn.anchorScroll = function (options) {
         var defaults = {
           speed: 1100,
@@ -99,6 +119,7 @@ width:320px;
         })
       }
     })(jQuery);
+    */
     
 
     $(function(){
@@ -106,7 +127,7 @@ width:320px;
         window.prettyPrint && prettyPrint();
         
         //増加标题探测
-        $('body').scrollspy({target:'#titles', offset:50});
+        //$('body').scrollspy({target:'#titles', offset:50});
         
         $.ajax({
             type:'GET',
@@ -142,19 +163,29 @@ width:320px;
                 
             }
         });
+        /*
         $('p.tutorial_p').hover(function(e){
             $(this).find('a.para-comments-count').addClass('swing');
         }, function(e){
             $(this).find('a.para-comments-count').removeClass('swing');
         });
+        */
         
         //増加限制目录区高度的处理
-        $('#titles').height(viewport().height - 160);
+        //$('#titles').height(viewport().height - 160);
         
         //限定pageslide的高度
         //$('#pageslide').height(viewport().height - 160);
         //实现平滑滚动
-        $('#titles a').anchorScroll({offset:50});
+        //$('#titles a').anchorScroll({offset:50});
+        
+        $('#toc').height(viewport().height - 160);
+        $('#toc').toc({
+            'selectors': 'h2,h3', //elements to use as headings
+            'highlightOffset': 0, //offset to trigger the next headline
+            'offset': 50
+        });
+        
         
     });
 </script>

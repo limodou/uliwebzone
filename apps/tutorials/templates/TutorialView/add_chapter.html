@@ -35,6 +35,11 @@
 </div>
     
 <script>
-    var myCodeMirror = CodeMirror.fromTextArea($('#field_content').get(0));
+    $(function(){
+        var myCodeMirror = CodeMirror.fromTextArea($('#field_content').get(0), {
+            matchBrackets: true,
+            theme: "default"
+          });
+    });
 </script>
 {{end}}
