@@ -162,7 +162,8 @@ class TutorialView(object):
 
         if not self._can_edit_tutorial(obj):
             flash("你无权添加新章节", 'error')
-            return redirect(url_for(TutorialView.read, id=t_id))
+#            return redirect(url_for(TutorialView.read, id=t_id))
+            raise Redirect(url_for(TutorialView.read, id=t_id))
         
         def get_url(**kwargs):
             return url_for(TutorialView.view_chapter, **kwargs)
@@ -211,7 +212,7 @@ class TutorialView(object):
         g = grammar()
         result, rest = g.parse(text, resultSoFar=[], skipWS=False)
         
-        t = parser(grammar=g, tag_class={'table':'table'})
+        t = parser(grammar=g, tag_class={'table':'table', 'pre':'prettyprint pre-scrollable linenums'})
             
         content = t.visit(result, root=True)
         return content
