@@ -3,17 +3,57 @@
 {{block content}}
 
 {{use "jquery", ui=True}}
-{{use "prettify", theme="sons-of-obsidian"}}
+{{#use "prettify"}}
+{{use "prettify", theme=theme}}
 {{use "pageslide"}}
 {{use "jqutils",ajaxForm=True}}
 {{use "poshytip"}}
 {{use "toc"}}
 {{use "fontawesome"}}
+{{link "tutorials/comment.js"}}
+{{#link "scrollbar/nanoscroller.css"}}
+{{#link "scrollbar/jquery.nanoscroller.min.js"}}
+{{#link "totop/ui.totop.css"}}
+{{link "totop/jquery.ui.totop.js"}}
 
 <style>
 #pageslide {
 width:320px;
 }
+/* scrollbar  */
+.nano .content      { padding: 10px; }
+.nano .pane         { background: #999; }
+.nano .pane .slider { background: #111; }
+
+#toTop {
+	display:none;
+    padding-right:2px;
+	text-decoration:none;
+	position:fixed;
+	bottom:10px;
+	right:415px;
+	overflow:hidden;
+	width:16px;
+	border:1px solid Orange;
+    background-color: Orange;
+    color:#000;
+    text-align: center;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+}
+
+#toTopHover {
+	display:block;
+	overflow:hidden;
+	float:left;
+	-moz-opacity: 0;
+}
+
+#toTop:active, #toTop:focus {
+	outline:none;
+}
+
 </style>
 <div class="container-fluid">
     <div class="row-fluid">
@@ -33,17 +73,12 @@ width:320px;
     </div>
     <div class="row-fluid">
         <div class="span8">
+            {{include "TutorialView/inc_check_browser.html"}}
             <div class="outter">
                 <div class="content-inner rounded_bottom" id="article">
-                    {{if object.tutorial.authors.has(request.user) or has_role(request.user, 'superuser'):}}
-                    <div class="buttons" align="right">
-                    <a href="/tutorial/edit_chapter/{{=object.id}}" class="btn btn-primary"><i class="icon-edit"></i>编辑</a>
-                    <a href="/tutorial/delete_chapter/{{=object.id}}" class="btn btn-danger"><i class="icon-trash"></i>删除</a>
-                    </div>
-                    {{pass}}
                     <h1 class="section">{{=object.title}}</h1>
                     <div style="margin-top:-10px;margin-bottom:20px;">
-                        <!-- 评论 <a id="global-comment-count" href="/tutorial/view_paragraph_comments/{{=object.id}}?para=0" class="para-comments-count right animated">0</a> -->
+                        <!-- 评论 <a id="global-comment-count" href="/tutorial/view_paragraph_comments/{{=object.id}}?para=0" class="para-comments-count active right animated">0</a> -->
                             <span class="gray">{{=unicode(object.modified_user)}} 于 {{=object.modified_date}} 更新</span>
                         
                     </div>
@@ -66,7 +101,7 @@ width:320px;
                    <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
                 -->
                     <div class="tutorial-footer">
-                        <p>评论 <a id="global-comment-count" href="/tutorial/view_paragraph_comments/{{=object.id}}?para=0" class="para-comments-count right animated">0</a>
+                        <p>评论 <a id="global-comment-count" href="/tutorial/view_paragraph_comments/{{=object.id}}?para=0" class="para-comments-count active right animated">0</a>
                             <span class="gray">{{=unicode(object.modified_user)}} 于 {{=object.modified_date}} 更新</span>
                         </p>
                     </div>
@@ -75,13 +110,28 @@ width:320px;
                 
             </div>
         </div>
-        <div class="span4">
-            <div id="toc"></div>
+        <div class="span4" id="right-side">
+            {{if object.tutorial.authors.has(request.user) or has_role(request.user, 'superuser'):}}
+            <div class="btn-toolbar" style="margin-bottom:10px;position:fixed;">
+                <div class="btn-group">
+                <a href="/tutorial/edit_chapter/{{=object.id}}" class="btn btn-primary"><i class="icon-edit"></i>编辑</a>
+                </div>
+                <div class="btn-group">
+                <a href="/tutorial/delete_chapter/{{=object.id}}" class="btn btn-danger"><i class="icon-trash"></i>删除</a>
+                </div>
+            </div>
+            {{pass}}
+            <div id="toc-container" class="nano">
+            <div id="toc" class="content"></div>
+            </div>
         </div>
     </div>
 </div>
 <div id="para-comments" style="display:none;">
 </div>
+<style>
+#toc {top:140px;}
+</style>
 <script>
     function viewport()
     {
@@ -147,7 +197,7 @@ width:320px;
                     $('#global-comment-count').text(data['0']);
                 }
                 //处理pageslide
-                $('a.para-comments-count').pageslide({
+                $('a.para-comments-count.active').pageslide({
                     //'href':'#para-comments',
                     iframe:false,
                     direction:'right',
@@ -179,13 +229,21 @@ width:320px;
         //实现平滑滚动
         //$('#titles a').anchorScroll({offset:50});
         
-        $('#toc').height(viewport().height - 160);
+        $('#toc').height(viewport().height - $('#toc').offset()['top'] - 40);
         $('#toc').toc({
             'selectors': 'h2,h3', //elements to use as headings
             'highlightOffset': 0, //offset to trigger the next headline
             'offset': 50
         });
         
+        //増加代码提示
+        $('pre').code_comment();
+        
+        //处理回到顶部显示
+        $('.outter').UItoTop({ easingType: 'easeOutQuart', text:'<i class="icon-arrow-up"></i>回到顶部' });
+        
+        //处理动态滚动条
+        //$("#toc-container").nanoScroller();
         
     });
 </script>

@@ -53,7 +53,7 @@ class Tutorials_Chapters(Model):
     title = Field(str, max_length=255, verbose_name='标题', required=True)
     order = Field(int, verbose_name='顺序号')
     content = Field(TEXT, verbose_name='内容', default='', nullable=False, required=True)
-    format = Field(CHAR, max_length=1, verbose_name='格式', choices=get_var('TUTORIALS/format'), default='1')
+    format = Field(CHAR, max_length=1, verbose_name='格式', choices=get_var('TUTORIALS/format'), default='2')
     render = Field(CHAR, max_length=1, verbose_name='渲染器', choices=get_var('TUTORIALS/render'), default='1')
     html = Field(TEXT, verbose_name='显示内容', default='', nullable=False)
     modified_user = Reference('user', verbose_name='修改人')
@@ -64,15 +64,18 @@ class Tutorials_Chapters(Model):
     chars_count = Field(int, verbose_name='字节数', default=0, server_default='0')
     comments_count = Field(int, verbose_name='评论条数', default=0, server_default='0')
     #enable_para_comment = Field(bool, verbose_name='是否打开段落评论', default=True)
+    theme = Field(CHAR, max_length=1, verbose_name='代码块样式', choices=get_var('TUTORIALS/theme'), default='1')
+    linenum = Field(bool, verbose_name='行号显示')
+    scrollable = Field(bool, verbose_name='代码滚动')
     
     def __unicode__(self):
         return self.title
     
     class AddForm:
-        fields = ['title', 'content', 'format', 'render']
+        fields = ['title', 'content', 'format', 'render', 'theme', 'scrollable']
     
     class EditForm:
-        fields = ['title', 'content', 'format', 'render']
+        fields = ['title', 'content', 'format', 'render', 'theme', 'scrollable']
 
     @classmethod
     def OnInit(cls):

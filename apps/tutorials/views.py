@@ -175,7 +175,7 @@ class TutorialView(object):
             order, = self.model_chapters.filter(self.model_chapters.c.tutorial==int(t_id)).values_one(func.max(self.model_chapters.c.order))
             data['order'] = order+1 if order>0 else 1
 #            data['content'] = self._prepare_content(data['content'], data['render'])
-            data['html'] = self._get_chapter_html(data['content'], data['format'], data['render'])
+            data['html'] = self._get_chapter_html(data['content'], data['format'], data['render'], data['scrollable'])
             data['chars_count'] = len(data['content'])
             data['modified_date'] = date.now()
             data['modified_user'] = request.user.id
@@ -187,8 +187,9 @@ class TutorialView(object):
             obj.tutorial.save();
             
         template_data = {'object':obj}
+        data = {'scrollable':True}
         view = AddView(self.model_chapters, ok_url=get_url, pre_save=pre_save,
-            template_data=template_data, post_save=post_save)
+            template_data=template_data, post_save=post_save, data=data)
         return view.run()
     
     def _can_edit_tutorial(self, obj):
@@ -197,7 +198,10 @@ class TutorialView(object):
         return (obj.authors.has(request.user) or 
             functions.has_role(request.user, 'superuser'))
         
-    def _get_chapter_html(self, text, format, render):
+    def _get_chapter_html(self, text, format, render, scrollable):
+        from par.bootstrap_ext import blocks
+        from md_ext import code_comment
+        
         if format == '1':
             from par.gwiki import WikiGrammar as grammar
             from par.gwiki import WikiHtmlVisitor as parser
@@ -212,7 +216,13 @@ class TutorialView(object):
         g = grammar()
         result, rest = g.parse(text, resultSoFar=[], skipWS=False)
         
-        t = parser(grammar=g, tag_class={'table':'table', 'pre':'prettyprint pre-scrollable linenums'})
+        blocks['code-comment'] = code_comment
+        cls = 'prettyprint linenums'
+        if scrollable:
+            cls += ' pre-scrollable'
+        t = parser(grammar=g, tag_class={'table':'table', 
+                'pre':cls}, 
+            block_callback=blocks)
             
         content = t.visit(result, root=True)
         return content
@@ -228,13 +238,13 @@ class TutorialView(object):
             return redirect(url_for(TutorialView.read, id=obj._tutorial_))
         
         if not obj.html:
-            obj.html = self._get_chapter_html(obj.content, obj.format, obj.render)
+            obj.html = self._get_chapter_html(obj.content, obj.format, obj.render, obj.scrollable)
             obj.save()
         
         if obj.render == '2': #reveal
             response.template = 'TutorialView/render_reveal.html'
             
-        return {'object':obj, 'html':obj.html}
+        return {'object':obj, 'html':obj.html, 'theme':obj.get_display_value('theme')}
     
 #    def _prepare_content(self, text, render='html'):
 #        """
@@ -269,7 +279,7 @@ class TutorialView(object):
         
         def pre_save(obj, data):
 #            data['content'] = self._prepare_content(data['content'], data['render'])
-            data['html'] = self._get_chapter_html(data['content'], data['format'], data['render'])
+            data['html'] = self._get_chapter_html(data['content'], data['format'], data['render'], data['scrollable'])
             data['chars_count'] = len(data['content'])
             data['modified_date'] = date.now()
             data['modified_user'] = request.user.id
