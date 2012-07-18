@@ -216,13 +216,16 @@ class TutorialView(object):
         g = grammar()
         result, rest = g.parse(text, resultSoFar=[], skipWS=False)
         
-        blocks['code-comment'] = code_comment
-        cls = 'prettyprint linenums'
-        if scrollable:
-            cls += ' pre-scrollable'
-        t = parser(grammar=g, tag_class={'table':'table', 
-                'pre':cls}, 
-            block_callback=blocks)
+        if render == '2':
+            t = parser(grammar=g, tag_class={'table':'table'})
+        else:
+            blocks['code-comment'] = code_comment
+            cls = 'prettyprint linenums'
+            if scrollable:
+                cls += ' pre-scrollable'
+            t = parser(grammar=g, tag_class={'table':'table', 
+                    'pre':cls}, 
+                block_callback=blocks)
             
         content = t.visit(result, root=True)
         return content

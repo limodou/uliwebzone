@@ -5,10 +5,11 @@
 		<title>{{block title}}reveal{{end}}</title>
 		<link rel="stylesheet" href="/static/reveal/css/reset.css">
 		<link rel="stylesheet" href="/static/reveal/css/main.css">
-		<link rel="stylesheet" href="/static/reveal/lib/zenburn.css">
+		<link rel="stylesheet" href="/static/reveal/css/print.css" type="text/css" media="print">
+		<link rel="stylesheet" href="/static/reveal/lib/css/zenburn.css">
 	</head>
 	<body>
-		<div id="reveal">
+		<div class="reveal">
 			<div class="slides">
 				{{block content}}
 				<section>
@@ -227,44 +228,52 @@
 			
 		</div>
 		
-		<script src="/static/reveal/js/reveal.js"></script>
+		<script src="/static/reveal/lib/js/head.min.js"></script>
 
-		<!-- Optional libraries for code syntax highlighting and classList support in IE9 -->
-		<script src="/static/reveal/lib/highlight.js"></script>
-		<script src="/static/reveal/lib/classList.js"></script>
-		
 		<script>
-			// Parse the query string into a key/value object
-			var query = {};
-			location.search.replace( /[A-Z0-9]+?=(\w*)/gi, function(a) {
-				query[ a.split( '=' ).shift() ] = a.split( '=' ).pop();
+			// Load the main reveal.js script
+			head.js( '/static/reveal/js/reveal.js', function() {
+				// Parse the query string into a key/value object
+				var query = {};
+
+				location.search.replace( /[A-Z0-9]+?=(\w*)/gi, function(a) {
+					query[ a.split( '=' ).shift() ] = a.split( '=' ).pop();
+				} );
+
+				Reveal.initialize({
+					// Display controls in the bottom right corner
+					controls: true,
+
+					// Display a presentation progress bar
+					progress: true,
+
+					// If true; each slide will be pushed to the browser history
+					history: true,
+
+					// Loops the presentation, defaults to false
+					loop: false,
+
+					// Flags if mouse wheel navigation should be enabled
+					mouseWheel: true,
+
+					// Apply a 3D roll to links on hover
+					rollingLinks: true,
+
+					// UI style
+					theme: query.theme || 'default', // default/neon/beige
+
+					// Transition style
+					transition: query.transition || 'default' // default/cube/page/concave/linear(2d)
+				});
 			} );
-
-			Reveal.initialize({
-				// Display controls in the bottom right corner
-				controls: true,
-
-				// Display a presentation progress bar
-				progress: true,
-
-				// If true; each slide will be pushed to the browser history
-				history: true,
-
-				// Flags if mouse wheel navigation should be enabled
-				mouseWheel: true,
-
-				// Apply a 3D roll to links on hover
-				rollingLinks: true,
-
-				// UI style
-				theme: query.theme || 'default', // default/neon
-
-				// Transition style
-				transition: query.transition || 'default' // default/cube/page/concave/linear(2d)
-			});
-
-			hljs.initHighlightingOnLoad();
+			
+			// Load third party scripts
+			head.js( '/static/reveal/lib/js/classList.js' );
+			head.js( '/static/reveal/lib/js/highlight.js', function() {
+				// Fire off syntax highlighting for potential code samples in the slides
+				hljs.initHighlightingOnLoad();
+			} );
 		</script>
-
+		
 	</body>
 </html>

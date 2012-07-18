@@ -103,7 +103,8 @@ class MDRevealVisitor(MarkdownHtmlVisitor):
         return b + self.tag('h3', node.find('title_text').text)
 
     def __end__(self):
-        text = super(MDRevealVisitor, self).__end__()
+#        text = super(MDRevealVisitor, self).__end__()
+        text = ''
         if self.section3:
             text += '</section>\n'
         if self.section2:
