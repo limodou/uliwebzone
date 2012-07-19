@@ -434,7 +434,7 @@ class TutorialView(object):
         form = UploadForm()
         flag = form.validate(request.values, request.files)
         if flag:
-            filename = functions.save_file(os.path.join('toturials', str(obj.id), form.filename.data.filename), form.filename.data.file)
+            filename = functions.save_file(os.path.join('tutorials', str(obj.id), form.filename.data.filename), form.filename.data.file)
             #process thumbnail
             rfilename, thumbnail = thumbnail_image(functions.get_filename(filename, filesystem=True), filename, settings.get_var('TUTORIALS/IMAGE_THUMBNAIL_SIZE'))
             thumbnail_url = functions.get_href(thumbnail)
