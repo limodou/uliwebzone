@@ -12,33 +12,34 @@
         {{pass}}
     </div>
 </div>
-<script type="text/html" id="tutorialTemplate">
+<ul class="unstyled tutorial-list" id="tutorials">
+    {{for row in objects:}}
     <li class="tutorial-item clearfix">
-        <img src="${image}" class="preface pull-left" title="${title}"/>
-        <h2><a href="/tutorial/read/${id}">《${title}》</a></h2>
-        <span class="gray">由 ${author} 更新，最后更新时间 ${modified_date}</span>
+        <img src="{{=row.image}}" class="preface pull-left" title="{{=row.title}}"/>
+        <h2><a href="/tutorial/read/{{=row.id}}">《{{=row.title}}》</a></h2>
+        <span class="gray">由 {{=row.author}} 更新，最后更新时间 {{=row.modified_date}}</span>
         <p>
-            ${summary}
+            {{<< row.summary}}
         </p>
         <div class="turorial-buttons">
-            <a href="/tutorial/read/${id}" class="btn btn-primary">点击阅读 &raquo;</a>
+            <a href="/tutorial/read/{{=row.id}}" class="btn btn-primary">点击阅读 &raquo;</a>
         </div>
         <div class="tutorial-info">
-            <span>评论：<a href="#" class="para-comments-count right">${comments_count}</a></span>
+            <span>评论：<a href="#" class="para-comments-count right">{{=row.comments_count}}</a></span>
         </div>
     </li>
-</script>
-
-<ul class="unstyled tutorial-list" id="tutorials">
+    {{pass}}
 </ul>
 
+<div class="pagination">{{<< pagination}}</div>
 <script>
     $(function(){
         $('a.para-comments-count').click(function(e){
             e.preventDefault();
         });
+    /*    
         $('#tutorials').scrollpagination({
-            total: {{=total}},
+            total: {{#=total}},
             pageRows : 10,
             initLoad : true,
             onChange: function(page){
@@ -60,6 +61,7 @@
             }
             
         });
+    */
     });
 </script>
 {{end}}

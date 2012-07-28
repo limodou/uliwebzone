@@ -13,9 +13,7 @@
 {{link "tutorials/comment.js"}}
 {{#link "scrollbar/nanoscroller.css"}}
 {{#link "scrollbar/jquery.nanoscroller.min.js"}}
-{{#link "totop/ui.totop.css"}}
-{{link "totop/jquery.ui.totop.js"}}
-
+{{use "totop"}}
 <style>
 #pageslide {
 width:320px;
@@ -24,35 +22,6 @@ width:320px;
 .nano .content      { padding: 10px; }
 .nano .pane         { background: #999; }
 .nano .pane .slider { background: #111; }
-
-#toTop {
-	display:none;
-    padding-right:2px;
-	text-decoration:none;
-	position:fixed;
-	bottom:10px;
-	right:415px;
-	overflow:hidden;
-	width:16px;
-	border:1px solid Orange;
-    background-color: Orange;
-    color:#000;
-    text-align: center;
-    -webkit-border-radius: 5px;
-    -moz-border-radius: 5px;
-    border-radius: 5px;
-}
-
-#toTopHover {
-	display:block;
-	overflow:hidden;
-	float:left;
-	-moz-opacity: 0;
-}
-
-#toTop:active, #toTop:focus {
-	outline:none;
-}
 
 </style>
 <div class="container-fluid">

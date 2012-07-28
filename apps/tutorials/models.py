@@ -36,6 +36,11 @@ class Tutorials(Model):
         
     class EditForm:
         fields = ['title', 'authors', 'summary']
+        
+    class Table:
+        fields = ['title', 'author', 'image', 'modified_date', 'comments_count',
+            'summary',
+            ]
 
     def get_image(self):
         from uliweb import functions

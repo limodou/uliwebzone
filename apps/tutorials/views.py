@@ -32,21 +32,50 @@ class TutorialView(object):
         pageno = int(request.GET.get('page', 1)) - 1
         rows_per_page = int(request.GET.get('rows', 10))
 
-        if 'data' in request.GET:
-            def render(r, obj):
-                data = dict(r)
-                data['image'] = obj.get_image()
-                data['author'] = unicode(obj.modified_user)
-                data['modified_date'] = self._get_date(obj.modified_date)
-                return data
+#        def render(r, obj):
+#            from uliweb import Storage
+#            
+#            data = Storage(dict(r))
+#            data['image'] = obj.get_image()
+#            data['author'] = unicode(obj.modified_user)
+#            data['modified_date'] = self._get_date(obj.modified_date)
+#            return data
+
+        def image(value, obj):
+            return obj.get_image()
+    
+        def author(value, obj):
+            return unicode(obj.modified_user)
+        
+        def modified_date(value, obj):
+            return self._get_date(obj.modified_date)
+        
+        fields_convert_map = {'image':image, 'author':author, 'modified_date':modified_date}
+        
+        view = ListView(self.model, condition=condition, 
+            order_by=self.model.c.modified_date.desc(), pageno=pageno,
+            rows_per_page=rows_per_page, fields_convert_map=fields_convert_map)
             
-            view = ListView(self.model, condition=condition, 
-                order_by=self.model.c.modified_date.desc(), pageno=pageno,
-                rows_per_page=rows_per_page, render=render)
-            return json(view.json())
-        else:
-            total = self.model.filter(condition).count()
-            return {'total':total}
+        view.query()
+        pagination = functions.create_pagination(request.url, view.total, pageno+1, 
+            rows_per_page)
+        return {'pagination':pagination, 'objects':view.objects()}
+
+#        if 'data' in request.GET:
+#            def render(r, obj):
+#                data = dict(r)
+#                data['image'] = obj.get_image()
+#                data['author'] = unicode(obj.modified_user)
+#                data['modified_date'] = self._get_date(obj.modified_date)
+#                return data
+#            
+#            view = ListView(self.model, condition=condition, 
+#                order_by=self.model.c.modified_date.desc(), pageno=pageno,
+#                rows_per_page=rows_per_page, render=render)
+#            return json(view.json())
+#        else:
+#            total = self.model.filter(condition).count()
+#            return {'total':total}
 
     def add(self):
         """
