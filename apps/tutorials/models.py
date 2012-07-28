@@ -38,7 +38,7 @@ class Tutorials(Model):
         fields = ['title', 'authors', 'summary']
         
     class Table:
-        fields = ['title', 'author', 'image', 'modified_date', 'comments_count',
+        fields = ['id', 'title', 'author', 'image', 'modified_date', 'comments_count',
             'summary',
             ]
 
