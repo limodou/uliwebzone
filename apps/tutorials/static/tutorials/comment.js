@@ -49,13 +49,18 @@ function($) {
     , show: function(){
       var id = this.$element.attr('id') || '', that=this;
       var t = comments[id];
-    console.log('aaaaaaaaaaaa', comments, t);
-      if (t){
+      if (this.$element[0].tagName != 'PRE'){
+        var id = that.$element.data('rel');
+        var title = that.$element.text();
+        var content = t[id];
+        if (content){
+            this.$element.popover({title:title, content:content});
+        }
+      }
+      else if (t){
         $.each(t, function(x, y){
-        console.log('===========', x, y);
             if (/\d+/.test(x)){
                 var el = $('.linenums li:eq('+(parseInt(x)-1)+')', that.$element);
-                console.log(el);
                 if (el){
                     el.css({position:'relative'});
                     var offset = el.offset()
@@ -67,7 +72,7 @@ function($) {
                     }
                     var item = $('<a href="#" class="para-comments-count">'+t+'.</a>')
                     .css({position:'absolute', left:-40}).click(function(e){e.preventDefault();});
-                    item.popover({title:'Line:'+x, content:y})
+                    item.popover({title:'Line:'+x, content:y});
                     $(el).prepend(item);
                 }
             }else{
@@ -77,7 +82,7 @@ function($) {
                     if (r.test(t.text())){
                         var item = ('<code class="nocode" style="background-color:blue;color:#fff;cursor:pointer;">'+x+'</code>');
                         t.html(t.text().replace(r, item));
-                        $('code', t).popover({title:x, content:y})
+                        $('code', t).popover({title:x, content:y});
                     }
                 });
                 
