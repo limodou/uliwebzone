@@ -51,8 +51,8 @@ function($) {
       var t = comments[id];
       if (this.$element[0].tagName != 'PRE'){
         var id = that.$element.data('rel');
-        var title = that.$element.text();
-        var content = t[id];
+        var title = t[id].title || that.$element.text();
+        var content = t[id].content;
         if (content){
             this.$element.popover({title:title, content:content});
         }
@@ -72,7 +72,7 @@ function($) {
                     }
                     var item = $('<a href="#" class="para-comments-count">'+t+'.</a>')
                     .css({position:'absolute', left:-40}).click(function(e){e.preventDefault();});
-                    item.popover({title:'Line:'+x, content:y});
+                    item.popover({title:y.title || 'Line:'+x, content:y.content||y});
                     $(el).prepend(item);
                 }
             }else{
@@ -82,7 +82,7 @@ function($) {
                     if (r.test(t.text())){
                         var item = ('<code class="nocode" style="background-color:blue;color:#fff;cursor:pointer;">'+x+'</code>');
                         t.html(t.text().replace(r, item));
-                        $('code', t).popover({title:x, content:y});
+                        $('code', t).popover({title:y.title||x, content:y.content||y});
                     }
                 });
                 

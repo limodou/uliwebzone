@@ -24,8 +24,13 @@ def code_comment(visitor, items):
             if line.strip():
                 k, v = line.split(':', 1)
                 k = k.strip()
+                if '=' in v:
+                    title, v = v.split('=', 1)
+                    title = title.strip()
+                else:
+                    title = k
                 v = visitor.parse_text(v.strip(), 'article')
-                d[k] = v
+                d[k] = {'title':title, 'content':v}
         if len(x['kwargs']) == 1 and x['kwargs'].keys()[0] != 'target':
             key = x['kwargs'].keys()[0]
         else:
