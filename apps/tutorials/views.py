@@ -101,6 +101,15 @@ class TutorialView(object):
             post_created_form=post_created_form)
         return view.run()
     
+    def _get_hits(self, obj, field_name='hits'):
+        key = '__tutorialvisited__:%s:%s:%d' % (obj.tablename, request.remote_addr, obj.id)
+        cache = functions.get_cache()
+        v = cache.get(key, None)
+        if not v:
+            setattr(obj, field_name, getattr(obj, field_name)+1)
+            obj.save()
+            cache.set(key, 1, settings.get_var('PARA/TUTORIAL_USER_VISITED_TIMEOUT'))
+        
     def view(self, id):
         """
         查看教程
@@ -170,6 +179,9 @@ class TutorialView(object):
         """
         obj = self.model.get_or_notfound(int(id))
         objects = list(self.model_chapters.filter((self.model_chapters.c.tutorial == obj.id) & (self.model_chapters.c.deleted==False)).order_by(self.model_chapters.c.parent, self.model_chapters.c.order))
+        
+        #处理点击次数
+        self._get_hits(obj)
         
         def get_chapters(parent=None, parent_num='', objects=objects):
             index = 1
@@ -268,6 +280,9 @@ class TutorialView(object):
         if obj.deleted:
             flash('此章节已经被删除！')
             return redirect(url_for(TutorialView.read, id=obj._tutorial_))
+        
+        #处理点击次数
+        self._get_hits(obj)
         
         if not obj.html:
             obj.html = self._get_chapter_html(obj.content, obj.format, obj.render, obj.scrollable)

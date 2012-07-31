@@ -39,7 +39,7 @@ class Tutorials(Model):
         
     class Table:
         fields = ['id', 'title', 'author', 'image', 'modified_date', 'comments_count',
-            'summary',
+            'summary', 'hits',
             ]
 
     def get_image(self):

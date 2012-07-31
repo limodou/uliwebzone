@@ -99,7 +99,7 @@
                     <span>[id={{=row.id}}, order={{=row.order}}]</span>
                     {{pass}}
                     <a href="/tutorial/view_chapter/{{=row.id}}" class="chapter-title" id="info-{{=row.id}}">{{=row.title}}</a>
-                    [<span class="small gray">字数:{{=row.chars_count}}/评论数:{{=row.comments_count}}</span>]
+                    [<span class="small gray">字数:{{=row.chars_count}}/评论数:{{=row.comments_count}}/点击次数:{{=row.hits}}</span>]
                     {{if row.render == '1':}}<i class="icon-file" title="文章"></i>{{else:}}<i class="icon-film" title="幻灯"></i>{{pass}}
                     {{from datetime import timedelta
                     from uliweb.utils import date
