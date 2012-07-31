@@ -49,8 +49,9 @@ function($) {
     , show: function(){
       var id = this.$element.attr('id') || '', that=this;
       var t = comments[id];
-      if (this.$element[0].tagName != 'PRE'){
+      if (t && this.$element[0].tagName != 'PRE'){
         var id = that.$element.data('rel');
+        if (!t[id]) return;
         var title = t[id].title || that.$element.text();
         var content = t[id].content;
         if (content){
@@ -100,7 +101,7 @@ function($) {
       //calculate the comment points
       $('script[type="text/code-comment"]').each(function(i, v){
         var x = JSON.parse($(this).html());
-        comments = $.extend(comments, x);
+        comments = $.extend(true, comments, x);
       });
     }
   }
