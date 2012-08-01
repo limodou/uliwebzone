@@ -1,5 +1,6 @@
 {{extend "tutorial_layout.html"}}
 
+{{block title}}{{super}} - {{=object.tutorial.title}} - {{=object.title}}{{end}}
 {{block content}}
 
 {{use "jquery", ui=True}}
@@ -14,6 +15,7 @@
 {{#link "scrollbar/nanoscroller.css"}}
 {{#link "scrollbar/jquery.nanoscroller.min.js"}}
 {{use "totop"}}
+{{use "jqhotkeys"}}
 <style>
 #pageslide {
 width:320px;
@@ -41,9 +43,16 @@ width:320px;
         </div>
     </div>
     <div class="row-fluid">
-        <div class="span8">
+        <div class="span8" id="article">
             {{include "TutorialView/inc_check_browser.html"}}
             <div class="outter">
+                {{if prev:}}<div class="chapter-prev chapter-top animated">
+                    <a prev-chapter href="/tutorial/view_chapter/{{=prev['id']}}"><i class="icon-arrow-left"></i> {{=prev['title']}}</a>
+                </div>{{pass}}
+                {{if next:}}<div class="chapter-next chapter-top animated">
+                    <a next-chapter href="/tutorial/view_chapter/{{=next['id']}}">{{=next['title']}} <i class="icon-arrow-right"></i></a>
+                </div>{{pass}}
+                <div class="expander">&raquo;</div>
                 <div class="content-inner rounded_bottom" id="article">
                     <h1 class="section">{{=object.title}}</h1>
                     <div style="margin-top:-10px;margin-bottom:20px;">
@@ -76,6 +85,19 @@ width:320px;
                         </p>
                     </div>
                 
+                    <div class="alert alert-info">
+                        <a href="#" class="close" data-dismiss="alert">&times;</a>
+                        可以使用<i class="icon-arrow-left"></i>和<i class="icon-arrow-right"></i>来跳转到前一章节或后一章节。
+                        还可以使用<b>回车</b>来扩展或缩小文章区域。
+                    </div>
+                
+                    {{if prev:}}<div class="chapter-prev chapter-down animated">
+                        <a prev-chapter href="/tutorial/view_chapter/{{=prev['id']}}"><i class="icon-arrow-left"></i> {{=prev['title']}}</a>
+                    </div>{{pass}}
+                    {{if next:}}<div class="chapter-next chapter-down animated">
+                        <a next-chapter href="/tutorial/view_chapter/{{=next['id']}}">{{=next['title']}} <i class="icon-arrow-right"></i></a>
+                    </div>{{pass}}
+                    
                 </div>
                 
             </div>
@@ -191,6 +213,12 @@ width:320px;
         });
         */
         
+        $('.chapter-prev, .chapter-next').hover(function(e){
+            $(this).animate({opacity:1}, 500);
+        }, function(e){
+            $(this).animate({opacity:0.5}, 500);;
+        });
+        
         //増加限制目录区高度的处理
         //$('#titles').height(viewport().height - 160);
         
@@ -199,12 +227,21 @@ width:320px;
         //实现平滑滚动
         //$('#titles a').anchorScroll({offset:50});
         
-        $('#toc').height(viewport().height - $('#toc').offset()['top'] - 40);
-        $('#toc').toc({
-            'selectors': 'h2,h3', //elements to use as headings
-            'highlightOffset': 0, //offset to trigger the next headline
-            'offset': 50
+        function setup_toc(){
+            $('#toc').height(viewport().height - $('#toc').offset()['top'] - 40);
+            $('#toc').toc({
+                'selectors': 'h2,h3', //elements to use as headings
+                'highlightOffset': 0, //offset to trigger the next headline
+                'offset': 50
+            });
+        }
+        
+        setup_toc();
+        
+        $(window).resize(function(){
+        	setup_toc();
         });
+        
         
         //増加代码提示
         $('pre, .inline-tag').code_comment();
@@ -214,6 +251,45 @@ width:320px;
         
         //处理动态滚动条
         //$("#toc-container").nanoScroller();
+        
+        //处理左键，右键前后翻页
+        $(document).bind('keydown.left', function(){
+            var el = $('a[prev-chapter]');
+            if (el.length>0){
+                el[0].click();
+            }
+        }).bind('keydown.right', function(){
+            var el = $('a[next-chapter]');
+            if (el.length>0){
+                el[0].click();
+            }
+        }).bind('keydown.return', function(){
+            $('.expander').click();
+        });
+        
+        function reset_totop(){
+            var top = $('#toTop');
+            var that = $('.outter');
+            var left = $(that).outerWidth() + $(that).offset().left + 2;
+            top.offset({left:left, bottom:10});
+        }
+        
+        //处理expander事件，如果点击，则隐藏目录栏
+        $('.expander').click({'opened':false}, function(e){
+            if (!e.data.opened){
+                $('#article').removeClass('span8').addClass('span12');
+                $('#right-side').removeClass('span4').hide();
+                e.data.opened = true;
+                $(this).html('&laquo;');
+            }else{
+                $('#article').removeClass('span12').addClass('span8');
+                $('#right-side').addClass('span4').show();
+                e.data.opened = false;
+                $(this).html('&raquo;');
+            }
+            //处理toTop
+            reset_totop();
+        });
         
     });
 </script>

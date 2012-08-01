@@ -1,5 +1,7 @@
 {{extend "tutorial_layout.html"}}
 
+{{block title}}{{super}} - {{=object.title}}{{end}}
+
 {{block content_main}}
 {{use "jquery",ui=True}}
 {{link "tutorials/jquery.liveflex.Tree.js"}}
@@ -104,7 +106,7 @@
                     {{from datetime import timedelta
                     from uliweb.utils import date
                     }}
-                    {{if (row.modified_date+timedelta(settings.get_var('TUTORIALS/new_diff_days')))>=date.now():}}
+                    {{if (date.to_datetime(row.modified_date)+timedelta(settings.get_var('TUTORIALS/new_diff_days')))>=date.now():}}
                         <img src="/static/tutorials/new.png"/>
                     {{pass}}
                     <script>

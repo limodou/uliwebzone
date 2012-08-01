@@ -1,6 +1,6 @@
 #coding=utf-8
 import os
-from uliweb import expose, functions
+from uliweb import expose, functions, Storage
 from uliweb.orm import get_model
 from uliweb.utils import date
 
@@ -173,24 +173,45 @@ class TutorialView(object):
             obj=obj)
         return view.run()
         
+    def _get_tutorial_chapters(self, tutorial_id):
+        from uliweb.utils import date
+        User = get_model('user')
+        
+        query = self.model_chapters.filter((self.model_chapters.c.tutorial == tutorial_id) & 
+            (self.model_chapters.c.deleted==False))
+        query.values('id', 'title', 'hits', 'parent', 'render', 'order', 'chars_count', 
+            'comments_count', 'modified_date')
+        query.order_by(self.model_chapters.c.parent, self.model_chapters.c.order)
+        for row in query:
+            d = Storage(dict(row))
+            d['modified_date'] = date.to_datetime(d.modified_date)
+            d['modified_user'] = User.get(d.modified_user)
+            yield d
+        
+    def _get_chapters(self, parent=None, parent_num='', objects=None):
+        index = 1
+        for row in objects:
+            if row.parent == parent:
+                cur_num = parent_num + str(index)
+                yield cur_num, row
+                index += 1
+    
     def read(self, id):
         """
         阅读教程
         """
+        from functools import partial
+        
         obj = self.model.get_or_notfound(int(id))
-        objects = list(self.model_chapters.filter((self.model_chapters.c.tutorial == obj.id) & (self.model_chapters.c.deleted==False)).order_by(self.model_chapters.c.parent, self.model_chapters.c.order))
+        objects = list(self._get_tutorial_chapters(obj.id))
         
         #处理点击次数
         self._get_hits(obj)
         
-        def get_chapters(parent=None, parent_num='', objects=objects):
-            index = 1
-            for row in objects:
-                if row._parent_ == parent:
-                    cur_num = parent_num + str(index)
-                    yield cur_num, row
-                    index += 1
-        return {'object':obj, 'objects':get_chapters, 'get_date':self._get_date}
+        def f(parent=None, num='', objects=objects):
+            return self._get_chapters(parent, num, objects)
+        
+        return {'object':obj, 'objects':f, 'get_date':self._get_date}
     
     def add_chapter(self, t_id):
         """
@@ -226,6 +247,10 @@ class TutorialView(object):
             obj.tutorial.modified_date = date.now()
             obj.tutorial.modified_user = request.user.id
             obj.tutorial.save();
+            
+            #删除章节顺序cache
+            cache = functions.get_cache()
+            cache.delete(self._get_tutorial_chapters_cache_key(int(t_id)))
             
         template_data = {'object':obj}
         data = {'scrollable':True}
@@ -270,6 +295,9 @@ class TutorialView(object):
             
         content = t.visit(result, root=True)
         return content
+    
+    def _get_tutorial_chapters_cache_key(self, tutorial_id):
+        return '__tutorials__:chapters_order:%d' % tutorial_id
         
     def view_chapter(self, id):
         """
@@ -291,7 +319,37 @@ class TutorialView(object):
         if obj.render == '2': #reveal
             response.template = 'TutorialView/render_reveal.html'
             
-        return {'object':obj, 'html':obj.html, 'theme':obj.get_display_value('theme')}
+        #处理上一章和下一章功能，思路是利用缓存，如果存在，则从缓存中取出，如果不存在
+        #则创建，保存格式为一个list，这样查找时进行遍历，只保存id和名称
+        
+        cache = functions.get_cache()
+        key = self._get_tutorial_chapters_cache_key(obj._tutorial_)
+        value = cache.get(key, None)
+        if not value:
+            chapters = []
+            objects = list(self._get_tutorial_chapters(obj._tutorial_))
+            def f(parent=None, n=''):
+                for num, row in self._get_chapters(parent, objects=objects):
+                    chapters.append({'id':row.id, 'title':n + num + ' ' + row.title})
+                    f(row.id, n+num+'.')
+            
+            f()
+            
+            value = chapters
+            cache.set(key, value, settings.get_var('TUTORIALS/TUTORIAL_CHAPTERS_NAV_TIMEOUT'))
+            
+        prev = None
+        next = None
+        for i in range(len(value)):
+            if value[i]['id'] == obj.id:
+                if i>0:
+                    prev = value[i-1]
+                if i != len(value)-1:
+                    next = value[i+1]
+                break
+            
+        return {'object':obj, 'html':obj.html, 'theme':obj.get_display_value('theme'), 
+            'prev':prev, 'next':next}
     
 #    def _prepare_content(self, text, render='html'):
 #        """
@@ -319,6 +377,7 @@ class TutorialView(object):
         from uliweb.utils.generic import EditView
     
         obj = self.model_chapters.get_or_notfound(int(id))
+        old_title = obj.title
         
         if not self._can_edit_tutorial(obj.tutorial):
             flash("你无权添加新章节", 'error')
@@ -335,6 +394,11 @@ class TutorialView(object):
             obj.tutorial.modified_date = date.now()
             obj.tutorial.modified_user = request.user.id
             obj.tutorial.save();
+            
+            #删除章节顺序cache
+            if old_title != obj.title:
+                cache = functions.get_cache()
+                cache.delete(self._get_tutorial_chapters_cache_key(obj._tutorial_))
         
         view = EditView(self.model_chapters, 
             ok_url=url_for(TutorialView.view_chapter, id=id), 
@@ -353,6 +417,10 @@ class TutorialView(object):
         
         #修改所有子结点的父结点
         obj.children_chapters.update(parent=parent)
+        
+        #删除章节顺序cache
+        cache = functions.get_cache()
+        cache.delete(self._get_tutorial_chapters_cache_key(obj._tutorial_))
         
         #删除当前章节
         obj.deleted = True
@@ -457,6 +525,11 @@ class TutorialView(object):
                 row.parent = d[row.id]['parent']
                 row.order = d[row.id]['order']
                 row.save()
+        
+        #删除章节顺序cache
+        cache = functions.get_cache()
+        cache.delete(self._get_tutorial_chapters_cache_key(int(id)))
+        
         return json({'success':True})
     
     def uploadimage(self, tid):
