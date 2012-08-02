@@ -180,7 +180,7 @@ class TutorialView(object):
         query = self.model_chapters.filter((self.model_chapters.c.tutorial == tutorial_id) & 
             (self.model_chapters.c.deleted==False))
         query.values('id', 'title', 'hits', 'parent', 'render', 'order', 'chars_count', 
-            'comments_count', 'modified_date')
+            'comments_count', 'modified_date', 'modified_user')
         query.order_by(self.model_chapters.c.parent, self.model_chapters.c.order)
         for row in query:
             d = Storage(dict(row))
