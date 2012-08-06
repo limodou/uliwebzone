@@ -1,0 +1,33 @@
+{{extend layout_template}}
+
+{{block sub_menu}}
+    {{sub_menu(menu_items, 'messages', 'send')}}
+{{end}}
+
+{{block content_main}}
+{{use "jquery"}}
+{{use "jqutils"}}
+{{use "jqrmselect", version2=True}}
+{{use "jquery", ui=True}}
+{{use "fontawesome"}}
+
+<div class="span8 dialog-box box-shadow">
+    <div class="header">
+        <h3><i class="icon-envelope"></i> 发送信息</h3>
+    </div>
+    {{<< form.begin}}
+    <div class="body">
+        {{<< form.body}}
+    </div>
+    <div class="footer">
+        {{<< form.buttons}}
+    </div>
+    {{<< form.end}}
+</div>
+
+<script>
+$(function(){
+    $('#field_users').remote_multiple_select2({width:380, height:100});
+});
+</script>
+{{end}}

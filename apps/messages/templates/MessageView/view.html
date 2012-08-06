@@ -1,0 +1,19 @@
+{{extend layout_template}}
+
+{{block sub_menu}}
+    {{sub_menu(menu_items, 'messages', 'reread')}}
+{{end}}
+
+{{block content_main}}
+{{use "jquery"}}
+<style type="text/css">
+</style>
+
+<div class="box col_12 center">
+    <h2>详细消息</h2>
+    <div class="box-body">
+        {{embed view}}
+    </div>
+</div>
+
+{{end}}

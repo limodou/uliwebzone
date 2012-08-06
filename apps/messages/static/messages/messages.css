@@ -1,0 +1,10 @@
+.message {padding:0.4em 2.3em 1em 2.3em;position:relative;border-bottom:1px dotted #ccc;}
+.message.unread {background-color:#EAF2F5;}
+.message .icon {position:absolute;left:8px;top:3px;cursor:pointer;}
+.message .delete {position:absolute;right:8px;top:3px;font-size:1.5em;cursor:pointer;}
+.message .details {position:relative;padding:4px 4px 4px 30px;}
+.message .user-image {position:absolute;left:2px;top:6px;}
+.message .user-image img {padding:2px;border:1px solid #ddd;}
+.message .message-text {padding:2px;}
+.list {margin-top:10px;border-top:1px solid #ccc;}
+.dialog button{margin-right:8px;}

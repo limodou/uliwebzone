@@ -61,6 +61,8 @@ width:320px;
                             <span class="label label-info">访问次数：{{=object.hits}}</span>
                         
                     </div>
+                    
+                    {{<< functions.get_var('TUTORIALS/chapter_header')}}
                 
                     {{<<object.html}}
                 <!-- <hr/>
@@ -84,6 +86,8 @@ width:320px;
                             <span class="gray">{{=unicode(object.modified_user)}} 于 {{=object.modified_date}} 更新</span>
                         </p>
                     </div>
+                    
+                    {{<< functions.get_var('TUTORIALS/chapter_footer')}}
                 
                     <div class="alert alert-info">
                         <a href="#" class="close" data-dismiss="alert">&times;</a>

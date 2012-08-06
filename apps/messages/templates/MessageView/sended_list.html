@@ -1,0 +1,62 @@
+{{extend layout_template}}
+
+{{block sub_menu}}
+    {{sub_menu(menu_items, 'messages', 'havesend')}}
+{{end}}
+
+{{block content_main}}
+{{use "jquery"}}
+{{link "messages/messages.css"}}
+
+<div class="row-fluid">
+    <div class="span12" style="text-align:right;">
+        <a href="{{=url_for('messages.views.MessageView.delete_all', send_flag='s')}}" 
+            class="btn btn-danger"
+            onclick="return confirm('{{=_("你确定要删除所有发送消息吗?")}}');"
+            >全部删除</a>
+    </div>
+</div>
+
+<div class="list">  
+    {{for x in objects:}}
+    <div class="message" data-message="{{=x.id}}">  
+        <div class="delete" data-click="delete" title="删除消息">&times;</div>
+        <div class="body">
+            <div class="title"> 
+                于 {{=x.create_date}} 发送给 {{=x.user}}
+            </div> 
+            <div class="details">
+                <div class="user-image"><img src="{{<< x.user_image}}"/></div>
+                <div class="message-text"> 
+                    {{<< x.message}}
+                </div> 
+            </div> 
+        </div>
+    </div>
+    {{pass}}
+</div>
+<div class="pagination">{{<< pagination}}</div>
+
+<script type="text/javascript">
+function get_id(el){
+    var parent = $(el).parents('.message').get(0);
+    return $(parent).data('message');
+}
+$(function(){
+    $('[data-click="delete"]').click(function(){
+        if(!confirm("确认要删除当前消息吗？")) return;
+        var $that = $(this);
+        $.post('{{=url_for("messages.views.MessageView.delete")}}', {id:get_id($that)})
+            .success(function(r){
+                if (r.success){
+                    window.location.reload();
+                }else{
+                    show_message(r.error);
+                }
+            });
+    });
+    
+});
+</script>
+</div>
+{{end}}

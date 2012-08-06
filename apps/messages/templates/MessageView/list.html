@@ -1,0 +1,166 @@
+{{extend layout_template}}
+
+{{block sub_menu}}
+{{sub_menu(menu_items, 'messages', 'receive')}}
+{{end}}
+
+{{block message_number_show}}{{end}}
+
+{{block content_main}}
+{{use "jquery"}}
+{{link "messages/messages.css"}}
+
+<div class="row-fluid">
+    <div class="span8">
+        <ul class="nav nav-pills" style="margin-bottom:0;">
+          <li{{if not read_flag:}} class="active"{{pass}}>
+            <a href="{{=url_for('messages.views.MessageView.list')}}">全部</a>
+          </li>
+          <li{{if read_flag=="1":}} class="active"{{pass}}><a href="{{=url_for('messages.views.MessageView.list', read=1)}}">已读</a></li>
+          <li{{if read_flag=="0":}} class="active"{{pass}}><a href="{{=url_for('messages.views.MessageView.list', read=0)}}">未读</a></li>
+          <li class="dropdown">
+              <a class="dropdown-toggle"
+                 data-toggle="dropdown"
+                 href="#">
+                  {{=message_type_name}}
+                  <b class="caret"></b>
+                </a>
+              <ul class="dropdown-menu">
+                <!-- links -->
+                {{from uliweb.utils.common import query_string}}
+                <li><a href="{{=request.url}}">全部类型</a></li>
+                <li><a href="{{=query_string(request.url, type='1')}}">系统消息类型</a></li>
+                <li><a href="{{=query_string(request.url, type='2')}}">通知消息类型</a></li>
+                <li><a href="{{=query_string(request.url, type='3')}}">用户消息类型</a></li>
+              </ul>
+          </li>
+        </ul>
+    </div>
+    <div class="span4" style="text-align:right;">
+        <a href="{{=url_for('messages.views.MessageView.read_all')}}" class="btn">全部设为已读</a>
+        <a href="{{=url_for('messages.views.MessageView.delete_all', send_flag='r')}}" 
+            class="btn btn-danger"
+            onclick="return confirm('{{=_("你确定要删除所有接收消息吗?")}}');"
+            >全部删除</a>
+        
+    </div>
+</div>
+
+<div class="list">  
+    {{for x in objects:}}
+    <div class="message{{if not x._obj_.read_flag :}} unread{{pass}}" data-message="{{=x.id}}" data-sender="{{=x._obj_._sender_}}" data-sender-name="{{=x.sender}}">  
+        <div class="icon">
+            {{if x._obj_.read_flag :}}
+                <img src="/static/messages/reread.png" title="设置为未读" data-click="read"/>
+            {{else:}}
+                <img src="/static/messages/reun.png" title="设置为已读" data-click="read"/>
+            {{pass}}
+        </div> 
+        <div class="delete" data-click="delete" title="删除消息">&times;</div>
+        <div class="body">
+            <div class="title"> 
+                由 {{=x.sender}} 发送于 {{=x.create_date}}
+                <a href="#" data-click="reply">回复</a>
+            </div> 
+            <div class="details">
+                <div class="user-image"><img src="{{<< x.user_image}}"/></div>
+                <div class="message-text"> 
+                    {{<< x.message}}
+                </div> 
+            </div> 
+        </div>
+    </div>
+    {{pass}}
+</div>
+<div class="pagination">{{<< pagination}}</div>
+
+<script type="text/javascript">
+function get_id(el){
+    var parent = $(el).parents('.message').get(0);
+    return $(parent).data('message');
+}
+$(function(){
+    $('[data-click="read"]').click(function(){
+        var $that = $(this);
+        $.post('{{=url_for("messages.views.MessageView.read")}}', {id:get_id($that)})
+            .success(function(r){
+                if (r.success){
+                    if (r.read){
+                        $that.attr('src', '/static/messages/reread.png');
+                        $that.attr('title', '设置为未读');
+                    }else{
+                        $that.attr('src', '/static/messages/reun.png');
+                        $that.attr('title', '设置为已读');
+                    }
+                }else{
+                    show_message(r.error);
+                }
+            });
+    });
+    
+    $('[data-click="delete"]').click(function(){
+        if(!confirm("确认要删除当前消息吗？")) return;
+        var $that = $(this);
+        $.post('{{=url_for("messages.views.MessageView.delete")}}', {id:get_id($that)})
+            .success(function(r){
+                if (r.success){
+                    window.location.reload();
+                }else{
+                    show_message(r.error);
+                }
+            });
+    });
+    
+    $('[data-click="reply"]').click(function(e){
+        var that = $(this);
+        e.preventDefault();
+        var parent = $(this).parents('.message').get(0);
+        var sender = $(parent).data('sender');
+        var sender_name = $(parent).data('sender-name');
+        var url = '{{=url_for('messages.views.MessageView.reply')}}';
+        var dialog = $('<div class="dialog">'+
+            '<div class="control-group">'+
+            '<label class="control-label">输入消息:</label>'+
+            '<div class="controls">'+
+            '<textarea row="5" cols="15" name="reply-message" style="width:290px;height:100px;">回复 @'+sender_name+': </textarea>'+
+            '</div>'+
+            '</div>'+
+            '<div class="btn-toolbar">'+
+            '<button type="button" class="btn btn-primary" data-target="send">发送</button>'+
+            '<button type="button" class="btn" data-target="cancel">取消</button>'+
+            '</div>'+
+            '</div>');
+        $(this).poshytip({
+          className: 'tip-yellowsimple',
+          content: dialog,
+          showOn: 'none',
+          alignTo: 'target',
+          alignX: 'center',
+          alignY: 'bottom',
+          offsetX: 0,
+          offsetY: 5
+//          closeButton: true
+        });
+        $(this).poshytip('show');
+       
+        dialog
+            .on('click', '[data-target="send"]', function(e){
+            var message = dialog.find('textarea').val();
+            if (!$.trim(message)){
+                alert('消息不能为空!');
+                return;
+            }
+            $.post(url, {'message':message, 'user':sender}).success(function(){
+                show_message('发送消息成功！');
+                that.poshytip('destroy');
+            });
+        });
+        dialog
+            .on('click', '[data-target="cancel"]', function(e){
+                that.poshytip('destroy');
+            });
+    });
+});
+</script>
+</div>
+{{end}}
