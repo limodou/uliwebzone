@@ -9,6 +9,7 @@
 {{block content_main}}
 {{use "jquery"}}
 {{link "messages/messages.css"}}
+{{use "fontawesome"}}
 
 <div class="row-fluid">
     <div class="span8">
@@ -60,11 +61,11 @@
         <div class="body">
             <div class="title"> 
                 由 {{=x.sender}} 发送于 {{=x.create_date}}
-                <a href="#" data-click="reply">回复</a>
+                <a href="#" data-click="reply"><i class="icon-comment-alt" title="回复"></i></a>
             </div> 
             <div class="details">
                 <div class="user-image"><img src="{{<< x.user_image}}"/></div>
-                <div class="message-text"> 
+                <div class="message-text">
                     {{<< x.message}}
                 </div> 
             </div> 

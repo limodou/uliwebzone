@@ -48,9 +48,7 @@ class MessageView(object):
             return functions.get_user_image(obj.sender, size=20)
         
         def message(value, obj):
-            from uliweb.utils.textconvert import text2html
-            
-            return text2html(value)
+            return value
         
         fields_convert_map = {'create_date':create_date, 
             'user_image':user_image,
@@ -118,7 +116,8 @@ class MessageView(object):
         from forms import SendMessageForm
         from uliweb.core.html import Tag
         from sqlalchemy.sql import select,func
-
+        from uliweb.utils.textconvert import text2html
+        
         User = get_model('user')
         form = SendMessageForm()
         if request.method == 'GET':
@@ -131,7 +130,8 @@ class MessageView(object):
                 for u in form.users.data:
                     _id = int(u)
                     user = User.get(_id)
-                    functions.send_message(request.user, user, form.message.data)
+                    
+                    functions.send_message(request.user, user, text2html(form.message.data))
                 flash(_('Send message successful!'))
                 return redirect(url_for(MessageView.sended_list))
             else:
@@ -153,12 +153,15 @@ class MessageView(object):
     def reply(self):
         """
         """
+        from uliweb.utils.textconvert import text2html
+
         user = request.POST.get('user')
         if not user:
             error('没有指定用户，无法回复')
             
         message = request.POST.get('message')
-        functions.send_message(request.user, int(user), message)
+        
+        functions.send_message(request.user, int(user), text2html(message))
         return json({'success':True})
         
     def view(self):
@@ -214,9 +217,7 @@ class MessageView(object):
             return functions.get_user_image(obj.user, size=20)
         
         def message(value, obj):
-            from uliweb.utils.textconvert import text2html
-            
-            return text2html(value)
+            return value
         
         fields_convert_map = {'create_date':create_date, 
             'user_image':user_image,
@@ -269,10 +270,10 @@ def messages_number():
 def post_save(sender, instance, created, data, old_data):
     from uliweb import request
     
-    _del_key(request.user.id)
+    _del_key(instance._user_)
     
 def pre_delete(sender, instance):
     from uliweb import request
     
-    _del_key(request.user.id)
+    _del_key(instance._user_)
     
