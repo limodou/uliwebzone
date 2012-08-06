@@ -92,7 +92,7 @@ width:320px;
                     <div class="alert alert-info">
                         <a href="#" class="close" data-dismiss="alert">&times;</a>
                         可以使用<i class="icon-arrow-left"></i>和<i class="icon-arrow-right"></i>来跳转到前一章节或后一章节。
-                        还可以使用<b>回车</b>来扩展或缩小文章区域。
+                        还可以使用<b>回车</b>来扩展或缩小文章区域。<b>C</b>键打开评论，<b>ESC</b>关闭评论。
                     </div>
                 
                     {{if prev:}}<div class="chapter-prev chapter-down animated">
@@ -193,7 +193,7 @@ width:320px;
                     $('#global-comment-count').text(data['0']);
                 }
                 //处理pageslide
-                $('a.para-comments-count.active').pageslide({
+                $('a.para-comments-count').pageslide({
                     //'href':'#para-comments',
                     iframe:false,
                     direction:'right',
@@ -201,9 +201,15 @@ width:320px;
                     onClick: function(e){
                         $('a.para-comments-count').removeClass('active');
                         $(this).addClass('active');
+                        console.log('click');
+                        //处理toTop
+                        reset_totop();
                     },
                     onClose: function(){
                         $('a.para-comments-count').removeClass('active');
+                        console.log('close');
+                        //处理toTop
+                        reset_totop();
                     }
                 });
                 
@@ -269,6 +275,8 @@ width:320px;
             }
         }).bind('keydown.return', function(){
             $('.expander').click();
+        }).bind('keydown.c', function(){
+            $('a.para-comments-count').click();
         });
         
         function reset_totop(){
