@@ -29,7 +29,7 @@
               <ul class="dropdown-menu">
                 <!-- links -->
                 {{from uliweb.utils.common import query_string}}
-                <li><a href="{{=request.url}}">全部类型</a></li>
+                <li><a href="{{=query_string(request.url, type='')}}">全部类型</a></li>
                 <li><a href="{{=query_string(request.url, type='1')}}">系统消息类型</a></li>
                 <li><a href="{{=query_string(request.url, type='2')}}">通知消息类型</a></li>
                 <li><a href="{{=query_string(request.url, type='3')}}">用户消息类型</a></li>
