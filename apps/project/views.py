@@ -23,7 +23,7 @@ def post_save(sender, instance, created, data, old_data):
     functions.send_message(request.user, authors, message, type='2')
     
 import re
-re_at = re.compile('@\S+')
+re_at = re.compile(u'@[a-zA-Z0-9_\u4E00-\u9FFF\.]+')
 def forumpost_post_save(sender, instance, created, data, old_data):
     """
     处理论坛发贴时当有@用户时发送消息进行通知
