@@ -1,0 +1,55 @@
+{{extend "layout.html"}}
+
+{{block menu}}
+{{menu('admin')}}
+{{end}}
+
+{{block content_sidebar}}
+{{use "jquery"}}
+{{use "jsmenu"}}
+{{
+menu_items = []
+if request.user:
+    menu_items.append(
+        {
+        'name': 'user',
+        'title':_('Settings'),
+        'subs':[
+                {'name': 'information', 'title':_('Information'), 'link':'/user/view'},
+                {'name': 'password', 'title':_('Change Password'), 'link':'/user/change_password'},
+                ]
+        },
+    )
+pass
+if request.user and request.user.is_superuser:
+    menu_items.append(
+        {
+            'name': 'user_admin',
+            'title':_('Admin Settings'),
+            'subs':[
+                {'name':'users', 'title':_('User Manager'), 'link':'/users/list'},
+            ]
+        }
+    )
+pass
+if request.user:
+    menu_items.append(
+        {
+            'name': 'messages',
+            'title': '消息',
+            'subs':[
+                    {'name': 'receive', 'title':'接收消息', 'link':'/admin/messages/list'},
+                    {'name': 'send', 'title':'发送消息', 'link':'/admin/messages/send'},
+                    {'name': 'havesend', 'title':'已发消息', 'link':'/admin/messages/sended_list'},
+                    ]
+            }
+            
+    )
+pass
+}}  
+<div class="sidebar">
+    {{block sub_menu}}
+    {{sub_menu(menu_items, 'user')}}
+    {{end}}
+</div>
+{{end}}
