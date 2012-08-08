@@ -34,7 +34,7 @@ def forumpost_post_save(sender, instance, created, data, old_data):
     content = instance.content
     User = get_model('user')
     
-    message = u"""用户 %s 在论坛提到了你，<a href="/forum/id/%d">查看贴子</a>""" % (unicode(instance.posted_by), instance.id)
+    message = u"""用户 %s 在论坛提到了你，查看: <a href="/forum/id/%d">%s</a>""" % (unicode(instance.posted_by), instance.id, unicode(instance.topic.subject))
     for x in re_at.findall(content):
         user = User.get(User.c.username==x[1:])
         if user and user.id != request.user.id:

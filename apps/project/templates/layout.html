@@ -20,7 +20,7 @@ function query() {
         url: "/admin/messages/number",
         success: function(r){
             if (r.success && r.data>0){
-                $('#user_image').poshytip('update', '你有 '+r.data+' 条消息未读，<a href="/admin/messages/list">点击阅读</a>');
+                $('#user_image').poshytip('update', r.data+' 条新消息，<a href="/admin/messages/list">点击查看</a>');
                 $('#user_image').poshytip('show');
             }
             setTimeout(query, {{=settings.LAYOUT.MESSAGE_REFRESH_INTERVAL}});
@@ -30,7 +30,7 @@ function query() {
 $(function(){
     $('#user_image').poshytip({
       className: 'tip-yellowsimple',
-      content: '你有 0 条消息未读，<a href="/admin/messages/list">点击阅读</a>',
+      content: '0 条新消息，<a href="/admin/messages/list">点击查看</a>',
       showOn: 'none',
       alignTo: 'fixed',
       alignX: 'center',
