@@ -22,6 +22,14 @@ def post_save(sender, instance, created, data, old_data):
     text2html(instance.content))
     functions.send_message(request.user, authors, message, type='2')
     
+    users = [x.id for x in functions.parse_user(instance.content)]
+    diff = set(users) - set(authors)
+    message = u"""<p>%s 评论教程 《<a href="/tutorial/view_chapter/%d">%s</a>》时提到了你</p>
+%s
+""" % (unicode(instance.modified_user), instance._chapter_, unicode(instance.chapter),
+    text2html(instance.content))
+    functions.send_message(request.user, list(diff), message, type='2')
+    
 import re
 re_at = re.compile(u'@[a-zA-Z0-9_\u4E00-\u9FFF\.]+')
 def forumpost_post_save(sender, instance, created, data, old_data):
@@ -31,12 +39,9 @@ def forumpost_post_save(sender, instance, created, data, old_data):
     from uliweb.orm import get_model
     from uliweb import request
     
-    content = instance.content
     User = get_model('user')
     
     message = u"""用户 %s 在论坛提到了你，查看: <a href="/forum/id/%d">%s</a>""" % (unicode(instance.posted_by), instance.id, unicode(instance.topic.subject))
-    for x in re_at.findall(content):
-        user = User.get(User.c.username==x[1:])
-        if user and user.id != request.user.id:
-            functions.send_message(instance.posted_by, user, message, type='2')
+    for user in functions.parse_user(instance.content):
+        functions.send_message(instance.posted_by, user, message, type='2')
     

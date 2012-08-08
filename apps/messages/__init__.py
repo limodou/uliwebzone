@@ -1,4 +1,5 @@
 from uliweb.orm import get_model
+import re
 
 def send_message(from_, to_, message, type='3'):
     """
@@ -22,3 +23,16 @@ def send_message(from_, to_, message, type='3'):
         if type == '3':
             obj = Message(type=type, message=message, sender=from_, user=x, send_flag='s')
             obj.save()
+            
+re_at = re.compile(u'@[a-zA-Z0-9_\u4E00-\u9FFF\.]+')
+def parse_user(text):
+    from uliweb.orm import get_model
+    from uliweb import request
+    
+    User = get_model('user')
+    
+    for x in re_at.findall(text):
+        user = User.get(User.c.username==x[1:])
+        if user and user.id != request.user.id:
+            yield user
+    
