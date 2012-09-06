@@ -56,7 +56,11 @@ cursor:pointer;
 .chapter_tip span.tip-label{width:60px;display:block-inline;}
 
 /*文章显示*/
-#article img {max-width:100%;}
+.article img {max-width:100%;}
+.article h2 {border-bottom: 1px solid #CCC;}
+.article h2, .article h3, .article h4, .article h5, .article h6 {margin-top:20px; margin-bottom:10px;}
+.alert h2, .alert h3, .alert h4, .alert h5, .alert h6 {margin-top:5px; margin-bottom:2px;}
+.alert p {margin-bottom: 2px;}
 
 /*侧边评论样式*/
 #paragraph-comments img{float:left;}
