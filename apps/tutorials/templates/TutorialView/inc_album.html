@@ -60,9 +60,9 @@
         });
         
         //处理双击，则自动插入链接到编辑器中
-        $('body').on('dbclick', 'a.thumbnail', function(e){
-            console.log($(this).data('id'));
-        });
+//        $('body').on('dbclick', 'a.thumbnail', function(e){
+//            console.log($(this).data('id'));
+//        });
         
         //处理删除按钮的显示
         $('body').on('hover', '.thumbnails > li', 
@@ -104,7 +104,6 @@
                 dragClass:'dragging',
                 on:{
                     loadend:function(e, file){
-                        console.log('aaaaa', e, file);
                         var arr = e.target.result.split(",");
                         var data = {'data':arr[1], 'filename':file.name}; // raw base64
                         $.post('/tutorial/postimage/{{=tutorial_id}}',
