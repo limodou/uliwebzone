@@ -4,3 +4,4 @@
 SQLAlchemy
 MySQL-python
 PIL
+alembic
