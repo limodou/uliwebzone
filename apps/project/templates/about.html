@@ -1,0 +1,23 @@
+{{extend "layout_container.html"}}
+
+{{block menu}}
+{{menu('about')}}
+{{end}}
+
+{{block content_main}}
+{{link "tutorials/tutorials.css"}}
+<div class="article">
+    <h2>关于Uliweb Zone网站</h2>
+    <p>Uliweb Zone是一个开源项目，它是由limodou基于Uliweb+Plugs开发的。并且由ascmos
+    帮助搭建而成。
+    </p>
+    <p>本网站用来提供Uliweb Zone的在线演示，并且提供一个讨论和学习Uliweb的场所，同时
+    还提供了一些公益服务。</p>
+    <p>欢迎对公益和Uliweb开发感兴趣的参与本项目。</p>
+    <ul>
+        <li>Uliweb <a href="https://github.com/limodou/uliweb">https://github.com/limodou/uliweb</a></li>
+        <li>Plugs <a href="https://github.com/limodou/plugs">https://github.com/limodou/plugs</a></li>
+        <li>Uliweb QQ群：162487035</li>
+    </ul>
+</div>
+{{end}}

@@ -5,6 +5,10 @@ from uliweb import expose, functions
 def index():
     return redirect('/forum')
 
+@expose('/about')
+def about():
+    return {}
+
 def post_save(sender, instance, created, data, old_data):
     """
     用来处理教程某个章节被评论时发送消息通知的处理

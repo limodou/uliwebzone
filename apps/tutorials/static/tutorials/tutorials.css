@@ -1,4 +1,3 @@
-body {font-family:Georgia;}
 textarea {width:98%;}
 .tutorial-list {position:relative;}
 .tutorial-list img.preface {height:128px; width:128px;position:absolute; top:8px;left:8px;}
@@ -20,7 +19,12 @@ p.tutorial_p {position:relative;}
 .tutorial-footer {margin-top: 18px; margin-bottom:18px; 
 background-color: #eee;padding:16px 8px 8px 8px;border-top:2px solid #717171;}
 .buttons {margin-top:10px;}
-.outter {position:relative;}
+.outter {position:relative;
+-webkit-box-shadow:  0px 0px 4px 2px rgba(128, 128, 128, 0.5);
+-moz-box-shadow:  0px 0px 4px 2px rgba(128, 128, 128, 0.5);
+box-shadow:  0px 0px 4px 2px rgba(128, 128, 128, 0.5);
+}
+}
 .chapter-prev {position:absolute;left:10px;color:#ccc;-webkit-border-radius:4px;
 -moz-border-radius:4px;
 border-radius:4px;background-color:#eee;padding:4px 8px;
@@ -38,8 +42,10 @@ filter:alpha(opacity=50);
 .chapter-down{bottom:5px;}
 
 /*expander用来缩放窗口*/
-.expander {position:absolute;top:5px;right:-15px;wdith:16px;height:20px;
+.expander {position:absolute;top:5px;right:-17px;wdith:16px;height:20px;
 font-size:20px;
+border:1px solid #ccc;
+border-left:none;
 border-top-right-radius:5px;
 -moz-border-radius-topright:5px;
 -webkit-border-top-right-radius:5px;
@@ -56,6 +62,7 @@ cursor:pointer;
 .chapter_tip span.tip-label{width:60px;display:block-inline;}
 
 /*文章显示*/
+.article {font-size:14px;line-height:1.5em;font-family:微软雅黑;}
 .article img {max-width:100%;}
 .article h2 {border-bottom: 1px solid #CCC;}
 .article h2, .article h3, .article h4, .article h5, .article h6 {margin-top:20px; margin-bottom:10px;}
