@@ -46,6 +46,15 @@ if request.user:
             
     )
 pass
+if has_role(request.user, 'superuser'):
+    menu_items.append(
+        {
+            'name':'forum',
+            'title':'论坛',
+            'link':'/forum/admin'
+        }
+    )
+pass
 }}  
 <div class="sidebar">
     {{block sub_menu}}

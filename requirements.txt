@@ -1,5 +1,6 @@
 -e git://github.com/limodou/uliweb.git#egg=uliweb
 -e git://github.com/limodou/plugs.git#egg=plugs
-SQLAlchemy==0.6.7
+-e git://github.com/limodou/par.git#egg=par
+SQLAlchemy
 MySQL-python
 PIL

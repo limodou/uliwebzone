@@ -1,48 +1,54 @@
 {{extend "layout.html"}}
 
-{{block user_info}}
-{{use 'poshytip'}}
-
-<p class="pull-right user_info">
-{{if hasattr(request, 'user') and request.user:}}
-    <img src="{{=functions.get_user_image(request.user, size=20)}}" align="top" id="user_image"/> {{=unicode(request.user)}} | <a href="/user/view">{{=_('Account Setting')}}</a> | <a href="/logout">{{=_('Logout')}}</a> 
-{{else:}}
-    {{=_('Not signed in yet')}}! <a href="/login">{{=_('Login')}}</a> | <a href="/register">{{=_('Register')}}</a>
-{{pass}}
-</p>
-
-{{block message_number_show}}
-{{if request.user:}}
-<script type="text/javascript">
-function query() {
-    $.ajax({
-        type: "POST",
-        url: "/admin/messages/number",
-        success: function(r){
-            if (r.success && r.data>0){
-                $('#user_image').poshytip('update', r.data+' 条新消息，<a href="/admin/messages/list">点击查看</a>');
-                $('#user_image').poshytip('show');
-            }
-            setTimeout(query, {{=settings.LAYOUT.MESSAGE_REFRESH_INTERVAL}});
-        }
-    });
-}    
-$(function(){
-    $('#user_image').poshytip({
-      className: 'tip-yellowsimple',
-      content: '0 条新消息，<a href="/admin/messages/list">点击查看</a>',
-      showOn: 'none',
-      alignTo: 'fixed',
-      alignX: 'center',
-      alignY: 'bottom',
-      offsetX: 0,
-      offsetY: 5,
-      closeButton: true
-    });
-    
-    setTimeout(query, 1000);
-});
-</script>
-{{pass}}
+{{block before_header}}
+{{super}}
+{{include "inc_jquery_csrf.html"}}
+{{use "bootheme"}}
 {{end}}
+
+{{block user_info}}
+    {{use 'poshytip'}}
+
+    <p class="pull-right user_info">
+    {{if hasattr(request, 'user') and request.user:}}
+        <img src="{{=functions.get_user_image(request.user, size=20)}}" align="top" id="user_image"/> {{=unicode(request.user)}} | <a href="/user/view">{{=_('Account Setting')}}</a> | <a href="/logout">{{=_('Logout')}}</a> 
+    {{else:}}
+        {{=_('Not signed in yet')}}! <a href="/login">{{=_('Login')}}</a> | <a href="/register">{{=_('Register')}}</a>
+    {{pass}}
+    </p>
+
+    {{block message_number_show}}
+        {{if request.user:}}
+        <script type="text/javascript">
+        function query() {
+            $.ajax({
+                type: "POST",
+                url: "/admin/messages/number",
+                success: function(r){
+                    if (r.success && r.data>0){
+                        $('#user_image').poshytip('update', r.data+' 条新消息，<a href="/admin/messages/list">点击查看</a>');
+                        $('#user_image').poshytip('show');
+                    }
+                    setTimeout(query, {{=settings.LAYOUT.MESSAGE_REFRESH_INTERVAL}});
+                }
+            });
+        }    
+        $(function(){
+            $('#user_image').poshytip({
+              className: 'tip-yellowsimple',
+              content: '0 条新消息，<a href="/admin/messages/list">点击查看</a>',
+              showOn: 'none',
+              alignTo: 'fixed',
+              alignX: 'center',
+              alignY: 'bottom',
+              offsetX: 0,
+              offsetY: 5,
+              closeButton: true
+            });
+            
+            setTimeout(query, 1000);
+        });
+        </script>
+        {{pass}}
+    {{end}}
 {{end user_info}}

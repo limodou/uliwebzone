@@ -1,8 +1,8 @@
 body {font-family:Georgia;}
 textarea {width:98%;}
 .tutorial-list {position:relative;}
-.tutorial-list img.preface {height:128px; width:128px;}
-.tutorial-list li.tutorial-item {position:relative;padding:8px; margin-top: 18px; margin-bottom: 10px;border-top:1px dotted #ccc;}
+.tutorial-list img.preface {height:128px; width:128px;position:absolute; top:8px;left:8px;}
+.tutorial-list li.tutorial-item {position:relative;padding:8px 8px 8px 136px; margin-top: 18px; margin-bottom: 10px;border-top:1px dotted #ccc;}
 .tutorial-list .tutorial-buttons {margin-top:8px;}
 .tutorial-info {position:absolute;right:20px;bottom:2px;}
 
