@@ -72,11 +72,13 @@ cursor:pointer;
 #paragraph-comments img{float:left;}
 
 /* inline-tag */
-.inline-tag {background-color:blue;color:white;-webkit-border-radius:2px;
--moz-border-radius:2px;
-border-radius:2px;
-padding:2px;
+.inline-tag {background-color:blue;color:white;
+padding: 1px 4px 2px;
+-webkit-border-radius: 3px;
+-moz-border-radius: 3px;
+border-radius: 3px;
 cursor:pointer;
+vertical-align:middle;
 }
 
 /*三角气泡评论样式*/

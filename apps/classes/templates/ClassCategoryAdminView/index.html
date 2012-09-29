@@ -1,0 +1,132 @@
+{{extend "classes_admin_layout.html"}}
+
+{{block sub_menu}}
+{{sub_menu(menu_items, 'classes', 'category')}}
+{{end}}
+
+{{block content_main}}
+{{use "angularjs"}}
+{{use "jquery"}}
+{{use "jqutils"}}
+{{use "fontawesome"}}
+
+<div class="row-fluid" ng-app="AdminApp" id="ng-app" ng-controller="adminCtrl">
+    <div class="line">
+        <form class="form-inline" style="margin-bottom:0px;">
+            <input id="field_category" ng-model="topictype_name" placeholder="新课程分类名称"></input>
+            <button class="btn btn-primary" type="button" ng-click="add_category()"><i class="icon-plus"></i>添加</button>
+        </form>
+    </div>
+    <div class="line">
+        <table class="table table-bordered table-header" style="width:200px;">
+            <colgroup>
+                {{for f in fields:}}
+                    {{w = f.get('width', -1)}}
+                    {{if w > -1:}}
+                        <col width="{{=w}}px"></col>
+                    {{else:}}
+                        <col width="*"></col>
+                    {{pass}}
+                {{pass}}
+                <col width="50px"></col>
+            </colgroup>
+            <thead>
+                <tr>
+                    {{for f in fields:}}
+                        <th>{{=f.get('verbose_name') or f['name']}}</th>
+                    {{pass}}
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="c in objects">
+                    <td>{% c.name %}</td>
+                    <td>
+                        <a href="#" ng-click="edit_category(c.id)"><i class="icon-edit" title="编辑"></i></a> 
+                        <a href="#" ng-click="remove_category(c.id)"><i class="icon-remove" title="删除"></i></a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+</div>
+
+<script>
+var app = angular.module('AdminApp', []).config(function ($interpolateProvider) {
+    $interpolateProvider.startSymbol('{%');
+    $interpolateProvider.endSymbol('%}');
+}); 
+
+function adminCtrl($scope, $http) {
+    $.get('/class/admin/category/query')
+        .success(function(data, status, headers, config){
+            $scope.objects = data.rows;
+            $scope.$apply();
+        });
+    $scope.find_object = function(id){
+        if (!$scope.objects) return -1;
+        for(var i=0; i<$scope.objects.length; i++){
+            if ($scope.objects[i].id == id){
+                return i;
+            }
+        }
+        return -1;
+    }
+    $scope.get_object = function(id){
+        if (id)
+            return $scope.objects[$scope.find_object(id)];
+        else
+            return {}
+    }
+    
+    $scope.add_category = function(){
+        var v = $('#field_category').val();
+        if (!v){
+            show_message('课程分类名称不能为空', 'error');
+        }else{
+            $.post('/class/admin/category/add', {'name':v}).success(function(data){
+                if (data.success){
+                    $scope.objects.push(data.data);
+                }else{
+                    show_message(data.message, 'error');
+                }
+                $scope.$apply();
+            });
+        }
+    }
+    $scope.edit_category = function(id){
+        var v = window.prompt('请输入新的课程分类名称');
+        if (v){
+            $.post('/class/admin/category/edit/'+id, 
+                {name:v}).success(function(data){
+                if(data.success){
+                    $scope.objects[$scope.find_object(id)] = data.data;
+                    $scope.$apply();
+                }else{
+                    show_message(data.message, 'error');
+                }
+            });
+        }else {
+            return;
+        }
+    }
+    $scope.remove_category = function(id){
+        $.post('/class/admin/category/delete/'+id).success(function(data){
+            if(data.success){
+                var index = $scope.find_object(id);
+                $scope.objects.splice(index, 1);
+                $scope.$apply();
+            }else{
+                show_message(data.message, 'error');
+            }
+        });
+    }
+}
+
+$(document).ajaxError(function(e, jqxhr, settings, exception){
+    show_message('请求处理失败', 'error');
+});
+
+</script>
+{{end}}

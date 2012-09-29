@@ -4,6 +4,9 @@
 {{menu('admin')}}
 {{end}}
 
+{{block content_tool_container}}
+{{end}}
+
 {{block content_sidebar}}
 {{use "jquery"}}
 {{use "jsmenu"}}
@@ -52,6 +55,18 @@ if has_role(request.user, 'superuser'):
             'name':'forum',
             'title':'论坛',
             'link':'/forum/admin'
+        }
+    )
+pass
+if has_role(request.user, 'superuser'):
+    menu_items.append(
+        {
+            'name':'classes',
+            'title':'课程',
+            'subs':[
+                    {'name': 'category', 'title':'课程分类', 'link':'/class/admin/category'},
+                    {'name': 'class', 'title':'课程管理', 'link':'/class/admin/class'},
+                    ]
         }
     )
 pass

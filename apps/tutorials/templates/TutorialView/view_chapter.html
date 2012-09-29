@@ -108,7 +108,7 @@ width:320px;
         </div>
         <div class="span4" id="right-side">
             {{if object.tutorial.authors.has(request.user) or has_role(request.user, 'superuser'):}}
-            <div class="btn-toolbar" style="margin-bottom:10px;position:fixed;">
+            <div class="btn-toolbar" style="margin-top:0px;position:fixed;">
                 <div class="btn-group">
                 <a href="/tutorial/edit_chapter/{{=object.id}}" class="btn btn-primary"><i class="icon-edit"></i>编辑</a>
                 </div>

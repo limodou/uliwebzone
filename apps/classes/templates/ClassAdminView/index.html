@@ -1,0 +1,104 @@
+{{extend "classes_admin_layout.html"}}
+
+{{block sub_menu}}
+{{sub_menu(menu_items, 'classes', 'class')}}
+{{end}}
+
+{{block content_main}}
+{{use "angularjs"}}
+{{use "jquery"}}
+{{use "jqutils"}}
+{{use "fontawesome"}}
+
+<div class="row-fluid" ng-app="AdminApp" id="ng-app" ng-controller="adminCtrl">
+    <div class="line">
+        <a class="btn btn-primary" href="/class/admin/class/add" ><i class="icon-plus"></i>添加新课程</a>
+    </div>
+    <div class="line">
+        <table class="table table-bordered table-header">
+            <colgroup>
+                <col width="50px"></col>
+                {{for f in fields:}}
+                    {{w = f.get('width', -1)}}
+                    {{if w > -1:}}
+                        <col width="{{=w}}px"></col>
+                    {{else:}}
+                        <col width="*"></col>
+                    {{pass}}
+                {{pass}}
+                <col width="50px"></col>
+            </colgroup>
+            <thead>
+                <tr>
+                    <th>序号</th>
+                    {{for f in fields:}}
+                        <th>{{=f.get('verbose_name') or f['name']}}</th>
+                    {{pass}}
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="c in classes|orderBy:ordering">
+                    <td>{% $index+1 %}</td>
+                    <td><a href="/class/admin/class/view/{% c.id %}">{% c.name %}</a></td>
+                    <td>{% c.category %}</td>
+                    <td>{% c.teachers %}</td>
+                    <td><div ng-bind-html-unsafe="c.link"></div></td>
+                    <td>{% c.issue_num %}</td>
+                    <td>
+                        <a href="/class/admin/class/edit/{%c.id%}"><i class="icon-edit" title="编辑"></i></a> 
+                        <a href="#" ng-click="remove_class(c.id)"><i class="icon-remove" title="删除"></i></a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+</div>
+
+<script>
+var app = angular.module('AdminApp', []).config(function ($interpolateProvider) {
+    $interpolateProvider.startSymbol('{%');
+    $interpolateProvider.endSymbol('%}');
+}); 
+
+function adminCtrl($scope, $http) {
+    $scope.find_object = function(id){
+        if (!$scope.classes) return -1;
+        for(var i=0; i<$scope.classes.length; i++){
+            if ($scope.classes[i].id == id){
+                return i;
+            }
+        }
+        return -1;
+    }
+    $scope.get_object = function(id){
+        if (id)
+            return $scope.classes[$scope.find_object(id)];
+        else
+            return {}
+    }
+
+    $.get('/class/admin/class/query')
+        .success(function(data, status, headers, config){
+            $scope.classes = data.rows;
+            $scope.$apply();
+        });
+        
+    $scope.remove_class = function(id){
+        $.post('/class/admin/class/delete/'+id).success(function(data){
+            if(data.success){
+                var index = $scope.find_object(id);
+                $scope.classes.splice(index, 1);
+                $scope.$apply();
+            }else{
+                show_message(data.message, 'error');
+            }
+        });
+    }
+    
+    
+    $scope.ordering = 'create_date';
+}
+</script>
+{{end}}

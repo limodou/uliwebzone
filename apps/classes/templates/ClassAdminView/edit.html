@@ -1,0 +1,22 @@
+{{extend "classes_admin_layout.html"}}
+
+{{block sub_menu}}
+{{sub_menu(menu_items, 'classes', 'class')}}
+{{end}}
+
+{{block content_main}}
+<style>
+#field_name, #field_link {width:80%;}
+</style>
+{{use "jqrmselect", version2=True}}
+{{use "uniform"}}
+
+    {{<< form}}
+    
+<script>
+$(function(){
+    $('#field_teachers').remote_multiple_select2({width:'80%', height:100, label:'', url:'/users/search'});
+});
+</script>
+
+{{end}}

@@ -11,15 +11,15 @@
 {{use "jquery", ui=True}}
 {{use "fontawesome"}}
 
-<div class="span8 dialog-box box-shadow">
-    <div class="header">
-        <h3><i class="icon-envelope"></i> 发送信息</h3>
+<div class="span8 panel">
+    <div class="panel-header">
+        <h2>发送信息</h2>
     </div>
     {{<< form.begin}}
-    <div class="body">
+    <div class="panel-content">
         {{<< form.body}}
     </div>
-    <div class="footer">
+    <div class="panel-footer">
         {{<< form.buttons}}
     </div>
     {{<< form.end}}

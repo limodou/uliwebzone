@@ -55,7 +55,7 @@ function($) {
         var title = t[id].title || that.$element.text();
         var content = t[id].content;
         if (content){
-            this.$element.popover({title:title, content:content});
+            this.$element.popover({title:title, content:content, trigger:'hover'});
         }
       }
       else if (t){
@@ -73,7 +73,7 @@ function($) {
                     }
                     var item = $('<a href="#" class="para-comments-count">'+t+'.</a>')
                     .css({position:'absolute', left:-40}).click(function(e){e.preventDefault();});
-                    item.popover({title:y.title || 'Line:'+x, content:y.content||y});
+                    item.popover({title:y.title || 'Line:'+x, content:y.content||y, trigger:'hover'});
                     $(el).prepend(item);
                 }
             }else{
@@ -83,7 +83,7 @@ function($) {
                     if (r.test(t.text())){
                         var item = ('<code class="nocode" style="background-color:blue;color:#fff;cursor:pointer;">'+x+'</code>');
                         t.html(t.text().replace(r, item));
-                        $('code', t).popover({title:y.title||x, content:y.content||y});
+                        $('code', t).popover({title:y.title||x, content:y.content||y, trigger:'hover'});
                     }
                 });
                 

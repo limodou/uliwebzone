@@ -1,0 +1,41 @@
+{{extend "classes_layout.html"}}
+
+{{block content_main}}
+    <div class="row-fluid">
+        <div class="span8">
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>课程列表</h2>
+                </div>
+                <div class="panel-content">
+                    <ul>
+                        {{for c in classes:}}
+                            <li>
+                                <div class="classes-item">
+                                    <div class="classes-logo">
+                                        <img src="{{=c.get_image()}}" width="50px"/>
+                                    </div>
+                                    <h3>{{=c.name}}</h3>
+                                </div>
+                            </li>
+                        {{pass}}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="span4">
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>最新动态</h2>
+                </div>
+                <div class="panel-content">
+                    <ul class="unstyled">
+                        {{for m in dynamic_messages:}}
+                            <li>{{=m.content}}</li>
+                        {{pass}}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+{{end}}
