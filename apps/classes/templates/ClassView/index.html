@@ -1,41 +1,43 @@
 {{extend "classes_layout.html"}}
 
 {{block content_main}}
-    <div class="row-fluid">
-        <div class="span8">
-            <div class="panel">
-                <div class="panel-header">
-                    <h2>课程列表</h2>
-                </div>
-                <div class="panel-content">
-                    <ul>
-                        {{for c in classes:}}
-                            <li>
-                                <div class="classes-item">
-                                    <div class="classes-logo">
-                                        <img src="{{=c.get_image()}}" width="50px"/>
-                                    </div>
-                                    <h3>{{=c.name}}</h3>
-                                </div>
-                            </li>
-                        {{pass}}
-                    </ul>
-                </div>
+{{link "classes/classes.css"}}
+
+<div class="row-fluid classes">
+    <div class="span8">
+        <div class="panel">
+            <div class="panel-header">
+                <h2>课程列表</h2>
             </div>
-        </div>
-        <div class="span4">
-            <div class="panel">
-                <div class="panel-header">
-                    <h2>最新动态</h2>
-                </div>
-                <div class="panel-content">
-                    <ul class="unstyled">
-                        {{for m in dynamic_messages:}}
-                            <li>{{=m.content}}</li>
-                        {{pass}}
-                    </ul>
-                </div>
+            <div class="panel-content">
+                <ul class="unstyled">
+                    {{for c in classes:}}
+                        <li class="classes-item">
+                            <!-- <div class="classes-logo">
+                                <img src="{{=c.get_image()}}" width="50px"/>
+                            </div> -->
+                            <div class="title">{{=c.name}}</div>
+                            <div class="summary">简介：{{=c.summary}}</div>
+                            <div class="tool"><a class="btn btn-primary btn-small">查看详情 &raquo;</a></div>
+                        </li>
+                    {{pass}}
+                </ul>
             </div>
         </div>
     </div>
+    <div class="span4">
+        <div class="panel">
+            <div class="panel-header">
+                <h2>最新动态</h2>
+            </div>
+            <div class="panel-content">
+                <ul class="unstyled">
+                    {{for m in infos:}}
+                        <li class="info-title">[{{=m.create_date.strftime('%m月%d日')}}] {{=m.title}}</li>
+                    {{pass}}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
 {{end}}

@@ -25,6 +25,7 @@ class Class(Model):
     name = Field(str, verbose_name='名称', required=True, index=True)
     teachers = ManyToMany('user', verbose_name='教师', required=True)
     description = Field(TEXT, verbose_name='课程介绍', required=True)
+    summary = Field(str, verbose_name='课程简介', required=True)
     requirement = Field(TEXT, verbose_name='课程要求')
     link = Field(str, verbose_name='课件链接')
     attention_num = Field(int, verbose_name='关注人数')
@@ -38,7 +39,7 @@ class Class(Model):
         return self.name
     
     class AddForm:
-        fields = ['name', 'teachers', 'description', 'requirement', 'link',
+        fields = ['name', 'teachers', 'summary', 'description', 'requirement', 'link',
             'category']
     
     def get_lastest(self):
@@ -67,7 +68,7 @@ class Class(Model):
         ]
         
     class EditForm:
-        fields = ['name', 'teachers', 'description', 'requirement', 'link',
+        fields = ['name', 'teachers', 'summary', 'description', 'requirement', 'link',
             'category']
     
 class Class_Issue(Model):
@@ -82,6 +83,7 @@ class Class_Issue(Model):
     need_num = Field(int, verbose_name='招生人数', required=True)
     students_num = Field(int, verbose_name='学生数')
     position = Field(str, verbose_name='上课地点', required=True)
+    map = Field(str, verbose_name='地图')
     type = Field(CHAR, max_length=1, verbose_name='课程性质', choices=get_var('CLASSES/class_type'))
     fee = Field(str, verbose_name='收费说明')
     
@@ -91,11 +93,11 @@ class Class_Issue(Model):
     
     class AddForm:
         fields = ['begin_date', 'finish_date', 'teachers', 'need_num',
-            'position', 'type', 'fee']
+            'position', 'map', 'type', 'fee']
             
     class EditForm:
         fields = ['begin_date', 'finish_date', 'teachers', 'need_num',
-            'position', 'type', 'fee']
+            'position', 'map', 'type', 'fee']
 
     class Table:
         fields = [
@@ -110,6 +112,7 @@ class Class_Issue(Model):
         ]
         
 class Class_Info(Model):
+    title = Field(str, verbose_name='标题', required=True)
     content = Field(TEXT, verbose_name='内容', required=True)
     issue = Field(int, verbose_name='期数', default=1)
     class_obj = Reference('class', verbose_name='课程', required=True)
@@ -119,6 +122,20 @@ class Class_Info(Model):
     def OnInit(cls):
         Index('cls_info_idx', cls.c.class_obj, cls.c.issue)
         
+    class AddForm:
+        fields = ['title', 'content']
+            
+    class EditForm:
+        fields = ['title', 'content']
+    
+    class Table:
+        fields = [
+            {'name':'issue', 'width':100},
+            {'name':'create_date', 'width':100},
+            {'name':'title'},
+            {'name':'content'},
+        ]
+    
 class Class_StudyRecord(Model):
     issue = Field(int, verbose_name='期数', default=1)
     class_obj = Reference('class', verbose_name='课程', required=True)

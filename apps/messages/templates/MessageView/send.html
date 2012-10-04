@@ -7,9 +7,9 @@
 {{block content_main}}
 {{use "jquery"}}
 {{use "jqutils"}}
-{{use "jqrmselect", version2=True}}
 {{use "jquery", ui=True}}
 {{use "fontawesome"}}
+{{include "inc_select2.html"}}
 
 <div class="span8 panel">
     <div class="panel-header">
@@ -27,7 +27,7 @@
 
 <script>
 $(function(){
-    $('#field_users').remote_multiple_select2({width:380, height:100});
+    simple_select2('#field_users', {ajax:{url:"/users/search"}});
 });
 </script>
 {{end}}

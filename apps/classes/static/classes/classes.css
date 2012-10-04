@@ -1,0 +1,12 @@
+.classes .info-item {border-bottom:1px dotted #ccc;position:relative;
+padding:5px;margin-bottom:15px;}
+.classes .info-item .info-header {background-color:whitesmoke;color:#999;line-height:18px;margin:0px;padding:4px;border-left:2px solid #D26911;}
+.classes .info-item .info-tool {color:#999;line-height:18px;position:absolute;right:10px;top:10px;
+opacity:0.5;filter:alpha(opacity=50);
+}
+.classes .info-item .info-content {margin-top:5px;}
+.classes .classes-item {border-bottom:1px dotted #ccc;margin-bottom: 15px;padding:5px;position:relative;}
+.classes .classes-item .title{font-size:200%;font-weight:bold;margin-bottom:4px;font-family:Georgia;}
+.classes .classes-item .summary{color:#555;}
+.classes .classes-item .tool{position:absolute;bottom:5px;right:10px;}
+.info-title {text-overflow:ellipsis;white-space:nowrap;overflow:hidden;line-height:25px;}

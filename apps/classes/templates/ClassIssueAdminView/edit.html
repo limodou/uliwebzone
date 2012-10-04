@@ -1,0 +1,8 @@
+<h1>修改课程安排</h1>
+<div>
+<form class="ajax form-horizontal" method="POST" action="{{=request.path}}?class_id={{=class_id}}">
+{{build = form.build}}
+{{<< build.body}}
+{{<< build.buttons_line}}
+</form>
+</div>

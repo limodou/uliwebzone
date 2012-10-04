@@ -1,0 +1,307 @@
+{{extend "classes_admin_layout.html"}}
+
+{{block sub_menu}}
+{{sub_menu(menu_items, 'classes', 'class')}}
+{{end}}
+
+{{block content_main}}
+{{use "angularjs"}}
+{{use "fontawesome"}}
+{{include "inc_select2.html"}}
+{{include "inc_jquery_dialog2.html"}}
+{{use "jqtimepicker", locale='zh-CN'}}
+{{use "jqutils", ajaxForm=True}}
+{{include "inc_paginate.html"}}
+{{link "classes/classes.css"}}
+
+<div ng-app="AdminApp" id="ng-app" ng-controller="adminCtrl" class="classes">
+    <div>
+        <ul class="breadcrumb">
+          <li><a href="/class/admin/class">返回课程列表</a></li>
+            <span class="divider">/</span>
+          <li class="active">课程管理</li>
+        </ul>
+    </div>
+
+    <div class="page-header">
+        <h1>{{=object.name}}</h1>
+    </div>
+    <table class="table table-bordered">
+        <colgroup>
+            <col width="33%"></col>
+            <col width="33%"></col>
+            <col width="*"></col>
+        </colgroup>
+        <td>教师：{{<< view_obj.f.teachers}}</td>
+        <td>分类：<span class="label label-info">{{<< view_obj.f.category}}</span></td>
+        <td>创建时间：{{<< view_obj.f.create_date}}</td>
+    </table>
+    <div class="panel">
+        <div class="panel-content">
+            <h3>课程介绍</h3>
+            {{<< view_obj.f.description}}
+        </div>
+        <div class="panel-content">
+            <h3>课程要求</h3>
+            {{<< view_obj.f.requirement}}
+        </div>
+        <div class="panel-content">
+            <p><i class="icon-share"></i>{{<< view_obj.f.link}}</p>
+        </div>
+        <div class="panel-content">
+            <a class="btn btn-info"><i class="icon-edit"></i>修改课程</a>
+        </div>
+    </div>
+    
+    <div class="panel">
+        <div class="panel-content">
+            <h3>课程安排</h3>
+            <div class="line">
+                <a ng-click="add()" class="btn btn-primary"><i class="icon-plus"></i>添加新的课程安排</a>
+            </div>
+            <table class="table table-bordered table-header">
+                <colgroup>
+                    {{for f in fields:}}
+                        {{w = f.get('width', -1)}}
+                        {{if w > -1:}}
+                            <col width="{{=w}}px"></col>
+                        {{else:}}
+                            <col width="*"></col>
+                        {{pass}}
+                    {{pass}}
+                    <col width="50px"></col>
+                </colgroup>
+                <thead>
+                    <tr>
+                        {{for f in fields:}}
+                            <th>{{=f.get('verbose_name') or f['name']}}</th>
+                        {{pass}}
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="c in issues|orderBy:ordering" ng-class="get_class(c.begin_date, c.finish_date)">
+                        <td>{% c.issue %}</td>
+                        <td>{% c.teachers %}</td>
+                        <td>{% c.begin_date %}</td>
+                        <td>{% c.finish_date %}</td>
+                        <td>{% c.need_num %}</td>
+                        <td><div ng-bind-html-unsafe="c.position"></div></td>
+                        <td>{% c.type %}</td>
+                        <td>{% c.fee %}</td>
+                        <td>
+                            <a ng-click="edit(c.id)"><i class="icon-edit" title="编辑"></i></a> 
+                            <a ng-click="remove(c.id)"><i class="icon-remove" title="删除"></i></a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="pagination pagination-centered" id="page-issues"></div>
+        </div>
+    </div>
+    
+    <div class="panel">
+        <div class="panel-content">
+            <h3>课程动态</h3>
+            <div class="line">
+                <a ng-click="add_info()" class="btn btn-primary"><i class="icon-plus"></i>添加新的课程动态</a>
+            </div>
+            <ul class="unstyled">
+                <li ng-repeat="i in infos" class="info-item">
+                    <div class="info-header rounded">
+                        <span>第 {% i.issue %} 期</span> <span class="sep-bullet"></span> 
+                        <span>{% i.create_date %}</span>
+                    </div>
+                    <div class="info-tool">
+                        <a ng-click="edit_info(i.id)"><i class="icon-edit" title="编辑"></i></a> 
+                        <a ng-click="remove_info(i.id)"><i class="icon-remove" title="删除"></i></a>
+                    </div>
+                    <div class="info-content">
+                        <div ng-bind-html-unsafe="i.content"></div>
+                    </div>
+                </li>
+            </ul>
+            <div class="pagination pagination-centered" id="page-infos"></div>
+        </div>
+    </div>
+    
+</div>
+
+<script>
+var app = angular.module('AdminApp', []).config(function ($interpolateProvider) {
+    $interpolateProvider.startSymbol('{%');
+    $interpolateProvider.endSymbol('%}');
+}); 
+
+/* 计划添加后，新的计划将显示 */
+var add_issue_success = function(r){
+    $(this).dialog2('close');
+}
+
+function adminCtrl($scope, $http) {
+    $scope.ordering = '-issue';
+    $scope.class_id = {{=object.id}};
+    $scope.query_issue = function(page){
+        page = page || 1;
+        $.get('/class/admin/issue/query?class_id='+$scope.class_id+'&page='+page).success(function(data){
+            $scope.issues = data.rows;
+            $scope.$apply();
+            
+            function callback(page){
+                $scope.query_issue(page);
+            }
+            create_pagination('#page-issues', data.total, data.page_rows, data.pageno, callback, {first:'', last:'', totalMessage:''});
+        });
+    }
+    $scope.query_issue();
+    
+    $scope.query_info = function(page){
+        page = page || 1;
+        $.get('/class/admin/info/query?class_id='+$scope.class_id+'&page='+page).success(function(data){
+            $scope.infos = data.rows;
+            $scope.$apply();
+            
+            function callback(page){
+                $scope.query_info(page);
+            }
+            
+            create_pagination('#page-infos', data.total, data.page_rows, data.pageno, callback, {first:'', last:'', totalMessage:''});
+        });
+    }
+    $scope.query_info();
+    
+    $scope.add = function(){
+        var dialog = $('<div id="add_object"></div>').dialog2(
+            {
+                autoFocus:false, 
+                url:'/class/admin/issue/add?class_id='+$scope.class_id,
+                ajaxFormOptions: {
+                    onSuccess: common_ajaxForm_success({
+                        success:function(data){
+                            $(this).dialog2('close');
+                            $scope.issues.push(data.data);
+                            $scope.$apply();
+                        }
+                    }),
+                    dataType: 'json'
+                }
+            }); 
+        dialog.bind('dialog2.content-update', function(e){
+            simple_select2('#field_teachers', {ajax:{url:"/users/search"}});
+            //初始化日期字段
+            $('input.field_datetime').datetimepicker({ dateFormat: 'yy-mm-dd' });
+        });
+    }
+    $scope.edit = function(id){
+        var dialog = $('<div id="edit_object"></div>').dialog2(
+            {
+                autoFocus:false, 
+                url:'/class/admin/issue/edit/'+id+'?class_id='+$scope.class_id,
+                ajaxFormOptions: {
+                    onSuccess: common_ajaxForm_success({
+                        success:function(data){
+                            $(this).dialog2('close');
+                            for(var i=0; i<$scope.issues.length; i++){
+                                if ($scope.issues[i].id == id){
+                                    $scope.issues[i] = data.data;
+                                    $scope.$apply();
+                                    return;
+                                }
+                            }
+                        }
+                    }),
+                    dataType: 'json'
+                }
+            }); 
+        dialog.bind('dialog2.content-update', function(e){
+            simple_select2('#field_teachers', {ajax:{url:"/users/search"}});
+            //初始化日期字段
+            $('input.field_datetime').datetimepicker({ dateFormat: 'yy-mm-dd' });
+        });
+    }
+    $scope.remove = function(id){
+        $.post('/class/admin/issue/delete/' + id+'?class_id='+$scope.class_id).success(function(data){
+            if(data.success){
+                for(var i=0; i<$scope.issues.length; i++){
+                    if ($scope.issues[i].id == id){
+                        $scope.issues.splice(i, 1);
+                        show_message(data.message);
+                        $scope.$apply();
+                        return;
+                    }
+                }
+            }else{
+                show_message(data.message, 'error');
+            }
+        });
+    }
+    $scope.get_class = function(begin_date, end_date){
+        var d = new Date();
+        begin_date = new Date(Date.parse(begin_date.replace(/-/g,"/")));
+        end_date = new Date(Date.parse(end_date.replace(/-/g,"/")));
+        if (d < begin_date) return '';
+        else if (d > end_date) return 'info';
+        else return 'success';
+    }
+    
+    $scope.add_info = function(){
+        var dialog = $('<div id="add_object"></div>').dialog2(
+            {
+                autoFocus:false, 
+                url:'/class/admin/info/add?class_id='+$scope.class_id,
+                ajaxFormOptions: {
+                    onSuccess: common_ajaxForm_success({
+                        success:function(data){
+                            $(this).dialog2('close');
+                            $scope.infos.push(data.data);
+                            $scope.$apply();
+                        }
+                    }),
+                    dataType: 'json'
+                }
+            }); 
+    }
+    $scope.edit_info = function(id){
+        var dialog = $('<div id="edit_object"></div>').dialog2(
+            {
+                autoFocus:false, 
+                url:'/class/admin/info/edit/'+id+'?class_id='+$scope.class_id,
+                ajaxFormOptions: {
+                    onSuccess: common_ajaxForm_success({
+                        success:function(data){
+                            $(this).dialog2('close');
+                            for(var i=0; i<$scope.infos.length; i++){
+                                if ($scope.infos[i].id == id){
+                                    $scope.infos[i] = data.data;
+                                    $scope.$apply();
+                                    return;
+                                }
+                            }
+                        }
+                    }),
+                    dataType: 'json'
+                }
+            }); 
+    }
+    $scope.remove_info = function(id){
+        $.post('/class/admin/issue/delete/' + id+'?class_id='+$scope.class_id).success(function(data){
+            if(data.success){
+                for(var i=0; i<$scope.infos.length; i++){
+                    if ($scope.infos[i].id == id){
+                        $scope.infos.splice(i, 1);
+                        show_message(data.message);
+                        $scope.$apply();
+                        return;
+                    }
+                }
+            }else{
+                show_message(data.message, 'error');
+            }
+        });
+    }
+    
+}
+
+</script>
+    
+{{end}}

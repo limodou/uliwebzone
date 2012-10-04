@@ -1,5 +1,5 @@
 #coding=utf-8
-from uliweb import expose, functions
+from uliweb import expose, functions, validators
 from uliweb.orm import get_model
 
 @expose('/class')
@@ -13,10 +13,10 @@ class ClassView(object):
         课程展示首页
         """
         Info = get_model('class_info')
-        dynamic_messages = Info.all().order_by(Info.c.create_date.desc()).limit(10)
+        infos = Info.all().order_by(Info.c.create_date.desc()).limit(10)
         
         classes = self.model.all().order_by(self.model.c.create_date.desc()).limit(10)
-        return {'dynamic_messages':dynamic_messages, 'classes':classes}
+        return {'infos':infos, 'classes':classes}
     
 @expose('/class/admin/class')
 class ClassAdminView(object):
@@ -177,6 +177,13 @@ class ClassIssueAdminView(object):
         self.class_id = int(request.GET.get('class_id', 0))
         self.condition = self.model.c.class_obj == self.class_id
         
+    def _position(self, value, obj):
+        if obj.map:
+            map = u' <a href="%s" target="_blank"><i class="icon-share"></i>查看地图</a>' % obj.map
+        else:
+            map = ''
+        return '%s%s' % (value, map)
+    
     def _get_fields(self):
         view = functions.ListView(self.model)
         return view.table_info()['fields_list']
@@ -189,9 +196,13 @@ class ClassIssueAdminView(object):
         def issue(value, obj):
             return value
         
-        view = functions.ListView(self.model, pagination=False, 
+        page = int(request.values.get('page', 1)) - 1
+        rows = 5
+        view = functions.ListView(self.model,
+            pageno=page, rows_per_page=rows,
             condition=self.condition,
-            fields_convert_map={'issue':issue},
+            order_by=[self.model.c.issue.desc()],
+            fields_convert_map={'issue':issue, 'position':self._position},
             )
         return json(view.json())
         
@@ -205,16 +216,23 @@ class ClassIssueAdminView(object):
             
         def post_created_form(fcls, model):
             fcls.teachers.choices = [('', '')]
+            fcls.map.validators.append(validators.IS_URL)
+            
+        def post_save(obj, data):
+            obj.class_obj.issue_num += 1
+            obj.class_obj.save()
 
         def success_data(obj, data):
             from uliweb.utils.generic import get_field_display
             
             d = obj.to_dict()
             d['teachers'] = get_field_display(self.model, 'teachers', obj)
+            d['position'] = self._position(d['position'], obj)
             return d
         
         view = functions.AddView(self.model,
             pre_save=pre_save,
+            post_save=post_save,
             post_created_form=post_created_form,
             template_data={'class_id':self.class_id},
             success_data=success_data,
@@ -227,10 +245,12 @@ class ClassIssueAdminView(object):
             
             d = obj.to_dict()
             d['teachers'] = get_field_display(self.model, 'teachers', obj)
+            d['position'] = self._position(d['position'], obj)
             return d
            
         def post_created_form(fcls, model, obj):
             fcls.teachers.query = obj.teachers
+            fcls.map.validators.append(validators.IS_URL)
         
         obj = self.model.get_or_notfound(int(id))
         view = functions.EditView(self.model, obj=obj, 
@@ -238,6 +258,79 @@ class ClassIssueAdminView(object):
             post_created_form=post_created_form,
             success_data=success_data,
             )
+        return view.run(json_result=True)
+        
+    def delete(self, id):
+        def pre_delete(obj):
+            obj.class_obj.issue_num -= 1
+            obj.class_obj.save()
+            
+        obj = self.model.get_or_notfound(int(id))
+        view = functions.DeleteView(self.model, obj=obj,
+            pre_delete=pre_delete,
+        )
+        return view.run(json_result=True)
+
+@expose('/class/admin/info')
+class ClassInfoAdminView(object):
+    def __init__(self):
+        from uliweb import request
+        
+        self.model = get_model('class_info')
+        self.class_id = int(request.GET.get('class_id', 0))
+        self.condition = self.model.c.class_obj == self.class_id
+        
+    def query(self):
+        def issue(value, obj):
+            return value
+        
+        page = int(request.values.get('page', 1)) - 1
+        rows = 5
+        view = functions.ListView(self.model,
+            pageno=page, rows_per_page=rows,
+            condition=self.condition,
+            order_by=[self.model.c.create_date.desc()],
+            fields_convert_map={'issue':issue},
+            )
+        return json(view.json())
+        
+    def add(self):
+        from sqlalchemy.sql import func
+        
+        def pre_save(data):
+            issue, = self.model.filter(self.model.c.class_obj==self.class_id).values_one(func.max(self.model.c.issue))
+            data['issue'] = (issue or 0)+1
+            data['class_obj'] = self.class_id
+            
+        def success_data(obj, data):
+            from uliweb.utils.generic import get_field_display
+
+            d = obj.to_dict()
+            d['content'] = get_field_display(self.model, 'content', obj)
+            return d
+        
+        view = functions.AddView(self.model,
+            pre_save=pre_save,
+            template_data={'title':'添加新的课程动态'},
+            success_data=success_data,
+            )
+        response.template = 'GenericAjaxView/add.html'
+        return view.run(json_result=True)
+        
+    def edit(self, id):
+        def success_data(obj, data):
+            from uliweb.utils.generic import get_field_display
+            
+            d = obj.to_dict()
+            d['content'] = get_field_display(self.model, 'content', obj)
+            return d
+           
+        obj = self.model.get_or_notfound(int(id))
+        view = functions.EditView(self.model, obj=obj, 
+            template_data={'title':'修改课程动态'},
+            success_data=success_data,
+            )
+        response.template = 'GenericAjaxView/edit.html'
         return view.run(json_result=True)
         
     def delete(self, id):

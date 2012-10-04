@@ -8,14 +8,18 @@
 <style>
 #field_name, #field_link {width:80%;}
 </style>
-{{use "jqrmselect", version2=True}}
+{{include "inc_select2.html"}}
 {{use "uniform"}}
+{{use "sisyphus"}}
 
     {{<< form}}
     
 <script>
 $(function(){
-    $('#field_teachers').remote_multiple_select2({width:'80%', height:100, label:'', url:'/users/search'});
+    simple_select2('#field_teachers', {ajax:{url:"/users/search"}});
+//    simple_select2('#field_cateogry');
+//    $('#field_category').select2({width:'100px', allowClear: true});
+    $('form').sisyphus();
 });
 </script>
 
