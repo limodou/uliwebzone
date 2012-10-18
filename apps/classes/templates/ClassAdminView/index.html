@@ -17,7 +17,6 @@
     <div class="line">
         <table class="table table-bordered table-header">
             <colgroup>
-                <col width="50px"></col>
                 {{for f in fields:}}
                     {{w = f.get('width', -1)}}
                     {{if w > -1:}}
@@ -30,7 +29,6 @@
             </colgroup>
             <thead>
                 <tr>
-                    <th>序号</th>
                     {{for f in fields:}}
                         <th>{{=f.get('verbose_name') or f['name']}}</th>
                     {{pass}}
@@ -38,13 +36,13 @@
                 </tr>
             </thead>
             <tbody>
-                <tr ng-repeat="c in classes|orderBy:ordering">
-                    <td>{% $index+1 %}</td>
+                <tr ng-repeat="c in classes">
                     <td><a ng-href="/class/admin/class/view/{% c.id %}">{% c.name %}</a></td>
                     <td>{% c.category %}</td>
                     <td>{% c.teachers %}</td>
                     <td><div ng-bind-html-unsafe="c.link"></div></td>
                     <td>{% c.issue_num %}</td>
+                    <td>{% c.order %}</td>
                     <td>
                         <a ng-href="/class/admin/class/edit/{% c.id %}"><i class="icon-edit" title="编辑"></i></a> 
                         <a href="#" ng-click="remove_class(c.id)"><i class="icon-remove" title="删除"></i></a>
@@ -97,8 +95,6 @@ function adminCtrl($scope, $http) {
         });
     }
     
-    
-    $scope.ordering = 'create_date';
 }
 </script>
 {{end}}

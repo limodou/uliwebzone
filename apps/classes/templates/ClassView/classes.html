@@ -1,0 +1,36 @@
+{{extend "classes_layout.html"}}
+
+{{block content_main}}
+{{link "classes/classes.css"}}
+
+<div>
+    <ul class="breadcrumb">
+      <li><a href="/class">返回课程</a></li>
+        <span class="divider">/</span>
+      <li class="active">课程列表</li>
+    </ul>
+</div>
+
+<div class="row-fluid classes">
+    <div class="span12">
+        <div class="panel">
+            <div class="panel-content">
+                <h2 class="line">课程列表</h2>
+                <ul class="unstyled">
+                    {{for c in objects:}}
+                        <li class="classes-item">
+                            {{## <div class="classes-logo">
+                                <img src="{{=c.get_image()}}" width="50px"/>
+                            </div> ##}}
+                            <div class="title">{{=c.name}}</div>
+                            <div class="summary">简介：{{=c.description}}</div>
+                            <div class="tool"><a class="btn btn-primary btn-small" href="/class/view/{{=c.id}}">查看详情 &raquo;</a></div>
+                        </li>
+                    {{pass}}
+                </ul>
+                <div class="pagination pagination-centered" id="pagination">{{<< pagination}}</div>
+            </div>
+        </div>
+    </div>
+</div>
+{{end}}

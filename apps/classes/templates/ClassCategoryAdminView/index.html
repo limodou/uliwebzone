@@ -13,8 +13,10 @@
 <div class="row-fluid" ng-app="AdminApp" id="ng-app" ng-controller="adminCtrl">
     <div class="line">
         <form class="form-inline" style="margin-bottom:0px;">
-            <input id="field_category" ng-model="topictype_name" placeholder="新课程分类名称"></input>
-            <button class="btn btn-primary" type="button" ng-click="add_category()"><i class="icon-plus"></i>添加</button>
+            <input id="field_category" ng-model="topictype_name" 
+                placeholder="新课程分类名称"></input>
+            <button class="btn btn-primary" type="button" ng-click="add_category()">
+                <i class="icon-plus"></i>添加</button>
         </form>
     </div>
     <div class="line">
@@ -42,14 +44,17 @@
                 <tr ng-repeat="c in objects">
                     <td>{% c.name %}</td>
                     <td>
-                        <a href="#" ng-click="edit_category(c.id)"><i class="icon-edit" title="编辑"></i></a> 
-                        <a href="#" ng-click="remove_category(c.id)"><i class="icon-remove" title="删除"></i></a>
+                        <a href="#" ng-click="edit_category(c.id)">
+                            <i class="icon-edit" title="编辑"></i>
+                        </a> 
+                        <a href="#" ng-click="remove_category(c.id)">
+                            <i class="icon-remove" title="删除"></i>
+                        </a>
                     </td>
                 </tr>
             </tbody>
         </table>
     </div>
-    
 </div>
 
 <script>
@@ -58,7 +63,7 @@ var app = angular.module('AdminApp', []).config(function ($interpolateProvider) 
     $interpolateProvider.endSymbol('%}');
 }); 
 
-function adminCtrl($scope, $http) {
+function adminCtrl($scope) {
     $.get('/class/admin/category/query')
         .success(function(data, status, headers, config){
             $scope.objects = data.rows;

@@ -31,6 +31,8 @@ if request.user and request.user.is_superuser:
             'title':_('Admin Settings'),
             'subs':[
                 {'name':'users', 'title':_('User Manager'), 'link':'/users/list'},
+                {'name':'roles', 'title':'角色管理', 'link':'/admin/roles'},
+                {'name':'permissions', 'title':'权限管理', 'link':'/admin/permissions'},
             ]
         }
     )
@@ -65,11 +67,23 @@ if has_role(request.user, 'superuser'):
             'title':'课程',
             'subs':[
                     {'name': 'category', 'title':'课程分类', 'link':'/class/admin/category'},
+                    {'name': 'teacher', 'title':'教师管理', 'link':'/class/admin/teacher'},
+                    {'name': 'class', 'title':'课程管理', 'link':'/class/admin/class'},
+                    ]
+        }
+    )
+elif has_role(request.user, 'teacher'):
+    menu_items.append(
+        {
+            'name':'classes',
+            'title':'课程',
+            'subs':[
                     {'name': 'class', 'title':'课程管理', 'link':'/class/admin/class'},
                     ]
         }
     )
 pass
+
 }}  
 <div class="sidebar">
     {{block sub_menu}}

@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "POT-Creation-Date: 2012-09-25 20:48\n"
-"PO-Revision-Date: 2012-09-25 20:50+0800\n"
+"PO-Revision-Date: 2012-10-15 20:59+0800\n"
 "Last-Translator: limodou <limodou@gmail.com>\n"
 "Language-Team: limodou <limodou@gmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -15,69 +15,70 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "Generated-By: pygettext.py 1.6\n"
 
-#: .\apps\admin\templates\admin_layout.html:17
-msgid "Settings"
-msgstr ""
-
 #: .\apps\admin\templates\admin_layout.html:19
+msgid "Settings"
+msgstr "设置"
+
+#: .\apps\admin\templates\admin_layout.html:21
 msgid "Information"
-msgstr ""
+msgstr "信息"
 
-#: .\apps\admin\templates\admin_layout.html:20
+#: .\apps\admin\templates\admin_layout.html:22
 msgid "Change Password"
-msgstr ""
-
-#: .\apps\admin\templates\admin_layout.html:29
-msgid "Admin Settings"
-msgstr ""
+msgstr "修改口令"
 
 #: .\apps\admin\templates\admin_layout.html:31
+msgid "Admin Settings"
+msgstr "管理设置"
+
+#: .\apps\admin\templates\admin_layout.html:33
 msgid "User Manager"
-msgstr ""
+msgstr "用户管理"
 
 #: .\apps\blog\models.py:7
 #: .\apps\blog\models.py:17
 msgid "Category"
-msgstr ""
+msgstr "分类"
 
 #: .\apps\blog\models.py:10
 #: .\apps\blog\models.py:18
 msgid "Tag"
-msgstr ""
+msgstr "标签"
 
 #: .\apps\blog\models.py:13
 msgid "Title"
-msgstr ""
+msgstr "标题"
 
 #: .\apps\blog\models.py:14
 #: .\apps\blog\models.py:30
 msgid "Content"
-msgstr ""
+msgstr "内容"
 
 #: .\apps\blog\models.py:15
 #: .\apps\blog\models.py:29
 msgid "Publish Date"
-msgstr ""
+msgstr "发布日期"
 
 #: .\apps\blog\models.py:16
 #: .\apps\blog\models.py:28
 msgid "Author"
-msgstr ""
+msgstr "作者"
 
 #: .\apps\blog\models.py:19
 msgid "Enable Comment"
-msgstr ""
+msgstr "允许评论"
 
 #: .\apps\blog\templates\BlogView\add.html:6
 #: .\apps\blog\templates\BlogView\list.html:18
 msgid "New Article"
-msgstr ""
+msgstr "新建文章"
 
 #: .\apps\blog\templates\BlogView\list.html:12
 msgid "There are no articles yet."
 msgstr ""
 
 #: .\apps\blog\templates\BlogView\list.html:52
+#: .\apps\classes\templates\ClassTeacherView\index.html:66
 msgid "Edit"
 msgstr ""
 
@@ -91,15 +92,15 @@ msgstr ""
 
 #: .\apps\messages\forms.py:7
 msgid "Send"
-msgstr ""
+msgstr "发送"
 
 #: .\apps\messages\forms.py:8
 msgid "Receiver"
-msgstr ""
+msgstr "收信人"
 
 #: .\apps\messages\forms.py:9
 msgid "Message"
-msgstr ""
+msgstr "消息"
 
 #: .\apps\messages\templates\MessageView\list.html:49
 msgid "你确定要删除所有接收消息吗?"
@@ -111,58 +112,87 @@ msgstr ""
 
 #: .\apps\messages\views.py:135
 msgid "Send message successful!"
-msgstr ""
+msgstr "发送消息成功"
 
 #: .\apps\messages\views.py:149
 msgid "There are something wrong, please fix them"
 msgstr ""
 
 #: .\apps\project\templates\layout.html:17
+#: .\apps\project\templates\layout_container.html:17
 msgid "Account Setting"
 msgstr "帐户设置"
 
 #: .\apps\project\templates\layout.html:19
+#: .\apps\project\templates\layout_container.html:19
 msgid "Logout"
 msgstr "注销"
 
 #: .\apps\project\templates\layout.html:23
+#: .\apps\project\templates\layout_container.html:23
 msgid "Not signed in yet"
 msgstr "尚未登录"
 
 #: .\apps\project\templates\layout.html:25
+#: .\apps\project\templates\layout_container.html:25
 msgid "Login"
 msgstr "登录"
 
 #: .\apps\project\templates\layout.html:27
+#: .\apps\project\templates\layout_container.html:27
 msgid "Register"
 msgstr "注册"
 
-#: .\apps\settings.ini:54
-#: .\apps\settings.ini:55
+#: .\apps\settings.ini:60
+#: .\apps\settings.ini:61
 msgid "Uliweb Zone"
 msgstr ""
 
-#: .\apps\settings.ini:57
+#: .\apps\settings.ini:63
 msgid "Home"
 msgstr "首页"
 
-#: .\apps\settings.ini:58
+#: .\apps\settings.ini:64
 msgid "Forum"
 msgstr "论坛"
 
-#: .\apps\settings.ini:59
+#: .\apps\settings.ini:65
 msgid "Tutorial"
 msgstr "教程"
 
-#: .\apps\settings.ini:60
+#: .\apps\settings.ini:67
 msgid "Admin"
 msgstr "管理"
 
-#: .\apps\settings.ini:61
+#: .\apps\settings.ini:68
 msgid "About"
 msgstr "关于"
 
 #: .\apps\tutorials\templates\TutorialView\read.html:25
 msgid "您确定要删除此教程吗?"
 msgstr ""
+
+#: .\apps\classes\templates\ClassTeacherView\index.html:70
+msgid "Request process failed!"
+msgstr "请求处理失败！"
+
+#: .\apps\classes\templates\ClassTeacherView\index.html:68
+msgid "Remove"
+msgstr ""
+
+#: .\apps\classes\templates\ClassTeacherView\index.html:18
+msgid "Add"
+msgstr ""
+
+#: .\apps\classes\templates\ClassTeacherView\index.html:52
+msgid "Action"
+msgstr "操作"
+
+#: .\apps\classes\settings.ini:16
+msgid "Teacher"
+msgstr "讲师"
+
+#: .\apps\settings.ini:66
+msgid "Class"
+msgstr "课程"
 

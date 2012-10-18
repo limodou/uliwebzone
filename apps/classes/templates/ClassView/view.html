@@ -1,0 +1,219 @@
+{{extend "classes_layout.html"}}
+
+{{block content_main}}
+{{use "angularjs"}}
+{{use "fontawesome"}}
+{{include "inc_select2.html"}}
+{{include "inc_jquery_dialog2.html"}}
+{{use "jqtimepicker", locale='zh-CN'}}
+{{use "jqutils", ajaxForm=True}}
+{{include "inc_paginate.html"}}
+{{link "classes/classes.css"}}
+
+<div ng-app="AdminApp" id="ng-app" ng-controller="adminCtrl" class="classes">
+    <div>
+        <ul class="breadcrumb">
+          <li><a href="/class/classes">返回课程列表</a></li>
+            <span class="divider">/</span>
+          <li class="active">课程管理</li>
+        </ul>
+    </div>
+
+    <div class="page-header">
+        <h1>{{=object.name}}</h1>
+    </div>
+    <table class="table table-bordered">
+        <colgroup>
+            <col width="33%"></col>
+            <col width="33%"></col>
+            <col width="*"></col>
+        </colgroup>
+        <td>教师：{{<< view_obj.f.teachers}}</td>
+        <td>分类：<span class="label label-info">{{<< view_obj.f.category}}</span></td>
+        <td>创建时间：{{<< view_obj.f.create_date}}</td>
+    </table>
+    <div class="panel">
+        <div class="panel-content">
+            <h3>课程介绍</h3>
+            {{<< view_obj.f.description}}
+        </div>
+        <div class="panel-content">
+            <h3>课程要求</h3>
+            {{<< view_obj.f.requirement}}
+        </div>
+        <div class="panel-content">
+            <i class="icon-share"></i>课件：{{<< view_obj.f.link}}
+        </div>
+    </div>
+    
+    <div class="panel">
+        <div class="panel-content">
+            <h3>课程安排</h3>
+            <ul class="unstyled class-detail">
+                <li ng-repeat="c in issues|orderBy:ordering" class="class-issue">
+                    <div class="class-header rounded">
+                        <span class="gray">
+                        第 {% c.issue %} 期
+                        <span class="sep-bullet" ng-init="c.status = get_status(c.begin_date, c.finish_date)"></span>
+                        <span ng-show="c.status==0" class="label">未开始</span>
+                        <span ng-show="c.status==1" class="label label-success">进行</span>
+                        <span ng-show="c.status==-1" class="label label-warning">结束</span>
+                        </span>
+                    </div>
+                    <div class="class-enrolled" ng-show="c.enrolled">
+                        <img src="{{=url_for_static('classes/enrolled.png')}}"/>
+                    </div>
+                    <div class="class-body">
+                        <div>
+                            <b>授课讲师：</b>{% c.teachers %}<br/>
+                            <b>上课时间：</b>{% format_date(c.begin_date)|date:'yyyy年M月d日 hh点' %} - {% format_date(c.finish_date)|date:'yyyy年M月d日 hh点' %}<br/>
+                            <b>上课地点：</b><span ng-bind-html-unsafe="c.position"></span><br/>
+                            <b>课程性质：</b><span class="label label-info">{% c.type %}</span> <span class="sep-bullet" ng-show="c.fee"></span>{% c.fee %}<br/>
+                            <a ng-show="!c.students" ng-click="query_students(c.issue)" class="btn btn-success btn-mini">报名查看</a>
+                        </div>
+                        <div class="class-students clearfix" ng-show="c.students">
+                            <b>报名学员：</b>
+                            <ul class="unstyled">
+                                <li ng-repeat="u in c.students">
+                                    <img ng-src="{% u.image %}" title="{% u.name %}"/>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <div class="class-neednum clearfix">
+                            <div class="class-neednum-left"><span class="number">{% c.need_num %}</span><br/><span>招收</span></div>
+                            <div class="class-neednum-left class-neednum-right"><span class="number">{% c.need_num - c.students_num %}</span><br/><span>剩余</span></div>
+                        </div>
+                        <div class="class-enroll" ng-show="c.status==0">
+                            <a ng-show="c.enroll==1" ng-click="enroll(c.issue)" class="btn btn-primary btn-large">报名</a>
+                            <a ng-show="c.enroll==0" ng-click="unenroll(c.issue)" class="btn btn-danger btn-large">取消报名</a>
+                            <span ng-show="c.enroll==-1" style="color:#f00;font-size:24px;">请先登录</span>
+                            <span ng-show="c.enroll==-3" style="color:#f00;font-size:24px;">报名已满</span>
+                        </div>
+                        
+                        {{pass}}
+                    </div>
+                </li>
+            </ul>
+            <div class="pagination pagination-centered" id="page-issues"></div>
+        </div>
+    </div>
+    
+    <div class="panel">
+        <div class="panel-content">
+            <h3>课程动态</h3>
+            <ul class="unstyled">
+                <li ng-repeat="i in infos" class="info-item">
+                    <div class="info-header rounded">
+                        <span>第 {% i.issue %} 期</span> <span class="sep-bullet"></span> 
+                        <span>{% i.create_date %}</span>
+                    </div>
+                    <div class="info-content">
+                        <div ng-bind-html-unsafe="i.content"></div>
+                    </div>
+                </li>
+            </ul>
+            <div class="pagination pagination-centered" id="page-infos"></div>
+        </div>
+    </div>
+    
+</div>
+
+<script>
+var app = angular.module('AdminApp', []).config(function ($interpolateProvider) {
+    $interpolateProvider.startSymbol('{%');
+    $interpolateProvider.endSymbol('%}');
+}); 
+
+function adminCtrl($scope, $http) {
+    $scope.ordering = '-issue';
+    $scope.class_id = {{=object.id}};
+    $scope.show_students = true;
+    $scope.query_issue = function(page){
+        page = page || 1;
+        $.get('/class/query_classissues?class_id='+$scope.class_id+'&page='+page).success(function(data){
+            $scope.issues = data.rows;
+            $scope.$apply();
+            
+            function callback(page){
+                $scope.query_issue(page);
+            }
+            create_pagination('#page-issues', data.total, data.page_rows, data.pageno, callback, {first:'', last:'', totalMessage:''});
+        });
+    }
+    $scope.query_issue();
+    
+    $scope.query_info = function(page){
+        page = page || 1;
+        $.get('/class/query_classinfos?class_id='+$scope.class_id+'&page='+page).success(function(data){
+            $scope.infos = data.rows;
+            $scope.$apply();
+            
+            function callback(page){
+                $scope.query_info(page);
+            }
+            
+            create_pagination('#page-infos', data.total, data.page_rows, data.pageno, callback, {first:'', last:'', totalMessage:''});
+        });
+    }
+    $scope.query_info();
+    
+    $scope.get_status = function(begin_date, end_date){
+        var d = new Date();
+        begin_date = new Date(Date.parse(begin_date.replace(/-/g,"/")));
+        end_date = new Date(Date.parse(end_date.replace(/-/g,"/")));
+        if (d < begin_date) return status = 0;
+        else if (d > end_date) return status = -1;
+        else return status = 1;
+    }
+    $scope.format_date = function(date){
+        return new Date(Date.parse(date.replace(/-/g,"/")));
+    }
+    $scope.enroll = function(issue){
+        $.post('/class/enroll', {class_id:$scope.class_id, issue:issue}).success(function(data){
+            if(data.success){
+                for(var i=0; i<$scope.issues.length; i++){
+                    var c = $scope.issues[i];
+                    if(c.issue==issue){
+                        c.enroll = false;
+                        c.enrolled = data.data.enrolled;
+                        c.students_num = data.data.students_num;
+                    }
+                }
+                $scope.$apply();
+            }
+            show_message(data.message);
+        });
+    }
+    $scope.unenroll = function(issue){
+        $.post('/class/unenroll', {class_id:$scope.class_id, issue:issue}).success(function(data){
+            if(data.success){
+                for(var i=0; i<$scope.issues.length; i++){
+                    var c = $scope.issues[i];
+                    if(c.issue==issue){
+                        c.enroll = true;
+                        c.enrolled = data.data.enrolled;
+                        c.students_num = data.data.students_num;
+                    }
+                }
+                $scope.$apply();
+            }
+            show_message(data.message);
+        });
+    }
+    $scope.query_students = function(issue){
+        $.post('/class/students', {class_id:$scope.class_id, issue:issue}).success(function(data){
+            for(var i=0; i<$scope.issues.length; i++){
+                var c = $scope.issues[i];
+                if(c.issue==issue){
+                    c.students = data.rows;
+                }
+            }
+            $scope.$apply();
+        });
+    }
+}
+
+</script>
+    
+{{end}}

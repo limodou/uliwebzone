@@ -1,0 +1,41 @@
+{{extend "classes_layout.html"}}
+
+{{block content_main}}
+{{link "classes/classes.css"}}
+
+<div>
+    <ul class="breadcrumb">
+      <li><a href="/class">返回课程</a></li>
+        <span class="divider">/</span>
+      <li class="active">最新动态</li>
+    </ul>
+</div>
+
+<div class="row-fluid classes">
+    <div class="span12">
+        <div class="panel">
+            <div class="panel-content">
+                <h2 class="line">最新动态</h2>
+                <ul class="unstyled">
+                    {{for m in objects:}}
+                        <li class="info-item">
+                            <div class="info-header">
+                                {{=m.title}}
+                            </div>
+                            <div class="info-content">
+                                {{<< m.content}}
+                            </div>
+                            <div class="info-footer">
+                                <span class="lightgray">{{<< m.class_obj}}</span>
+                                <span class="sep-bullet"></span>
+                                <span class="lightgray">{{=m.create_date}}</span>
+                            </div>
+                        </li>
+                    {{pass}}
+                </ul>
+                <div class="pagination pagination-centered" id="pagination">{{<< pagination}}</div>
+            </div>
+        </div>
+    </div>
+</div>
+{{end}}

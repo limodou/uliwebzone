@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2012-09-25 20:48\n"
+"POT-Creation-Date: 2012-10-15 20:56\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,23 +16,23 @@ msgstr ""
 "Generated-By: pygettext.py 1.6\n"
 
 
-#: .\apps\admin\templates\admin_layout.html:17
+#: .\apps\admin\templates\admin_layout.html:19
 msgid "Settings"
 msgstr ""
 
-#: .\apps\admin\templates\admin_layout.html:19
+#: .\apps\admin\templates\admin_layout.html:21
 msgid "Information"
 msgstr ""
 
-#: .\apps\admin\templates\admin_layout.html:20
+#: .\apps\admin\templates\admin_layout.html:22
 msgid "Change Password"
 msgstr ""
 
-#: .\apps\admin\templates\admin_layout.html:29
+#: .\apps\admin\templates\admin_layout.html:31
 msgid "Admin Settings"
 msgstr ""
 
-#: .\apps\admin\templates\admin_layout.html:31
+#: .\apps\admin\templates\admin_layout.html:33
 msgid "User Manager"
 msgstr ""
 
@@ -74,6 +74,7 @@ msgid "There are no articles yet."
 msgstr ""
 
 #: .\apps\blog\templates\BlogView\list.html:52
+#: .\apps\classes\templates\ClassTeacherView\index.html:66
 msgid "Edit"
 msgstr ""
 
@@ -83,6 +84,26 @@ msgstr ""
 
 #: .\apps\blog\views.py:29
 msgid "You can't delete this article, because you are not the author"
+msgstr ""
+
+#: .\apps\classes\settings.ini:16
+msgid "Teacher"
+msgstr ""
+
+#: .\apps\classes\templates\ClassTeacherView\index.html:18
+msgid "Add"
+msgstr ""
+
+#: .\apps\classes\templates\ClassTeacherView\index.html:52
+msgid "Action"
+msgstr ""
+
+#: .\apps\classes\templates\ClassTeacherView\index.html:68
+msgid "Remove"
+msgstr ""
+
+#: .\apps\classes\templates\ClassTeacherView\index.html:70
+msgid "Request process failed!"
 msgstr ""
 
 #: .\apps\messages\forms.py:7
@@ -114,46 +135,55 @@ msgid "There are something wrong, please fix them"
 msgstr ""
 
 #: .\apps\project\templates\layout.html:17
+#: .\apps\project\templates\layout_container.html:17
 msgid "Account Setting"
 msgstr ""
 
 #: .\apps\project\templates\layout.html:19
+#: .\apps\project\templates\layout_container.html:19
 msgid "Logout"
 msgstr ""
 
 #: .\apps\project\templates\layout.html:23
+#: .\apps\project\templates\layout_container.html:23
 msgid "Not signed in yet"
 msgstr ""
 
 #: .\apps\project\templates\layout.html:25
+#: .\apps\project\templates\layout_container.html:25
 msgid "Login"
 msgstr ""
 
 #: .\apps\project\templates\layout.html:27
+#: .\apps\project\templates\layout_container.html:27
 msgid "Register"
 msgstr ""
 
-#: .\apps\settings.ini:54 .\apps\settings.ini:55
+#: .\apps\settings.ini:60 .\apps\settings.ini:61
 msgid "Uliweb Zone"
 msgstr ""
 
-#: .\apps\settings.ini:57
+#: .\apps\settings.ini:63
 msgid "Home"
 msgstr ""
 
-#: .\apps\settings.ini:58
+#: .\apps\settings.ini:64
 msgid "Forum"
 msgstr ""
 
-#: .\apps\settings.ini:59
+#: .\apps\settings.ini:65
 msgid "Tutorial"
 msgstr ""
 
-#: .\apps\settings.ini:60
+#: .\apps\settings.ini:66
+msgid "Class"
+msgstr ""
+
+#: .\apps\settings.ini:67
 msgid "Admin"
 msgstr ""
 
-#: .\apps\settings.ini:61
+#: .\apps\settings.ini:68
 msgid "About"
 msgstr ""
 

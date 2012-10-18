@@ -1,43 +1,112 @@
 {{extend "classes_layout.html"}}
 
 {{block content_main}}
+{{use "angularjs"}}
+{{use "jquery"}}
 {{link "classes/classes.css"}}
 
-<div class="row-fluid classes">
+<div class="row-fluid classes" ng-app="AdminApp" id="ng-app">
     <div class="span8">
         <div class="panel">
             <div class="panel-header">
                 <h2>课程列表</h2>
+                <div class="panel-icon"><a href="/class/classes">更多&raquo;</a>&nbsp;&nbsp;</div>
             </div>
             <div class="panel-content">
                 <ul class="unstyled">
                     {{for c in classes:}}
                         <li class="classes-item">
-                            <!-- <div class="classes-logo">
+                            {{## <div class="classes-logo">
                                 <img src="{{=c.get_image()}}" width="50px"/>
-                            </div> -->
+                            </div> ##}}
                             <div class="title">{{=c.name}}</div>
                             <div class="summary">简介：{{=c.summary}}</div>
-                            <div class="tool"><a class="btn btn-primary btn-small">查看详情 &raquo;</a></div>
+                            <div class="tool">
+                                <a class="btn btn-primary btn-small" href="/class/view/{{=c.id}}">查看详情 &raquo;</a>
+                            </div>
                         </li>
                     {{pass}}
                 </ul>
             </div>
         </div>
-    </div>
-    <div class="span4">
+        
         <div class="panel">
             <div class="panel-header">
                 <h2>最新动态</h2>
+                <div class="panel-icon"><a href="/class/infos">更多&raquo;</a>&nbsp;&nbsp;</div>
             </div>
             <div class="panel-content">
                 <ul class="unstyled">
                     {{for m in infos:}}
-                        <li class="info-title">[{{=m.create_date.strftime('%m月%d日')}}] {{=m.title}}</li>
+                        <li class="info-item">
+                            <div class="info-header">
+                                {{=m.title}}
+                            </div>
+                            <div class="info-content expandable">
+                                {{<< m.content}}
+                            </div>
+                            <div class="info-footer">
+                                <span class="lightgray">
+                                {{<< m.class_obj}}
+                                <span class="sep-bullet"></span>
+                                {{=m.create_date}}
+                                </span>
+                            </div>
+                        </li>
                     {{pass}}
+                </ul>
+            </div>
+        </div>
+        
+    </div>
+    <div class="span4" ng-controller="adminCtrl" >
+        <div class="panel">
+            <div class="panel-header">
+                <h2>讲师介绍</h2>
+            </div>
+            <div class="panel-content clearfix">
+                <ul class="unstyled" id="teachers">
+                    <li ng-repeat="u in teachers">
+                        <img ng-src="{% u.image %}" class="img-rounded" popover/>
+                    </li>
                 </ul>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+var app = angular.module('AdminApp', []).config(function ($interpolateProvider) {
+    $interpolateProvider.startSymbol('{%');
+    $interpolateProvider.endSymbol('%}');
+}); 
+function adminCtrl($scope) {
+    $scope.teachers = []
+    $scope.query = function(page){
+        page = page || 1;
+        $.get('/class/teachers?page='+page).success(function(data){
+            $scope.teachers = $scope.teachers.concat(data.rows);
+            $scope.$apply();
+            if ($scope.teachers.length < data.total){
+                $scope.query(page+1);
+            }
+        });
+    }
+    $scope.query();
+}
+app.directive('popover', function(){
+    return function(scope, element, attrs, control){
+        $(element).ready(function(){
+            $(element).popover({
+                html:true,
+                trigger:'hover',
+                title: scope.u.teacher,
+                placement:'left',
+                content:(scope.u.description ? scope.u.description : '无内容')
+            });
+            console.log(scope.u.teacher);
+        });
+    };
+});
+</script>
 {{end}}

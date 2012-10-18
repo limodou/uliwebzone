@@ -4,13 +4,25 @@ from uliweb.utils.common import get_var
 
 class Class_Teacher(Model):
     teacher = Reference('user', verbose_name='教师', required=True)
-    weibo = Field(str, verbose_name='微博')
-    blog = Field(str, verbose_name='博客')
-    qq = Field(str, verbose_name='QQ号', max_length=20)
     description = Field(TEXT, verbose_name='介绍')
     
     def __unicode__(self):
         return unicode(self.teacher)
+    
+    class Table:
+        fields = [
+            {'name':'teacher'},
+            {'name':'description', 'hidden':True},
+        ]
+        
+    class ListTable:
+        fields = [
+            {'name':'user_id'},
+            {'name':'teacher'},
+            {'name':'description'},
+            {'name':'image'},
+        ]
+    
     
 class Class_Category(Model):
     name = Field(str, verbose_name='名称', max_length=20, required=True)
@@ -31,16 +43,20 @@ class Class(Model):
     attention_num = Field(int, verbose_name='关注人数')
     attention_users = ManyToMany('user', verbose_name='关注人')
     logo = Field(FILE, verbose_name='Logo')
-    issue_num = Field(int, verbose_name='期数')
+    issue_num = Field(int, verbose_name='总期数')
     create_date = Field(datetime.datetime, verbose_name='创建时间', auto_now_add=True)
     category = Reference('class_category', verbose_name='分类', required=True)
+    order = Field(int, verbose_name='序号', hint="序号越大排列越靠前")
     
     def __unicode__(self):
         return self.name
     
+    def get_url(self):
+        return '<a href="/class/view/%d">%s</a>' % (self.id, self.name)
+    
     class AddForm:
         fields = ['name', 'teachers', 'summary', 'description', 'requirement', 'link',
-            'category']
+            'category', 'order']
     
     def get_lastest(self):
         P = Class_Phrase
@@ -65,11 +81,25 @@ class Class(Model):
             {'name':'teachers', 'width':150},
             {'name':'link', 'width':100},
             {'name':'issue_num', 'width':60},
+            {'name':'order', 'width':60},
+        ]
+        
+    class ListTable:
+        fields = [
+            {'name':'id'},
+            {'name':'name'},
+            {'name':'category', 'width':60},
+            {'name':'teachers', 'width':150},
+            {'name':'link', 'width':100},
+            {'name':'issue_num', 'width':60},
+            {'name':'summary'},
+            {'name':'description'},
+            {'name':'order'},
         ]
         
     class EditForm:
         fields = ['name', 'teachers', 'summary', 'description', 'requirement', 'link',
-            'category']
+            'category', 'order']
     
 class Class_Issue(Model):
     """
@@ -84,7 +114,7 @@ class Class_Issue(Model):
     students_num = Field(int, verbose_name='学生数')
     position = Field(str, verbose_name='上课地点', required=True)
     map = Field(str, verbose_name='地图')
-    type = Field(CHAR, max_length=1, verbose_name='课程性质', choices=get_var('CLASSES/class_type'))
+    type = Field(CHAR, max_length=1, verbose_name='课程性质', choices=get_var('CLASSES/class_type'), required=True)
     fee = Field(str, verbose_name='收费说明')
     
     @classmethod
@@ -111,6 +141,21 @@ class Class_Issue(Model):
             {'name':'fee', 'width':90},
         ]
         
+    class ListTable:
+        fields = [
+            {'name':'issue'},
+            {'name':'teachers'},
+            {'name':'begin_date'},
+            {'name':'finish_date'},
+            {'name':'need_num'},
+            {'name':'students_num'},
+            {'name':'position'},
+            {'name':'type'},
+            {'name':'fee'},
+            {'name':'enroll'},
+            {'name':'enrolled'},
+        ]
+    
 class Class_Info(Model):
     title = Field(str, verbose_name='标题', required=True)
     content = Field(TEXT, verbose_name='内容', required=True)
@@ -136,15 +181,30 @@ class Class_Info(Model):
             {'name':'content'},
         ]
     
+    class ListTable:
+        fields = [
+            {'name':'issue', 'width':100},
+            {'name':'create_date', 'width':100},
+            {'name':'title'},
+            {'name':'content'},
+            {'name':'class_obj'},
+        ]
+    
 class Class_StudyRecord(Model):
     issue = Field(int, verbose_name='期数', default=1)
     class_obj = Reference('class', verbose_name='课程', required=True)
     student = Reference('user', verbose_name='学生', required=True)
     score = Field(int, verbose_name='成绩')
+    create_date = Field(datetime.datetime, verbose_name='报名时间', auto_now_add=True)
     evaluate_level = Field(TEXT, verbose_name='评价级别', choices=get_var('CLASSES/evaluate_level'))
     evaluation = Field(TEXT, verbose_name='评语')
+    deleted = Field(bool, verbose_name='删除标志')
     
     @classmethod
     def OnInit(cls):
-        Index('cls_std_idx', cls.c.class_obj, cls.c.issue)
+        Index('cls_std_idx', cls.c.class_obj, cls.c.issue, cls.c.student, unique=True)
         
+    class QueryStudents:
+        fields = [
+            'student', 'image', 'name',
+        ]
