@@ -71,7 +71,12 @@ class MessageView(object):
 #        result['total'] = view.total
 #        result['pages'] = pages
         result['pagination'] = functions.create_pagination(request.url, view.total, pageno+1, rows_per_page)
-        result['objects'] = view.objects()
+        result['objects'] = list(view.objects())
+        ids = []
+        for row in result['objects']:
+            ids.append(row._obj_.id)
+        self.model.filter(self.model.c.id.in_(ids)).update(read_flag=True)
+        _del_key(request.user.id)
         return result
 
     def read(self):
