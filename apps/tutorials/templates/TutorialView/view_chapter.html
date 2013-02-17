@@ -20,6 +20,7 @@
 #pageslide {
 width:320px;
 }
+#toc {width:22%;}
 /* scrollbar  */
 .nano .content      { padding: 10px; }
 .nano .pane         { background: #999; }
@@ -43,7 +44,7 @@ width:320px;
         </div>
     </div>
     <div class="row-fluid">
-        <div class="span8" id="article">
+        <div class="span9" id="article">
             {{include "TutorialView/inc_check_browser.html"}}
             <div class="outter">
                 {{if prev:}}<div class="chapter-prev chapter-top animated">
@@ -54,7 +55,7 @@ width:320px;
                 </div>{{pass}}
                 <div class="expander">&raquo;</div>
                 <div class="content-inner rounded_bottom article">
-                    <h1 class="section">{{=object.title}}</h1>
+                    <h1>{{=object.title}}</h1>
                     <div style="margin-top:-10px;margin-bottom:20px;">
                         <!-- 评论 <a id="global-comment-count" href="/tutorial/view_paragraph_comments/{{=object.id}}?para=0" class="para-comments-count active right animated">0</a> -->
                             <span class="gray">{{=unicode(object.modified_user)}} 于 {{=object.modified_date}} 更新</span>
@@ -106,7 +107,7 @@ width:320px;
                 
             </div>
         </div>
-        <div class="span4" id="right-side">
+        <div class="span3" id="right-side">
             {{if object.tutorial.authors.has(request.user) or has_role(request.user, 'superuser'):}}
             <div class="btn-toolbar" style="margin-top:0px;position:fixed;">
                 <div class="btn-group">

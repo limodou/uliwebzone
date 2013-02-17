@@ -63,8 +63,11 @@ cursor:pointer;
 /*文章显示*/
 .article {font-size:14px;line-height:1.5em;font-family:微软雅黑;}
 .article img {max-width:100%;}
+.article h1 {margin-bottom:20px;}
 .article h2 {border-bottom: 1px solid #CCC;}
 .article h2, .article h3, .article h4, .article h5, .article h6 {margin-top:20px; margin-bottom:10px;}
+h3.popover-title {margin: 0; color:#000;}
+.popover-content {color:#000;}
 .alert h2, .alert h3, .alert h4, .alert h5, .alert h6 {margin-top:5px; margin-bottom:2px;}
 .alert p {margin-bottom: 2px;}
 
@@ -202,6 +205,33 @@ float:none;
     border-right-color: green;
 }
 
+.comment-lineno:link,
+.comment-lineno:visited {
+    position: relative;
+    /*float: left;*/
+    min-width: 15px;
+    height: 18px;
+    padding: 0 3px;
+    border: 1px solid #bbb;
+    margin: 0 0 0 5px; 
+    text-decoration: none;
+    color: #fff;
+    background: blue;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 3px;
+}
+
+.comment-lineno:hover,
+.comment-lineno:focus,
+.comment-lineno:active,
+.comment-lineno:visited:hover,
+.comment-lineno:visited:focus,
+.comment-lineno:visited:active {
+    background-color: #f5a615;
+    color: white;
+}
+
 /* animate from animate.css swing */
 .animated {
 	-webkit-animation-fill-mode: both;
@@ -271,3 +301,4 @@ float:none;
 }
 
 .CodeMirror {border: 1px solid #ccc;}
+

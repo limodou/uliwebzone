@@ -7,15 +7,39 @@
 {{end}}
 
 {{block user_info}}
+<style>
+#userinfo.btn-toolbar {margin-top:0;margin-bottom:0;font-size:14px;}
+#userinfo.btn-toolbar a{vertical-align:middle;}
+#userinfo img {
+-webkit-border-radius: 3px;
+   -moz-border-radius: 3px;
+        border-radius: 3px;
+}
+#userinfo [class^="icon-"], #userinfo [class*=" icon-"], #userinfo [class^="icon-"]:hover, #userinfo [class*=" icon-"]:hover{
+    vertical-align:middle;
+    margin-bottom:3px;
+}
+</style>
     {{use 'poshytip'}}
 
-    <p class="pull-right user_info">
     {{if hasattr(request, 'user') and request.user:}}
-        <img src="{{=functions.get_user_image(request.user, size=20)}}" align="top" id="user_image"/> {{=unicode(request.user)}} | <a href="/user/view">{{=_('Account Setting')}}</a> | <a href="/logout"><i class="icon-off" title="{{=_('Logout')}}"></i></a> 
+      <div id="userinfo" class="btn-toolbar pull-right userinfo">
+        <div class="btn-group">
+          <a class="btn btn-primary dropdown-toggle" data-toggle="dropdown" href="#">
+            <img id="user_image" src="{{=functions.get_user_image(request.user, size=20)}}" align="top"/> {{=unicode(request.user)}} 
+            <b class="caret"></b></a><span style="padding-right:40px;"></span>
+          <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+            <li><a href="/admin/messages/list" target="_blank" id=""><i class="icon-envelope"></i> 收到的消息(未读:<font color="red"><span id="messages_number"></span></font>)</a></li>
+            <li class="divider"></li>
+            <li><a href="/logout"><i class="icon-off"></i> {{=_('Logout')}}</a></li>
+          </ul>
+        </div>
+      </div>
     {{else:}}
-        {{=_('Not signed in yet')}}! <a href="/login">{{=_('Login')}}</a> | <a href="/register">{{=_('Register')}}</a>
+        <p class="pull-right user_info" style="width:350px;text-align:right;">
+            <a href="/login">登录</a>
+        </p>
     {{pass}}
-    </p>
 
     {{block message_number_show}}
         {{if request.user:}}

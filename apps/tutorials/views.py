@@ -266,7 +266,7 @@ class TutorialView(object):
         
     def _get_chapter_html(self, text, format, render, scrollable):
         from par.bootstrap_ext import blocks
-        from md_ext import code_comment
+        from md_ext import new_code_comment
         
         if format == '1':
             from par.gwiki import WikiGrammar as grammar
@@ -285,7 +285,7 @@ class TutorialView(object):
         if render == '2':
             t = parser(grammar=g, tag_class={'table':'table table-bordered'})
         else:
-            blocks['code-comment'] = code_comment
+            blocks['code-comment'] = new_code_comment
             cls = 'prettyprint linenums'
             if scrollable:
                 cls += ' pre-scrollable'
