@@ -98,13 +98,16 @@ class User(Model):
         display_field = 'username'
         
     class AddForm:
-        fields = ('username', 'nickname', 'email', 'weibo', 'blog', 'qq', 'description', 'is_superuser')
+        fields = ['username', 'nickname', 'email', 'weibo', 'blog', 'qq', 'description', 'is_superuser']
         
     class EditForm:
-        fields = ('username', 'nickname', 'email', 'weibo', 'blog', 'qq', 'description', 'is_superuser')
-        
+        fields = ['nickname', 'email', 'weibo', 'blog', 'qq', 'description']
+    
+    class AdminEditForm:
+        fields = ['nickname', 'email', 'weibo', 'blog', 'qq', 'description', 'is_superuser']
+    
     class DetailView:
-        fields = ('username', 'nickname', 'email', 'weibo', 'blog', 'qq', 'description', 'is_superuser', 'date_join', 'last_login')
+        fields = ['username', 'nickname', 'email', 'weibo', 'blog', 'qq', 'description', 'is_superuser', 'date_join', 'last_login']
         
     class Table:
         fields = [
