@@ -6,7 +6,8 @@ from uliweb.orm import get_model
 class BlogView(object):
     def __init__(self):
         self.model = get_model('blog')
-        
+    
+    @expose('')
     def list(self):
         from uliweb.utils.generic import ListView
         
