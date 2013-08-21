@@ -83,7 +83,7 @@ class User(Model):
         from uliweb.contrib.staticfiles import url_for_static
         
         if self.image:
-            return get_href(self.image)
+            return functions.get_href(self.image)
         else:
             return functions.url_for_static('images/user%dx%d.jpg' % (50, 50))
         
