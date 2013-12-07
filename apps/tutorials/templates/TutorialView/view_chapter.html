@@ -302,6 +302,13 @@ width:320px;
             reset_totop();
         });
         
+        //处理标题hover
+        $('.article').find('h1,h2,h3,h4,h5,h6').hover(function(e){
+           $(this).find('a.anchor').css('color', '#c60f0f');
+        }, function(e){
+           $(this).find('a.anchor').css('color', 'white');
+        });
+        
     });
 </script>
 {{end}}

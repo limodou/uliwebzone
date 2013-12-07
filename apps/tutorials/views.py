@@ -375,7 +375,8 @@ class TutorialView(object):
         编辑章节
         """
         from uliweb.utils.generic import EditView
-    
+        import cgi
+        
         obj = self.model_chapters.get_or_notfound(int(id))
         old_title = obj.title
         
@@ -400,7 +401,9 @@ class TutorialView(object):
                 cache = functions.get_cache()
                 cache.delete(self._get_tutorial_chapters_cache_key(obj._tutorial_))
         
+        data = {'content':cgi.escape(obj.content)}
         view = EditView(self.model_chapters, 
+            data=data,
             ok_url=url_for(TutorialView.view_chapter, id=id), 
             obj=obj, pre_save=pre_save, post_save=post_save)
         return view.run()
