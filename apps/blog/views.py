@@ -33,3 +33,7 @@ class BlogView(object):
         view = DeleteView(self.model, url_for(BlogView.list), obj=obj,
             validator=validator)
         return view.run()
+
+    def test(self):
+        response.template = 'demo.html'
+        return {}
