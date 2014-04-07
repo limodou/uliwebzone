@@ -1,0 +1,18 @@
+{{extend "tutorial_layout.html"}}
+
+{{block content_main}}
+{{use "jqrmselect"}}
+    <ul class="breadcrumb">
+      <li>
+        <a href="/tutorial">返回</a> <span class="divider">/</span>
+      </li>
+      <li class="active">
+        添加新分类
+      </li>
+    </ul>
+    
+    <h2 class="section">添加新分类</h2>
+    <div class="span10">
+    {{<< form}}
+    </div>
+{{end}}

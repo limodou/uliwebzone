@@ -1,0 +1,65 @@
+{{extend "tutorial_layout.html"}}
+
+{{block title}}{{super}} - {{=object.name}}{{end}}
+
+{{block content_main}}
+{{use "jquery",ui=True}}
+{{link "tutorials/jquery.liveflex.Tree.js"}}
+{{use "json2"}}
+
+<style type="text/css">
+.over{outline:solid 1px #afa}
+.on{border:solid 1px green;}
+.below{border-bottom:solid 2px #f00;}
+.below span{}
+.above{border-top:solid 2px #f00;}
+.tree_hover{background:#ccc}
+.ui-droppable {cursor:move;}
+</style>
+
+    <ul class="breadcrumb">
+      <li>
+        <a href="/tutorial">返回</a> <span class="divider">/</span>
+      </li>
+      <li>
+        <a href="/tutorial_cate/read/{{=object.id}}">{{=object.name}}</a> <span class="divider">/</span>
+      </li>
+      <li class="active">
+        目录
+      </li>
+    </ul>
+
+    <div>
+        {{if has_role(request.user, 'superuser'):}}
+        <a href="/tutorial_cate/add" class="btn btn-success"><i class="icon icon-edit icon-white"></i>添加新分类</a>
+        <a href="/tutorial_cate/edit/{{=object.id}}" class="btn btn-success"><i class="icon icon-edit icon-white"></i>修改分类信息</a>
+        <a href="/tutorial_cate/delete/{{=object.id}}" class="btn btn-danger" onclick="return confirm('{{=_("您确定要删除此分类吗?")}}');"><i class="icon icon-remove icon-white"></i>删除分类</a>
+	{{pass}}
+  </div>
+   <div>所有分类:
+	{{for obj in objects:}}
+	<a class="btn btn-primary" href="/tutorial_cate/read/{{=obj.id}}">{{=obj.name}}</a>	
+	{{pass}}
+   </div>
+
+<ul class="unstyled tutorial-list" id="tutorials">
+    {{for row in object.tutorials:}}
+    <li class="tutorial-item clearfix">
+        <img src="{{=row.image}}" class="preface pull-left" title="{{=row.title}}"/>
+        <h2><a href="/tutorial/read/{{=row.id}}">《{{=row.title}}》</a></h2>
+        <p>
+            {{<< row.summary}}
+        </p>
+        <div class="turorial-buttons">
+            <a href="/tutorial/read/{{=row.id}}" class="btn btn-primary">点击阅读 &raquo;</a>
+        </div>
+        <div class="tutorial-info">
+            <span>访问次数：<a href="#" class="para-comments-count right">{{=row.hits}}</a></span>
+            <span>评论：<a href="#" class="para-comments-count right">{{=row.comments_count}}</a></span>
+        </div>
+    </li>
+    {{pass}}
+</ul>
+
+
+{{end}}
