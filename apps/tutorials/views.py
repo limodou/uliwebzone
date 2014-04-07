@@ -16,7 +16,7 @@ class TutorialcateView(object):
         """
         from uliweb.utils.generic import AddView
 	def get_url(**kwargs):
-            return url_for(TutcateView.read, **kwargs)
+            return url_for(TutorialcateView.read, **kwargs)
 
         view = AddView(self.model,ok_url=get_url)
         return view.run()
