@@ -11,7 +11,15 @@
             <span>你还没有登录，无法添加新教程！</span>
         {{pass}}
     </div>
+
 </div>
+  <div>所有分类:
+        {{for objcate in cateobjects:}}
+        <a class="btn btn-primary" href="/tutorial_cate/read/{{=objcate.id}}">{{=objcate.name}}</a>
+        {{pass}}
+   </div>
+
+
 <ul class="unstyled tutorial-list" id="tutorials">
     {{for row in objects:}}
     <li class="tutorial-item clearfix">
