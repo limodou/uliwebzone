@@ -45,7 +45,7 @@
 <ul class="unstyled tutorial-list" id="tutorials">
     {{for row in object.tutorials:}}
     <li class="tutorial-item clearfix">
-        <img src="{{=row.image}}" class="preface pull-left" title="{{=row.title}}"/>
+        <img src="http://uliweb.cpython.org/static/tutorials/default_book.png?ver=2" class="preface pull-left" title="{{=row.title}}"/>
         <h2><a href="/tutorial/read/{{=row.id}}">《{{=row.title}}》</a></h2>
         <p>
             {{<< row.summary}}
