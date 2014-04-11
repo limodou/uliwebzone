@@ -112,8 +112,3 @@ class Tutorials_Albums(Model):
     filename = Field(FILE, verbose_name='图片')
     created_on = Field(datetime, verbose_name='创建时间', auto_now_add=True)
     
-class Tutorials_Category(Model):
-    __verbose_name__ = '分类'
-    name = Field(str, max_length=255, verbose_name='类名', required=True)
-    created_on = Field(datetime, verbose_name='创建时间', auto_now_add=True)
-    tutorials = ManyToMany('Tutorials', verbose_name='教程', nullable=False, collection_name='authors_tutorials')
