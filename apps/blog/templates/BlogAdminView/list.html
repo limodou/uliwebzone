@@ -1,8 +1,4 @@
-{{extend "classes_admin_layout.html"}}
-
-{{block sub_menu}}
-{{sidemenu('sidemenu','classes/teacher')}}
-{{end}}
+{{extend "blog_admin_layout.html"}}
 
 {{block content_main}}
 {{use "angularjs"}}
@@ -12,16 +8,16 @@
 {{use "bootheme"}}
 {{include "inc_jquery_dialog2.html"}}
 {{include "inc_paginate.html"}}
-{{include "inc_select2.html"}}
+{{include "inc_show_flashes.html"}}
 
 <div class="row-fluid" ng-app="AdminApp" id="ng-app" ng-controller="adminCtrl">
     <div class="line">
-        <button class="btn btn-primary" type="button" ng-click="add()"><i class="icon-plus"></i>{{=_('Add')}}</button>
+        <a class="btn btn-primary" href="/blog/admin/add" type="button" ><i class="icon-plus icon-white"></i>{{=_('Add')}}</a>
     </div>
     <div class="line">
-        <table class="table table-bordered table-header" style="width:300px;">
+        <table class="table table-bordered table-header">
             <colgroup>
-                {{for f in fields:}}
+                {{for f in view.table_info['fields_list']:}}
                     {{if f.get('hidden', False):}}
                         {{continue}}
                     {{pass}}
@@ -32,11 +28,11 @@
                         <col width="*"></col>
                     {{pass}}
                 {{pass}}
-                <col width="60px"></col>
+                <col width="70px"></col>
             </colgroup>
             <thead>
                 <tr>
-                    {{for f in fields:}}
+                    {{for f in view.table_info['fields_list']:}}
                         {{if f.get('hidden', False):}}
                             {{continue}}
                         {{pass}}
@@ -47,32 +43,50 @@
             </thead>
             <tbody>
                 <tr ng-repeat="obj in objects">
-                    {{for f in fields:}}
+                    {{for f in view.table_info['fields_list']:}}
                         {{if f.get('hidden', False):}}
                             {{continue}}
                         {{pass}}
                         <td><div ng-bind-html-unsafe="obj.{{ =f['name'] }}"></div></td>
                     {{pass}}
                     <td>
-                        <a href="#" ng-click="edit(obj.id)"><i class="icon-edit" title="{{=_('Edit')}}"></i></a> 
-                        <a href="#" ng-click="remove(obj.id)"><i class="icon-remove" title="{{=_('Remove')}}"></i></a>
+                        <a ng-href="/blog/admin/view/{%obj.id%}" data-click="view"><i class="icon-eye-open" title="{{=_('View')}}"></i></a> 
+                        <a ng-href="/blog/admin/edit/{%obj.id%}" ><i class="icon-edit" title="{{=_('Edit')}}"></i></a> 
+                        <a  ng-click="remove(obj.id)"><i class="icon-remove" title="{{=_('Remove')}}"></i></a>
                     </td>
                 </tr>
             </tbody>
         </table>
+        
+        <div class="pagination pagination-centered"></div>
+        
     </div>
 </div>
+<!-- Download code -->
+
+
 <script>
 var app = angular.module('AdminApp', []).config(function ($interpolateProvider) {
     $interpolateProvider.startSymbol('{%');
     $interpolateProvider.endSymbol('%}');
 }); 
 function adminCtrl($scope, $http) {
-    $.get('/class/admin/teacher/query')
-        .success(function(data, status, headers, config){
-            $scope.objects = data.rows;
-            $scope.$apply();
-        });
+    $scope.query = function(page){
+        page = page || 1;
+        $.get('/blog/admin?data=1'+'&page='+page)
+            .success(function(data, status, headers, config){
+                $scope.objects = data.rows;
+                $scope.$apply();
+                
+                
+                function callback(page){
+                    $scope.query(page);
+                }
+                create_pagination('.pagination', data.total, data.page_rows, data.pageno, callback, {first:'', last:'', totalMessage:''});
+                
+            });
+    }
+    $scope.query();
     $scope.find_object = function(id){
         if (!$scope.objects) return -1;
         for(var i=0; i<$scope.objects.length; i++){
@@ -92,7 +106,7 @@ function adminCtrl($scope, $http) {
         var dialog = $('<div id="add_object"></div>').dialog2(
             {
                 autoFocus:false, 
-                url:'/class/admin/teacher/add',
+                url:'/blog/admin/add',
                 ajaxFormOptions: {
                     onSuccess: common_ajaxForm_success({
                         success:function(data){
@@ -106,14 +120,13 @@ function adminCtrl($scope, $http) {
             }); 
         dialog.bind('dialog2.content-update', function(e){
             //add what you want to do after the content update from server
-            simple_select2('#field_teacher', {ajax:{url:"/users/search"}});
         });
     }
     $scope.edit = function(id){
         var dialog = $('<div id="edit_object"></div>').dialog2(
             {
                 autoFocus:false, 
-                url:'/class/admin/teacher/edit/'+id,
+                url:'/blog/admin/edit/'+id,
                 ajaxFormOptions: {
                     onSuccess: common_ajaxForm_success({
                         success:function(data){
@@ -131,11 +144,12 @@ function adminCtrl($scope, $http) {
             }); 
         dialog.bind('dialog2.content-update', function(e){
             //add what you want to do after the content update from server
-            simple_select2('#field_teacher', {ajax:{url:"/users/search"}});
         });
     }
     $scope.remove = function(id){
-        $.post('/class/admin/teacher/delete/'+id).success(function(data){
+        if(!confirm('{{=_("Do you want to delete this record?")}}'))
+            return;
+        $.post('/blog/admin/delete/'+id).success(function(data){
             if(data.success){
                 var index = $scope.find_object(id);
                 if (index > -1){

@@ -1,0 +1,646 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    
+    <title></title>
+    <!-- toplinks -->
+<link rel="stylesheet" type="text/css" href="/static/jquery/ui/css/redmond/jquery-ui-1.8.16.custom.css?ver=2"/>
+<script type="text/javascript" src="/static/jquery/jquery-1.7.2.min.js?ver=2"></script>
+<script type="text/javascript" src="/static/jsutils/json2.js?ver=2"></script>
+<!--[if lt IE 9]>
+<script type="text/javascript" src="/static/bootstrap/asset/html5.js?ver=2"></script>
+<![endif]-->
+<link rel="stylesheet" type="text/css" href="/static/bootstrap/2.1.1/bootstrap.min.css?ver=2"/>
+<script type="text/javascript" src="/static/bootstrap/2.1.1/js/bootstrap.min.js?ver=2"></script>
+<link rel="stylesheet" type="text/css" href="/static/bootstrap_extend.css?ver=2"/>
+<link rel="stylesheet" type="text/css" href="/static/pnotify/1.2.0/jquery.pnotify.default.css?ver=2"/>
+<link rel="stylesheet" type="text/css" href="/static/pnotify/1.2.0/jquery.pnotify.default.icons.css?ver=2"/>
+<script type="text/javascript" src="/static/pnotify/1.2.0/jquery.pnotify.min.js?ver=2"></script>
+<link rel="stylesheet" type="text/css" href="/static/bootheme/bootheme.css?ver=2"/>
+<link rel="stylesheet" type="text/css" href="/static/tutorials/tutorials.css?ver=2"/>
+<link rel="stylesheet" type="text/css" href="/static/poshytip/tip-twitter/tip-twitter.css?ver=2"/>
+<link rel="stylesheet" type="text/css" href="/static/poshytip/tip-yellow/tip-yellow.css?ver=2"/>
+<link rel="stylesheet" type="text/css" href="/static/poshytip/tip-yellowsimple/tip-yellowsimple.css?ver=2"/>
+<script type="text/javascript" src="/static/poshytip/jquery.poshytip.js?ver=2"></script>
+<link rel="stylesheet" type="text/css" href="/static/codemirror/lib/codemirror.css?ver=2"/>
+<script type="text/javascript" src="/static/codemirror/lib/codemirror.js?ver=2"></script>
+<script type="text/javascript" src="/static/jquery/ui/js/jquery-ui-1.8.16.custom.min.js?ver=2"></script>
+<script type="text/javascript" src="/static/jquery/ui/js/jquery.ui.datepicker.zh.js?ver=2"></script>
+<link rel="stylesheet" type="text/css" href="/static/jqutils/jqutils.css?ver=2"/>
+<script type="text/javascript" src="/static/jqutils/jqrselect.js?ver=2"></script>
+<script type="text/javascript" src="/static/jqutils/jqutils.js?ver=2"></script>
+<link rel="stylesheet" type="text/css" href="/static/jqutils/jqrmselect.css?ver=2"/>
+<script type="text/javascript" src="/static/jqutils/jqrmselect.js?ver=2"></script>
+<script type="text/javascript" src="/static/jqupload/jquery.iframe-transport.js?ver=2"></script>
+<script type="text/javascript" src="/static/jqupload/jquery.fileupload.js?ver=2"></script>
+<link rel="stylesheet" type="text/css" href="/static/jqimgzoom/css/imgzoom.css?ver=2"/>
+<script type="text/javascript" src="/static/jqimgzoom/scripts/jquery.imgzoom.pack.js?ver=2"></script>
+<script type="text/javascript" src="/static/jsreader/filereader.js?ver=2"></script>
+<script type="text/javascript" src="/static/xheditor/1.2.1/xheditor-1.2.1.min.js?ver=2"></script>
+    
+    
+  
+<script>$.ajaxSetup({cache:false, traditional:true});</script></head>
+
+<body class="bootstrap-body">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript">
+$.extend($.pnotify.defaults, {"styling":"bootstrap"});
+var show_message = function(message, category){
+    $.pnotify({
+        //pnotify_title: 'Regular Notice',
+        pnotify_history: false,
+        pnotify_text: message,
+        pnotify_type: category || 'success',
+        pnotify_animation: 'fade',
+        pnotify_before_open: function(pnotify){
+           // Position this notice in the center of the screen.
+           pnotify.css({
+               "top": 1,
+               "left": ($(top.window).width() / 2) - (pnotify.width() / 2)
+           });
+        }
+    });
+}
+
+$(function(){
+    
+});
+</script>
+
+
+<script>
+// using jQuery
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie != '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+$.ajaxSetup({
+    crossDomain: false, // obviates need for sameOrigin test
+    beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type)) {
+            xhr.setRequestHeader("X-CSRFToken", getCookie('_csrf_token'));
+        }
+    }
+});
+</script>
+
+
+
+
+<div class="navbar navbar-fixed-top">
+  <div class="navbar-inner">
+    <div class="container-fluid">
+      <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </a>
+      <a class="brand" href="#">CLOUD ELEVATION</a>
+      <div class="nav-collapse">
+        
+<ul class="nav">
+    
+<li><a href="/"><span>首頁</span></a></li><li><a href="/forum"><span>服務交流專區</span></a></li><li class="active"><a href="/tutorial"><span>教程</span></a></li><li class="active"><a href="/ftutorial"><span>個人首頁</span></a></li><li><a href="/class"><span>課程</span></a></li><li><a href="/homeworks"><span>上載</span></a></li><li><a href="/user/view"><span>管理</span></a></li><li><a href="/about"><span>關於</span></a></li>
+
+
+
+</ul>
+
+      
+    
+
+    <p class="pull-right user_info">
+    
+        <img src="/static/images/user20x20.jpg?ver=2" align="top" id="user_image"/> admin | <a href="/user/view">帳號設定</a> | <a href="/logout"><i class="icon-off" title="登出"></i></a> 
+    
+    </p>
+
+    
+        
+        <script type="text/javascript">
+        function query() {
+            $.ajax({
+                type: "POST",
+                url: "/admin/messages/number",
+                success: function(r){
+                    if (r.success && r.data>0){
+                        $('#user_image').poshytip('update', r.data+' 條新消息，<a href="/admin/messages/list">點擊查看</a>');
+                        $('#user_image').poshytip('show');
+                    }
+                    setTimeout(query, 300000);
+                }
+            });
+        }    
+        $(function(){
+            $('#user_image').poshytip({
+              className: 'tip-yellowsimple',
+              content: '0 條新消息，<a href="/admin/messages/list">點擊查看</a>',
+              showOn: 'none',
+              alignTo: 'fixed',
+              alignX: 'center',
+              alignY: 'bottom',
+              offsetX: 0,
+              offsetY: 5,
+              closeButton: true
+            });
+            
+            setTimeout(query, 1000);
+        });
+        </script>
+        
+    
+
+      </div><!--/.nav-collapse -->
+    </div>
+  </div>
+</div>
+
+    
+
+
+
+<div class="container-fluid">
+    
+    <ul class="breadcrumb">
+      <li>
+        <a href="/ftutorial">返回</a> <span class="divider">/</span>
+      </li>
+      <li>
+        <a href="/ftutorial/read/1">過程</a> <span class="divider">/</span>
+      </li>
+      <li class="active">
+        添加新章節
+      </li>
+    </ul>
+    
+
+
+
+
+    <div class="row-fluid">
+        <div class="span8">
+            <div class="outter">
+                <h2 class="section">添加新章節</h2>
+                <div>
+                <form action="" class="form-horizontal" method="POST">
+<input type="hidden" name="csrf_token" value="cd5aa59e3a9c49cd958469a11340f6d7">
+<div class="control-group" id="div_field_title">
+    <label class="control-label" for="field_title">標題:<span class="field_required">*</span></label>
+    <div class="controls">
+    <input class="field" id="field_title" name="title" placeholder="" type="text" value=""></input>
+    <p class="help help-block"></p>
+</div>
+
+</div>
+
+<div class="control-group" id="div_field_content">
+    <label class="control-label" for="field_content">底層:</label>
+    <div class="controls">
+    <textarea class="field" cols="40" id="field_content" name="content" placeholder="" rows="10">沒有輸入內容</textarea>
+    <p class="help help-block"></p>
+</div>
+
+</div>
+
+<div class="control-group" id="div_field_content2">
+    <label class="control-label" for="field_content2">表層:</label>
+    <div class="controls">
+    <textarea class="field" cols="40" id="field_content2" name="content2" placeholder="" rows="10"> </textarea>
+    <p class="help help-block"></p>
+</div>
+
+</div>
+
+<div class="control-group" id="div_field_format">
+    <label class="control-label" for="field_format">格式:</label>
+    <div class="controls">
+    <select class="field" id="field_format" name="format" placeholder="">
+<option value="1">wiki</option>
+<option selected value="3">不選擇</option>
+<option value="2">markdown</option>
+</select>
+
+    <p class="help help-block"></p>
+</div>
+
+</div>
+
+<div class="control-group" id="div_field_render">
+    <label class="control-label" for="field_render">佈景主題:</label>
+    <div class="controls">
+    <select class="field" id="field_render" name="render" placeholder="">
+<option selected value="1">文章</option>
+</select>
+
+    <p class="help help-block"></p>
+</div>
+
+</div>
+
+<div class="control-group" id="div_field_theme">
+    <label class="control-label" for="field_theme">代碼塊樣式:</label>
+    <div class="controls">
+    <select class="field" id="field_theme" name="theme" placeholder="">
+<option selected value="1">default</option>
+<option value="2">sons-of-obsidian</option>
+<option value="3">sunburst</option>
+</select>
+
+    <p class="help help-block"></p>
+</div>
+
+</div>
+
+<div class="control-group" id="div_field_scrollable">
+    <label class="control-label" for="field_scrollable">代碼滾動:</label>
+    <div class="controls">
+    <input checked class="checkbox" id="field_scrollable" name="scrollable" placeholder="" type="checkbox"></input>
+    <p class="help help-block"></p>
+</div>
+
+</div>
+
+<div class="control-group" id="div_field_tutorial_index">
+    <label class="control-label" for="field_tutorial_index">成為首頁:</label>
+    <div class="controls">
+    <input class="checkbox" id="field_tutorial_index" name="tutorial_index" placeholder="" type="checkbox"></input>
+    <p class="help help-block"></p>
+</div>
+
+</div>
+
+<div class="control-group" id="div_field_private">
+    <label class="control-label" for="field_private">是否私有:</label>
+    <div class="controls">
+    <input class="checkbox" id="field_private" name="private" placeholder="" type="checkbox"></input>
+    <p class="help help-block"></p>
+</div>
+
+</div>
+
+<div class="control-group" id="div_field_include_user">
+    <label class="control-label" for="field_include_user">允許觀看:</label>
+    <div class="controls">
+    <select class="field" id="field_include_user" multiple name="include_user" placeholder="" size="10" url="/users/search">
+<option value=""></option>
+</select>
+
+    <p class="help help-block"></p>
+</div>
+
+</div>
+
+<div class="control-group" id="div_field_exclude_user">
+    <label class="control-label" for="field_exclude_user">不允許觀看:</label>
+    <div class="controls">
+    <select class="field" id="field_exclude_user" multiple name="exclude_user" placeholder="" size="10" url="/users/search">
+<option value=""></option>
+</select>
+
+    <p class="help help-block"></p>
+</div>
+
+</div>
+
+<div class="control-group" id="div_field_include_editor">
+    <label class="control-label" for="field_include_editor">允許修改:</label>
+    <div class="controls">
+    <select class="field" id="field_include_editor" multiple name="include_editor" placeholder="" size="10" url="/users/search">
+<option value=""></option>
+</select>
+
+    <p class="help help-block"></p>
+</div>
+
+</div>
+
+<div class="control-group" id="div_field_exclude_editor">
+    <label class="control-label" for="field_exclude_editor">不允許修改:</label>
+    <div class="controls">
+    <select class="field" id="field_exclude_editor" multiple name="exclude_editor" placeholder="" size="10" url="/users/search">
+<option value=""></option>
+</select>
+
+    <p class="help help-block"></p>
+</div>
+
+</div>
+
+
+<div class="form-actions">
+    <button class="btn btn-primary" type="submit">儲存</button>
+</div>
+
+</form>
+
+                </div>
+            </div>
+        </div>
+        <div class="span4">
+            
+            
+
+
+
+
+
+<style>
+.thumbnails > li {min-height:80px;height:80px;}
+.thumbnails li {position:relative;}
+.thumbnails li a.remove{position:absolute; right:2px; bottom:2px;}
+</style>
+<div class="outter">
+    <div class="control-group">
+      <label class="control-label" for="field_filename">圖片上傳</label>
+      <div class="controls">
+        <input type="file" id="field_filename" name="filename">
+      </div>
+    </div>
+    <div class="alert alert-success">
+        <a class="close" data-dismiss="alert" href="#">&times;</a>
+        <p>向編輯窗口插入圖片只要拖動要插入的圖片到編輯窗口中即可。在支持HTML5文件拖拽的瀏覽器上可以拷貝或拖拽文件到當前頁面，圖片會自動上傳。</p>
+    </div>
+    <ul id="album_images" class="thumbnails">
+    </ul>
+</div>
+<script type="text/html" id="imageTemplate">
+    <li>
+        <a href="${url}" class="thumbnail insert_image">
+            <img src="${thumbnail_url}"/>
+        </a>
+        <a href="#" class="remove" style="display:none" data-id="${id}"><i class="icon icon-remove"></i></a>
+    </li>
+</script>
+<script>
+    function load_images(el){
+      var that = $(el);
+      $.ajax({
+          url: '/tutorial/getimages/1',
+          dateType: 'json',
+          success: function(data){
+              $.each(data.data, function(index, value){
+                  var topic = template($('#imageTemplate').html(), value).appendTo(that);
+                    topic.find('img').imgZoom({loadingImg:"/static/jqimgzoom/css/imgzoom-loading.gif?ver=2"});
+              });
+          }
+      });
+    }
+    
+    $(function () {
+        
+        //處理上傳
+        $('#field_filename').fileupload({
+            dataType: 'json',
+            url: '/tutorial/uploadimage/1',
+            done: function (e, data) {
+                if(data.result.success){
+                    $('#album_images').append(template($('#imageTemplate').html(), data.result));
+                }
+            }
+        });
+        
+        //處理雙擊，則自動插入鏈接到編輯器中
+//        $('body').on('dbclick', 'a.thumbnail', function(e){
+//            console.log($(this).data('id'));
+//        });
+        
+        //處理刪除按鈕的顯示
+        $('body').on('hover', '.thumbnails > li', 
+            function(e){
+                if(e.type == 'mouseenter'){
+                    $(this).find('a.remove').slideDown();
+                }else{
+                    $(this).find('a.remove').slideUp();
+                }
+            }
+        );
+        
+        //處理圖片刪除
+        $('body').on('click', 'a.remove', function(e){
+            var that = $(this);
+            e.preventDefault();
+            if(confirm('你確定要刪除當前圖片嗎？')){
+                $.ajax({
+                    type:'POST',
+                    url:'/tutorial/deleteimage/'+that.data('id'),
+                    success:function(data){
+                        if (data.success){
+                            that.parent().remove();
+                        }
+                        show_message(data.message);
+                    }
+                });
+            }
+        })
+        
+        //裝入圖片
+        load_images('#album_images');
+        
+        //處理圖片拷貝
+        if(window.FileReader){
+            $('#copy_image').show();
+            var opts = {
+                readAsMap:{'image/*': 'DataURL'},
+                dragClass:'dragging',
+                on:{
+                    loadend:function(e, file){
+                        var arr = e.target.result.split(",");
+                        var data = {'data':arr[1], 'filename':file.name}; // raw base64
+                        $.post('/tutorial/postimage/1',
+                            data,
+                            function(data){
+                                if(data.success){
+                                    $('#album_images').append(template($('#imageTemplate').html(), data.data));
+                                    $('#album_images li:last').effect('highlight', 5000);
+                                }
+                            }
+                        );
+                    }
+                }
+            }
+            $("body").fileReaderJS(opts);
+            $("body").fileClipboard(opts);
+        }
+    });
+</script>
+
+        </div>
+    </div>
+</div>
+    
+<style type="text/css">  
+<!--  
+/* 增加插入代码工具图标 */  
+.btnCode {  
+    background:transparent url(/static/xheditor/xheditor_plugins/code.png) no-repeat 20px 20px;  
+    background-position:3px 3px;  
+}  
+.btnQuote {  
+    background:transparent url(/static/xheditor/xheditor_plugins/quote.gif) no-repeat 20px 20px;  
+    background-position:3px 3px;  
+}
+-->  
+</style>  
+<script type="text/javascript">
+    var pic_addr;
+    var plugins = {
+        Code:{  
+            c:'btnCode',t:'插入代码',h:1,e:function(){  
+                var _this=this;  
+                var htmlCode=('<div><select id="xheCodeType">'+
+                '<option value="xml">HTML/XML</option>'+
+                '<option value="javascript">JavaScript</option>'+
+                '<option value="css">CSS</option>'+
+                '<option value="php">PHP</option>'+
+                '<option value="csharp">C#</option>'+
+                '<option value="cpp">C++</option>'+
+                '<option value="java">Java</option>'+
+                '<option value="perl">Perl</option>'+
+                '<option value="python">Python</option>'+
+                '<option value="ruby">Ruby</option>'+
+                '<option value="vb">Visual Basic</option>'+
+                '<option value="delphi">Delphi</option>'+
+                '<option value="as3">Action Script 3</option>'+
+                '<option value="sql">SQL</option>'+
+                '<option value="plain">其它</option>'+
+                '</select></div>'+
+                '<div><textarea id="xheCodeValue" wrap="soft" spellcheck="false" style="width:300px;height:100px;" /></div>'+
+                '<div style="text-align:right;"><input type="button" id="xheSave" value="确定" /></div>');  
+                var jCode=$(htmlCode),jType=$('#xheCodeType',jCode),jValue=$('#xheCodeValue',jCode),jSave=$('#xheSave',jCode);  
+                jSave.click(function(){  
+                    _this.loadBookmark();  
+                    var txt = $('<div/>').text(jValue.val()).html();
+                    _this.pasteHTML('<pre class="brush: '+jType.val()+';">\r\n'+txt+'\r\n</pre><p>&nbsp;</p>');  
+                    _this.hidePanel();
+                    return false;     
+                });  
+                _this.showDialog(jCode);  
+            }  
+        },
+        Quote:{
+            c:'btnQuote',t:'引用文本',h:1,e:function(){  
+                var _this=this;
+                var htmlCode=('<div><textarea id="xheText" wrap="soft" spellcheck="false" style="width:300px;height:100px;" /></div>'+
+                '<div style="text-align:right;"><input type="button" id="xheSave" value="确定" /></div>');  
+                var jCode=$(htmlCode),jValue=$('#xheText',jCode),jSave=$('#xheSave',jCode);  
+                jSave.click(function(){  
+                    _this.loadBookmark();  
+                    var txt = $('<div/>').text(jValue.val()).html();
+                    _this.pasteHTML('<blockquote>'+txt+'</blockquote><p>&nbsp;</p>');  
+                    _this.hidePanel();
+                    return false;     
+                });  
+                _this.showDialog(jCode);  
+            }  
+        }
+    }
+</script>
+
+
+
+<script type="text/javascript">
+    /*$(function(){
+        var myCodeMirror = CodeMirror.fromTextArea($('#field_content').get(0), {
+            matchBrackets: true,
+            theme: "default"
+          });
+    });*/
+    $(function(){
+        $('#field_content').xheditor({
+            //tools:'Cut,Copy,Paste,Pastetext,|,Blocktag,Fontface,FontSize,Bold,Italic,Underline,Strikethrough,FontColor,BackColor,SelectAll,Removeformat,|,Align,List,Outdent,Indent,|,Link,Unlink,Anchor,Img,Hr,Emot,Table,Code,Quote,Draw,|,About',
+            tools:'full',
+            skin:'vista',
+            upLinkUrl:"!/ftutorial/upload_file?forum_id=1&slug=",
+            upFlashUrl:"!/ftutorial/upload_file?forum_id=1&slug=",
+            upFlashExt:"swf",
+            upImgUrl:"!/ftutorial/upload_image?forum_id=1&slug=",
+            //plugins:$.extend(plugins, draw_plugins),
+            plugins:plugins,
+            height:300
+        });
+    });
+    $(function(){
+        $('#field_content2').xheditor({
+            //tools:'Cut,Copy,Paste,Pastetext,|,Blocktag,Fontface,FontSize,Bold,Italic,Underline,Strikethrough,FontColor,BackColor,SelectAll,Removeformat,|,Align,List,Outdent,Indent,|,Link,Unlink,Anchor,Img,Hr,Emot,Table,Code,Quote,Draw,|,About',
+            tools:'full',
+            skin:'vista',
+            upLinkUrl:"!/ftutorial/upload_file?forum_id=1&slug=",
+            upFlashUrl:"!/ftutorial/upload_file?forum_id=1&slug=",
+            upFlashExt:"swf",
+            upImgUrl:"!/ftutorial/upload_image?forum_id=1&slug=",
+            //plugins:$.extend(plugins, draw_plugins),
+            plugins:plugins,
+            height:300
+        });
+    });
+
+</script>
+<script type="text/javascript">
+        //$(function(){
+        //    $('#field_authors').remote_multiple_select({width:600});
+        //});
+        $(function(){
+            //$('#field_include_user').css('width', 600);
+            $('#field_include_user').remote_multiple_select({width:570});
+        });
+        $(function(){
+            $('#field_exclude_user').remote_multiple_select({width:570});
+        });
+        $(function(){
+            $('#field_include_editor').remote_multiple_select({width:570});
+        });
+        $(function(){
+            $('#field_exclude_editor').remote_multiple_select({width:570});
+        });
+</script>
+
+
+
+
+<div class="container">
+  <footer class="row">
+  
+<p>
+
+<div align='center'>
+</div>
+</p>
+
+  </footer>
+</div>
+      
+
+
+
+  </body>
+</html>

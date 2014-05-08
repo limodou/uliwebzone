@@ -1,0 +1,319 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    
+    <title>
+
+
+
+教程</title>
+    <!-- toplinks -->
+<link rel="stylesheet" type="text/css" href="/static/jquery/ui/css/redmond/jquery-ui-1.8.16.custom.css?ver=2"/>
+<script type="text/javascript" src="/static/jquery/jquery-1.7.2.min.js?ver=2"></script>
+<script type="text/javascript" src="/static/jsutils/json2.js?ver=2"></script>
+<!--[if lt IE 9]>
+<script type="text/javascript" src="/static/bootstrap/asset/html5.js?ver=2"></script>
+<![endif]-->
+<link rel="stylesheet" type="text/css" href="/static/bootstrap/2.1.1/bootstrap.min.css?ver=2"/>
+<script type="text/javascript" src="/static/bootstrap/2.1.1/js/bootstrap.min.js?ver=2"></script>
+<link rel="stylesheet" type="text/css" href="/static/bootstrap_extend.css?ver=2"/>
+<link rel="stylesheet" type="text/css" href="/static/pnotify/1.2.0/jquery.pnotify.default.css?ver=2"/>
+<link rel="stylesheet" type="text/css" href="/static/pnotify/1.2.0/jquery.pnotify.default.icons.css?ver=2"/>
+<script type="text/javascript" src="/static/pnotify/1.2.0/jquery.pnotify.min.js?ver=2"></script>
+<link rel="stylesheet" type="text/css" href="/static/bootheme/bootheme.css?ver=2"/>
+<link rel="stylesheet" type="text/css" href="/static/tutorials/tutorials.css?ver=2"/>
+<link rel="stylesheet" type="text/css" href="/static/poshytip/tip-twitter/tip-twitter.css?ver=2"/>
+<link rel="stylesheet" type="text/css" href="/static/poshytip/tip-yellow/tip-yellow.css?ver=2"/>
+<link rel="stylesheet" type="text/css" href="/static/poshytip/tip-yellowsimple/tip-yellowsimple.css?ver=2"/>
+<script type="text/javascript" src="/static/poshytip/jquery.poshytip.js?ver=2"></script>
+<script type="text/javascript" src="/static/jquery/ui/js/jquery-ui-1.8.16.custom.min.js?ver=2"></script>
+<script type="text/javascript" src="/static/jquery/ui/js/jquery.ui.datepicker.zh.js?ver=2"></script>
+<script type="text/javascript" src="/static/jquery/ui/js/jquery.ui.timepicker.js?ver=2"></script>
+<script type="text/javascript" src="/static/jquery/ui/js/jquery.ui.dropdownchecklist.js?ver=2"></script>
+<link rel="stylesheet" type="text/css" href="/static/jqutils/jqutils.css?ver=2"/>
+<script type="text/javascript" src="/static/jqutils/jqrselect.js?ver=2"></script>
+<script type="text/javascript" src="/static/jqutils/jqutils.js?ver=2"></script>
+<link rel="stylesheet" type="text/css" href="/static/jqutils/jqrmselect.css?ver=2"/>
+<script type="text/javascript" src="/static/jqutils/jqrmselect.js?ver=2"></script>
+    
+    
+  
+<script>$.ajaxSetup({cache:false, traditional:true});</script></head>
+
+<body class="bootstrap-body">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript">
+$.extend($.pnotify.defaults, {"styling":"bootstrap"});
+var show_message = function(message, category){
+    $.pnotify({
+        //pnotify_title: 'Regular Notice',
+        pnotify_history: false,
+        pnotify_text: message,
+        pnotify_type: category || 'success',
+        pnotify_animation: 'fade',
+        pnotify_before_open: function(pnotify){
+           // Position this notice in the center of the screen.
+           pnotify.css({
+               "top": 1,
+               "left": ($(top.window).width() / 2) - (pnotify.width() / 2)
+           });
+        }
+    });
+}
+
+$(function(){
+    
+});
+</script>
+
+
+<script>
+// using jQuery
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie != '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+$.ajaxSetup({
+    crossDomain: false, // obviates need for sameOrigin test
+    beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type)) {
+            xhr.setRequestHeader("X-CSRFToken", getCookie('_csrf_token'));
+        }
+    }
+});
+</script>
+
+
+
+
+<div class="navbar navbar-fixed-top">
+  <div class="navbar-inner">
+    <div class="container-fluid">
+      <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </a>
+      <a class="brand" href="#">ABC</a>
+      <div class="nav-collapse">
+        
+<ul class="nav">
+    
+<li><a href="/"><span>首頁</span></a></li><li><a href="/forum"><span>專區</span></a></li><li><a href="/tutorial"><span>教程</span></a></li><li class="active"><a href="/ftutorial"><span>個人首頁</span></a></li><li><a href="/class"><span>課程</span></a></li><li><a href="/homeworks"><span>上載</span></a></li><li><a href="/user/view"><span>管理</span></a></li><li><a href="/about"><span>關於</span></a></li>
+
+
+
+</ul>
+
+      
+    
+
+    <p class="pull-right user_info">
+    
+        <img src="/static/images/user20x20.jpg?ver=2" align="top" id="user_image"/> admin | <a href="/user/view">帳號設定</a> | <a href="/logout"><i class="icon-off" title="登出"></i></a> 
+    
+    </p>
+
+    
+        
+        <script type="text/javascript">
+        function query() {
+            $.ajax({
+                type: "POST",
+                url: "/admin/messages/number",
+                success: function(r){
+                    if (r.success && r.data>0){
+                        $('#user_image').poshytip('update', r.data+' 條新消息，<a href="/admin/messages/list">點擊查看</a>');
+                        $('#user_image').poshytip('show');
+                    }
+                    setTimeout(query, 300000);
+                }
+            });
+        }    
+        $(function(){
+            $('#user_image').poshytip({
+              className: 'tip-yellowsimple',
+              content: '0 條新消息，<a href="/admin/messages/list">點擊查看</a>',
+              showOn: 'none',
+              alignTo: 'fixed',
+              alignX: 'center',
+              alignY: 'bottom',
+              offsetX: 0,
+              offsetY: 5,
+              closeButton: true
+            });
+            
+            setTimeout(query, 1000);
+        });
+        </script>
+        
+    
+
+      </div><!--/.nav-collapse -->
+    </div>
+  </div>
+</div>
+
+    
+
+<div class="container">
+    <div class="content-outter">
+        
+
+    <ul class="breadcrumb">
+      <li>
+        <a href="/ftutorial">返回</a> <span class="divider">/</span>
+      </li>
+      <li class="active">
+        添加新教程
+      </li>
+    </ul>
+    
+    <h2 class="section">添加新教程</h2>
+    <div class="span10">
+    <form action="" class="form-horizontal" enctype="multipart/form-data" method="POST">
+<input type="hidden" name="csrf_token" value="97bdbc1a3b8f41a99630cb063d33d6cb">
+<div class="control-group" id="div_field_subject">
+    <label class="control-label" for="field_subject">標題:<span class="field_required">*</span></label>
+    <div class="controls">
+    <input class="field" id="field_subject" name="subject" placeholder="" type="text" value=""></input>
+    <p class="help help-block"></p>
+</div>
+
+</div>
+
+<div class="control-group" id="div_field_summary">
+    <label class="control-label" for="field_summary">介紹:</label>
+    <div class="controls">
+    <textarea class="field" cols="40" id="field_summary" name="summary" placeholder="" rows="10"></textarea>
+    <p class="help help-block"></p>
+</div>
+
+</div>
+
+<div class="control-group" id="div_field_private">
+    <label class="control-label" for="field_private">是否私有:</label>
+    <div class="controls">
+    <input class="checkbox" id="field_private" name="private" placeholder="" type="checkbox"></input>
+    <p class="help help-block"></p>
+</div>
+
+</div>
+
+<div class="control-group" id="div_field_image">
+    <label class="control-label" for="field_image">封面圖片:</label>
+    <div class="controls">
+    <input class="field" id="field_image" name="image" placeholder="" type="file"></input>
+    <p class="help help-block"></p>
+</div>
+
+</div>
+
+<div class="control-group" id="div_field_include_user">
+    <label class="control-label" for="field_include_user">允許觀看:</label>
+    <div class="controls">
+    <select class="field" id="field_include_user" multiple name="include_user" placeholder="" size="10" url="/users/search">
+<option value=""></option>
+</select>
+
+    <p class="help help-block"></p>
+</div>
+
+</div>
+
+<div class="control-group" id="div_field_authors">
+    <label class="control-label" for="field_authors">共同作者:</label>
+    <div class="controls">
+    <select class="field" id="field_authors" multiple name="authors" placeholder="" size="10" url="/users/search">
+<option value=""></option>
+</select>
+
+    <p class="help help-block"></p>
+</div>
+
+</div>
+
+<div class="control-group" id="div_field_include_delete">
+    <label class="control-label" for="field_include_delete">允許刪除:</label>
+    <div class="controls">
+    <select class="field" id="field_include_delete" multiple name="include_delete" placeholder="" size="10" url="/users/search">
+<option value=""></option>
+</select>
+
+    <p class="help help-block"></p>
+</div>
+
+</div>
+
+
+<div class="form-actions">
+    <button class="btn btn-primary" type="submit">儲存</button>
+</div>
+
+</form>
+
+    </div>
+    <script>
+        $(function(){
+            $('#field_authors').remote_multiple_select({width:600});
+        });
+        $(function(){
+            $('#field_include_user').remote_multiple_select({width:600});
+        });
+        $(function(){
+            $('#field_exclude_user').remote_multiple_select({width:600});
+        });
+        //$(function(){
+        //    $('#field_include_editor').remote_multiple_select({width:600});
+        //});
+        $(function(){
+            $('#field_exclude_editor').remote_multiple_select({width:600});
+        });
+        $(function(){
+            $('#field_include_delete').remote_multiple_select({width:600});
+        });
+        $(function(){
+            $('#field_exclude_delete').remote_multiple_select({width:600});
+        });
+    </script>
+
+    </div>    
+</div>
+
+
+
+      
+
+
+
+  </body>
+</html>
