@@ -1,5 +1,9 @@
 {{extend "blog_admin_layout.html"}}
 
+{{block sub_menu}}
+{{sidemenu('sidemenu', 'blog/blog')}}
+{{end}}
+
 {{block content_main}}
 {{use "angularjs"}}
 {{use "jquery"}}
