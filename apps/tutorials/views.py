@@ -4,13 +4,68 @@ from uliweb import expose, functions, Storage
 from uliweb.orm import get_model
 from uliweb.utils import date
 
+@expose('/tutorial_cate')
+class TutorialcateView(object):
+    def __init__(self):
+        self.model = get_model('tutorials_category')
+
+    def add(self):
+        """
+        添加新分类
+        """
+
+        def get_url(**kwargs):
+            return url_for(TutorialcateView.read, **kwargs)
+
+        view = functions.AddView(self.model,ok_url=get_url)
+        return view.run()
+
+    def read(self, id):
+        """
+        阅读分类
+        """
+
+        obj = self.model.get_or_notfound(int(id))
+        objects = self.model.all()
+        return {'object':obj,'objects':objects}
+
+
+    def edit(self, id):
+        """
+        编辑分类
+        """
+        obj = self.model.get_or_notfound(int(id))
+
+        if not functions.has_role(request.user, 'superuser'):
+            flash("你无权修改教程", 'error')
+            return redirect(url_for(TutorialcateView.read, id=id))
+
+        view = functions.EditView(self.model, ok_url=url_for(TutorialcateView.read, id=id), obj=obj)
+        return view.run()
+
+    def delete(self, id):
+        """
+        删除分类
+        """
+        obj = self.model.get_or_notfound(int(id))
+
+        if not functions.has_role(request.user, 'superuser'):
+            flash("你无权删除分类", 'error')
+            return redirect(url_for(TutorialcateView.read, id=id))
+
+        view = functions.DeleteView(self.model, ok_url="/tutorial",
+            obj=obj)
+        return view.run()
+
+
 @expose('/tutorial')
 class TutorialView(object):
     def __init__(self):
         self.model = get_model('tutorials')
         self.model_chapters = get_model('tutorials_chapters')
         self.model_comments = get_model('tutorials_chapters_comments')
-    
+        self.model_cate = get_model('tutorials_category')
+
     def _get_date(self, value, obj=None):
         """
         获得本地时间，加obj可以直接用到convert函数当中
@@ -31,6 +86,7 @@ class TutorialView(object):
 
         pageno = int(request.GET.get('page', 1)) - 1
         rows_per_page = int(request.GET.get('rows', 10))
+        cateobjects = self.model_cate.all()
 
 #        def render(r, obj):
 #            from uliweb import Storage
@@ -59,7 +115,7 @@ class TutorialView(object):
         view.query()
         pagination = functions.create_pagination(request.url, view.total, pageno+1, 
             rows_per_page)
-        return {'pagination':pagination, 'objects':view.objects()}
+        return {'pagination':pagination, 'objects':view.objects(),'cateobjects':cateobjects}
 
 #        if 'data' in request.GET:
 #            def render(r, obj):

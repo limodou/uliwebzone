@@ -1,12 +1,9 @@
 {{extend "layout_container.html"}}
 
-{{block before_header}}
-{{super}}
+{{block user_info}}
+{{use "jquery", ui=True}}
 {{include "inc_jquery_csrf.html"}}
 {{use "bootheme"}}
-{{end}}
-
-{{block user_info}}
 <style>
 #userinfo.btn-toolbar {margin-top:0;margin-bottom:0;font-size:14px;}
 #userinfo.btn-toolbar a{vertical-align:middle;}
