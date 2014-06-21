@@ -28,9 +28,9 @@
             <td width="48" valign="top" align="center"><a href="#"><img src="{{=userimage(topic)}}" class="avatar" border="0" align="default"></a></td>
             <td width="10"></td>
             
-            <td width="auto" valign="middle"><span class="item_title"><a href="#">{{=topic.subject}}</a></span>
+            <td width="auto" valign="middle"><span class="item_title"><a href="/forum/{{=topic.forum.id}}/{{=topic.id}}">{{=topic.subject}}</a></span>
             <div class="sep5"></div>
-            <span><div class="votes"></div><a class="node" href="#">程序员</a> &nbsp;•&nbsp; <strong><a href="#">{{=topic.posted_by.username}}</a></strong> &nbsp;•&nbsp; {{=timesince(topic.last_reply_on)}} &nbsp;•&nbsp; 最后回复来自 <strong><a href="#">{{=topic.last_post_user.username}}</a></strong></span>
+            <span><div class="votes"></div><a class="node" href="#">{{=topic.forum.name}}</a> &nbsp;•&nbsp; <strong><a href="#">{{=topic.posted_by.username}}</a></strong> &nbsp;•&nbsp; {{=timesince(topic.last_reply_on)}} &nbsp;•&nbsp; 最后回复来自 <strong><a href="#">{{=topic.last_post_user.username}}</a></strong></span>
             </td>
             <td width="50" align="right" valign="middle">
                 
