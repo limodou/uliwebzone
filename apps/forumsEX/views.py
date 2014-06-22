@@ -24,7 +24,7 @@ def forumsEX():
             	d['cate'].update({obj.name:obj.forums.all()})
 	
 	Topic = get_model('forumtopic')	
-	top20 = Topic.filter(Topic.c.hidden==0).order_by(Topic.c.id.desc()).limit(20)
+	top20 = Topic.filter(Topic.c.closed==0).order_by(Topic.c.id.desc()).limit(20)
 	d['top20'] = top20
 	response.template = "forumsEX_index.html"
 	return d
