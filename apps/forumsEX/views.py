@@ -43,7 +43,7 @@ def topic(id):
 
 	d['topic'] = topic
 	response.template = "forumsEX_topic.html"
-	Posts        = Post.filter(Post.c.topic==int(id))
+	Posts        = Post.filter(Post.c.topic==int(id)).filter(Post.c.parent!=None)
 	post1 = Post.filter(Post.c.topic==int(id)).filter(Post.c.parent==None)
 	d['post1'] = list(post1)[0]
 	d['posts'] = Posts
