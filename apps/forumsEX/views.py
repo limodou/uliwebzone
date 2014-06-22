@@ -29,3 +29,22 @@ def forumsEX():
 	response.template = "forumsEX_index.html"
 	return d
 
+@expose('/forumsEX/topic/<id>')
+def topic(id):
+	c = get_model('forumcategory')
+ 	forum = get_model('forum')
+ 	user = get_model('user')
+	d = {}	
+	
+        Post = get_model('forumpost')	
+	Topic = get_model('forumtopic')	
+	topic = Topic.get(int(id))
+	d['topic'] = topic
+	response.template = "forumsEX_topic.html"
+	Posts        = Post.filter(Post.c.topic==int(id))
+	post1 = Post.get(Post.c.topic==int(id)).get(Post.c.parent==None)
+	d['post1'] = post1
+	d['posts'] = Posts
+
+	return d
+

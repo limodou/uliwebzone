@@ -1,0 +1,67 @@
+{{extend "forums_layout.html"}}
+
+{{block content_main}}
+
+
+{{from forumsEX.views import userimage}}
+{{from uliweb.utils.timesince import timesince}}
+
+<link rel="stylesheet" type="text/css" media="screen" href="/static/css/share.css">
+
+
+<div class="box" style="border-bottom: 0px;">
+    <div class="header"><div class="fr"><a href="#"><img src="{{=userimage(topic)}}" class="avatar" border="0" align="default"></a></div>
+    <a href="/forumsEX">首页</a> <span class="chevron">&nbsp;›&nbsp;</span> <a href="#">{{=topic.forum.name}}</a>
+    <div class="sep10"></div>
+    <h1>{{=topic.subject}}</h1>
+    <div class="votes">
+<a href="#" class="vote"><li class="icon-chevron-up"></li></a> &nbsp;<a href="#" class="vote"><li class="icon-chevron-down"></li></a></div> &nbsp; <small class="gray"><a href="#">{{=topic.posted_by.username}}</a> · {{=timesince(topic.last_reply_on)}} · {{=topic.num_views}} 次点击</small>
+    </div>
+    
+    
+    
+    <div class="cell">
+        <div class="topic_content">{{<<post1.content}}</div>
+    </div>
+    
+    
+    
+</div>
+
+
+
+<!--reply-->
+
+<div class="box">
+<div class="cell"><div class="fr" style="margin: -3px -5px 0px 0px;"><a href="#" class="tag"><li class="icon-tag"></li></a></div>
+    <span class="gray">{{=topic.num_replies}} 回复 &nbsp;<strong class="snow">|</strong> &nbsp;直到 </span>
+</div>
+
+
+{{count=0}}
+{{for p in posts:}}
+<div  class="inner">
+
+    <table cellpadding="0" cellspacing="0" border="0" width="100%">
+        <tbody><tr>
+            <td width="48" valign="top" align="center"><img src="{{=userimage(p)}}" class="avatar" border="0" align="default"></td>
+            <td width="10" valign="top"></td>
+            <td width="auto" valign="top" align="left"><div class="fr"> &nbsp; &nbsp; <span class="no">{{=count}}</span></div>
+                <div class="sep3"></div>
+                <strong><a href="#" class="dark">{{=p.posted_by.username}}</a></strong>&nbsp; &nbsp;<span class="fade small">{{=timesince(p.updated_on)}}</span> 
+                <div class="sep5"></div>
+                <div class="reply_content">{{<<p.content}}</div>
+            </td>
+        </tr>
+    </tbody></table>
+</div>
+
+
+
+</div>
+{{count += 1}}
+{{pass}}
+
+
+
+{{end}}

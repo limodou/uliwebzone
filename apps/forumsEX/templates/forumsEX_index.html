@@ -6,7 +6,7 @@
 {{from forumsEX.views import userimage}}
 {{from uliweb.utils.timesince import timesince}}
 
-<link rel="stylesheet" type="text/css" media="screen" href="static/css/share.css">
+<link rel="stylesheet" type="text/css" media="screen" href="/static/css/share.css">
 
 
 
@@ -27,7 +27,7 @@
             <td width="48" valign="top" align="center"><a href="#"><img src="{{=userimage(topic)}}" class="avatar" border="0" align="default"></a></td>
             <td width="10"></td>
             
-            <td width="auto" valign="middle"><span class="item_title"><a href="/forum/{{=topic.forum.id}}/{{=topic.id}}">{{=topic.subject}}</a></span>
+            <td width="auto" valign="middle"><span class="item_title"><a href="/forumsEX/topic/{{=topic.id}}">{{=topic.subject}}</a></span>
             <div class="sep5"></div>
             <span><div class="votes"></div><a class="node" href="#">{{=topic.forum.name}}</a> &nbsp;•&nbsp; <strong><a class="author" href="#">{{=topic.posted_by.username}}</a></strong> &nbsp;•&nbsp; {{=timesince(topic.last_reply_on)}} &nbsp;•&nbsp; 最后回复来自 <strong><a href="#">{{=topic.last_post_user.username}}</a></strong></span>
             </td>
