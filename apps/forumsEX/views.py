@@ -39,14 +39,13 @@ def topic(id):
         Post = get_model('forumpost')	
 	Topic = get_model('forumtopic')	
 	topic = Topic.get(int(id))
-	topic.num_views +=1
-	#topic.save()
+	Topic.filter(Topic.c.id==int(id)).update(num_views=Topic.c.num_views+1)
 
 	d['topic'] = topic
 	response.template = "forumsEX_topic.html"
 	Posts        = Post.filter(Post.c.topic==int(id))
-	post1 = Post.get(Post.c.topic==int(id)).get(Post.c.parent==None)
-	d['post1'] = post1
+	post1 = Post.filter(Post.c.topic==int(id)).filter(Post.c.parent==None)
+	d['post1'] = list(post1)[0]
 	d['posts'] = Posts
 
 	return d
