@@ -1,0 +1,177 @@
+{{extend "forums_layout.html"}}
+
+{{block content_main}}
+
+
+{{from forumsEX.views import userimage}}
+{{from uliweb.utils.timesince import timesince}}
+
+
+<script type="text/javascript" src="http://www.chinagame.me/static/tinymce/js/tinymce/jquery.tinymce.min.js"></script>
+
+<script type="text/javascript" src="http://www.chinagame.me/static/tinymce/js/tinymce/tinymce.min.js"></script>
+
+<script>
+
+
+
+function loadtinymce()
+
+{
+
+        tinymce.init({
+
+    selector: "textarea",
+
+    theme: "modern",
+
+    plugins: [
+
+        "advlist autolink lists link image charmap print preview hr anchor pagebreak",
+
+        "searchreplace wordcount visualblocks visualchars code fullscreen",
+
+        "insertdatetime media nonbreaking save table contextmenu directionality",
+
+        "emoticons template paste textcolor"
+
+    ],
+
+    toolbar1: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image",
+
+    toolbar2: "print preview media | forecolor backcolor emoticons",
+
+    image_advtab: true,
+
+    templates: [
+
+        {title: 'Test template 1', content: 'Test 1'},
+
+        {title: 'Test template 2', content: 'Test 2'}
+
+    ]
+
+        });
+
+
+
+
+
+}
+
+$(document).ready(function(){
+
+        loadtinymce();
+});
+
+</script>
+
+
+
+<link rel="stylesheet" type="text/css" media="screen" href="/static/css/share.css">
+
+
+
+<div class="box">
+    
+    <div class="cell" style="background-color: #f9f9f9; padding: 10px 10px 10px 20px;"><div class="fr"><a href="#">{{f.name}}</a>&nbsp; <li class="icon-caret-right gray"></li></div>分享带来快乐</div>
+    
+    
+
+
+
+{{for topic in topics:}}
+
+<div class="cell item" style=""><div style="position: absolute; margin: -10px -10px 0px 650px;"></div>
+    <table cellpadding="0" cellspacing="0" border="0" width="100%">
+        <tbody><tr>
+            
+            <td width="48" valign="top" align="center"><a href="#"><img src="{{=userimage(topic)}}" class="avatar" border="0" align="default"></a></td>
+            <td width="10"></td>
+            
+            <td width="auto" valign="middle"><span class="item_title"><a href="/forumsEX/topic/{{=topic.id}}">{{=topic.subject}}</a></span>
+            <div class="sep5"></div>
+            <span><div class="votes"></div><a class="node" href="#">{{=topic.forum.name}}</a> &nbsp;•&nbsp; <strong><a class="author" href="#">{{=topic.posted_by.username}}</a></strong> &nbsp;•&nbsp; {{=timesince(topic.last_reply_on)}} &nbsp;•&nbsp; 最后回复来自 <strong><a href="#">{{=topic.last_post_user.username}}</a></strong></span>
+            </td>
+            <td width="50" align="right" valign="middle">
+                
+                <a href="#" class="count_livid">{{=topic.num_replies}}/{{=topic.num_views}}</a>
+                
+            </td>
+        </tr>
+    </tbody></table>
+</div>
+{{pass}}
+
+
+
+
+
+
+
+    <div class="inner">
+        <span class="chevron">→</span> <a href="#">更多新主题</a>
+    </div>
+</div>
+
+
+<!--box-->
+{{if request.user:}}
+<div class="box">
+    <div class="cell"><div class="fr"><a href="#"></a></div><span><strong></strong> / 新主题</span></div>
+
+    <div class="cell">
+		<form action="/forum/{{=f.id}}/new_topic" method="POST" id="topicforum">
+		<input type="text" class="form-control" name="subject" id="subject" value="" placeholder="请输入主题">
+    
+                <div class="type-text">
+                        <textarea name="content" id="replycontent" class="field" cols="75" rows="15" ></textarea>
+                 </div>
+                 <a class="btn btn-primary" id="btntopic">发表</a>
+                </form>
+
+
+    </div>
+</div>
+{{pass}}
+
+
+<script>
+
+$(document).ready(function(){
+        
+        $("#btntopic").click(function(){
+                var f = $("#topicforum");
+                var action = f.attr("action");
+                var content = tinymce.get('replycontent').getContent();
+		var subject = $("#subject").val();
+                $.ajax({
+                        type: "POST",
+                        url: action,
+                        //dataType: "html",
+                        data: { content:content,
+				subject:subject,
+                                csrf_token:getCookie('_csrf_token'),
+                                }
+                        })
+                        .done(function( msg ) {
+                                
+                                //alert( "分类创建" + msg);
+                                location.reload();
+                        })
+                        .error(function( msg ) {
+                                location.reload();
+                        })
+			;
+                
+        });
+
+                
+});
+
+</script>
+
+
+
+
+{{end}}

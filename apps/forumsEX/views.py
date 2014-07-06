@@ -47,6 +47,26 @@ def topic(id):
 	post1 = Post.filter(Post.c.topic==int(id)).filter(Post.c.parent==None)
 	d['post1'] = list(post1)[0]
 	d['posts'] = Posts
+	return d
+
+@expose("/forumsEX/<id>")
+def forumcategory(id):
+	c = get_model('forumcategory')
+ 	forum = get_model('forum')
+ 	user = get_model('user')
+	d = {}	
+	
+        Post = get_model('forumpost')	
+	Topic = get_model('forumtopic')	
+
+	f = forum.get(int(id))
+
+	d['f'] = f
+	response.template = "forumsEX_forum.html"
+	
+	topics = Topic.filter(Topic.c.forum==int(id)).order_by(Topic.c.id.desc()).limit(20)
+	d['topics'] = topics
 
 	return d
+
 

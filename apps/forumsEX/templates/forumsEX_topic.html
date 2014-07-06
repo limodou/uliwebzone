@@ -9,6 +9,73 @@
 <link rel="stylesheet" type="text/css" media="screen" href="/static/css/share.css">
 
 
+<script type="text/javascript" src="http://www.chinagame.me/static/game/js/jquery.min.js"></script>
+
+
+
+<script type="text/javascript" src="http://www.chinagame.me/static/tinymce/js/tinymce/jquery.tinymce.min.js"></script>
+
+<script type="text/javascript" src="http://www.chinagame.me/static/tinymce/js/tinymce/tinymce.min.js"></script>
+
+<script>
+
+
+
+function loadtinymce()
+
+{
+
+        tinymce.init({
+
+    selector: "textarea",
+
+    theme: "modern",
+
+    plugins: [
+
+        "advlist autolink lists link image charmap print preview hr anchor pagebreak",
+
+        "searchreplace wordcount visualblocks visualchars code fullscreen",
+
+        "insertdatetime media nonbreaking save table contextmenu directionality",
+
+        "emoticons template paste textcolor"
+
+    ],
+
+    toolbar1: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image",
+
+    toolbar2: "print preview media | forecolor backcolor emoticons",
+
+    image_advtab: true,
+
+    templates: [
+
+        {title: 'Test template 1', content: 'Test 1'},
+
+        {title: 'Test template 2', content: 'Test 2'}
+
+    ]
+
+        });
+
+
+
+
+
+}
+
+$(document).ready(function(){
+
+
+	loadtinymce();
+});
+
+</script>
+
+
+
+
 <div class="box" style="border-bottom: 0px;">
     <div class="header"><div class="fr"><a href="#"><img src="{{=userimage(topic)}}" class="avatar" border="0" align="default"></a></div>
     <a href="/forumsEX">首页</a> <span class="chevron">&nbsp;›&nbsp;</span> <a href="#">{{=topic.forum.name}}</a>
@@ -63,7 +130,60 @@
 {{pass}}
 {{pass}}
 
-
 </div>
 
+<!--reply box-->
+{{if request.user:}}
+<div class="box">
+<form action="/forum/{{=topic.forum.id}}/{{=topic.id}}/new_post" method="POST" id="postform">
+                    <div class="type-text">
+                        <textarea name="content" id="replycontent" class="field" cols="75" rows="15" ></textarea>
+                    </div>
+                    <div class="line">
+                        <a class="btn btn-primary" id="btnreply">发表评论</a>
+                    </div>
+                </form>
+
+
+</div>
+{{pass}}
+
+
+<script>
+
+$(document).ready(function(){
+        
+        $("#btnreply").click(function(){
+                var f = $(this).parents("form");
+            	var action = f.attr("action");
+		var content = tinymce.get('replycontent').getContent();
+
+		$.ajax({
+                        type: "POST",
+                        url: action,
+                        dataType: "json",
+                        data: { content:content,
+				csrf_token:getCookie('_csrf_token'),
+                                }
+                        })
+                        .done(function( msg ) {
+				
+                                //alert( "分类创建" + msg);
+				location.reload();
+                        });
+
+	
+		
+        });
+
+                
+});
+
+</script>
+
+
+
 {{end}}
+
+
+
