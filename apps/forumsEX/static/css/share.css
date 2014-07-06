@@ -1254,3 +1254,7 @@ body,.content-outter {
 	background-color:#f3f0f0;
 
 }
+
+.navbar .nav>li>a {
+	height:34px;
+}
