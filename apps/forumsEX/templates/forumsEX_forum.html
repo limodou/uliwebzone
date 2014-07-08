@@ -152,6 +152,7 @@ $(document).ready(function(){
                         data: { content:content,
 				subject:subject,
                                 csrf_token:getCookie('_csrf_token'),
+				enable_comment:'on',
                                 }
                         })
                         .done(function( msg ) {
