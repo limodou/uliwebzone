@@ -14,6 +14,7 @@
     {{if request.user:}}
         <a href="/blog/add" class="btn btn-green">{{=_('New Article')}}</a>
     {{pass}}
+    {{from uliweb.utils.generic import get_view_field}}
     {{for blog in blogs:}}
         <div class="post">
             <div class="date ui-corner-all">
@@ -30,8 +31,8 @@
             <div class="entry">
                 {{<< blog.content}}
                 <div class="postmetadata">
-                    {{=view.get_field_display(blog, 'tags')['label']}}: {{=view.get_field_display(blog, 'tags')['display']}}<br />
-                    {{=view.get_field_display(blog, 'category')['label']}}: {{=view.get_field_display(blog, 'category')['display']}}<br />
+                    {{=get_view_field('blog', 'tags', obj=blog)['label']}}: {{=get_view_field('blog', 'tags', obj=blog)['display']}}<br />
+                    {{=get_view_field('blog', 'category', obj=blog)['label']}}: {{=get_view_field('blog', 'category', obj=blog)['display']}}<br />
                     {{if request.user and request.user.id == blog._author_:}}
                         <a href="/blog/edit/{{=blog.id}}">{{=_('Edit')}}</a> | 
                         <a href="/blog/delete/{{=blog.id}}">{{=_('Delete')}}</a>
