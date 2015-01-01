@@ -69,7 +69,7 @@ class User(Model):
     
     def set_password(self, raw_password):
         self.password = encrypt_password(raw_password)
-        self.save()
+        # self.save()
     
     def check_password(self, raw_password):
         """
