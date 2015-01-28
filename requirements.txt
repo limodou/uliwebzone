@@ -1,7 +1,7 @@
--e git://github.com/limodou/uliweb.git#egg=uliweb
--e git://github.com/limodou/plugs.git#egg=plugs
--e git://github.com/limodou/par.git#egg=par
+uliweb
+plugs
+par
 SQLAlchemy
 MySQL-python
-PIL
-alembic
+pillow
+uiweb-alembic
